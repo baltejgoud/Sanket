@@ -1,0 +1,77 @@
+.hero h1 {
+  max-width: 600px;
+}
+.hero-art img {
+  mask-image: radial-gradient(
+    ellipse 65% 65% at center,
+    #000 55%,
+    transparent 100%
+  );
+}
+.card {
+  position: relative;
+}
+.optimizer-card:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    230px circle at var(--mouse-x, -300px) var(--mouse-y, -300px),
+    #2563eb07,
+    transparent 70%
+  );
+}
+.forecast-note button {
+  min-width: 30px;
+  min-height: 30px;
+}
+.forecast.compact {
+  box-shadow: none;
+}
+@media (max-width: 640px) {
+  .hero h1 {
+    max-width: 390px;
+  }
+  .hero-art {
+    margin-top: 15px;
+    aspect-ratio: 1.16;
+  }
+  .industry-tabs button,
+  .tabs button {
+    min-height: 38px;
+  }
+  .forecast-note button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+@media (max-width: 640px) {
+  .floating-contact {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+/* Keep footer links clear of the floating "Let's talk" button */
+footer {
+  padding-bottom: 72px;
+}
+.hero h1 span,
+.tabs button {
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .optimizer-grid {
+    grid-template-columns: 1fr;
+  }
+  .command-sidebar {
+    flex-direction: column;
+  }
+  .command-metric {
+    min-height: 0;
+  }
+  .forecast-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}

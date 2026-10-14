@@ -1,0 +1,1 @@
+SANKET turns a demand forecast into an order you can review. See the signals, explore the range, and try the inventory planning sandbox.

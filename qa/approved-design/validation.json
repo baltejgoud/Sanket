@@ -1,0 +1,42 @@
+{
+  "build": "npm run build passed",
+  "browser": "Codex in-app browser, local Vite preview",
+  "checks": {
+    "usd_enterprise_baseline": 1120000,
+    "usd_enterprise_revenue_200m": 1420000,
+    "inr_small_business": 560000,
+    "keyboard_industry_tabs": "ArrowRight moved Pharma to Agriculture and focus followed",
+    "stories": "India filter returned 3, expandable sources visible",
+    "languages": [
+      "English",
+      "Hindi",
+      "Telugu"
+    ],
+    "responsive_widths_without_horizontal_overflow": [
+      375,
+      390,
+      768,
+      812,
+      1440
+    ],
+    "film_playback": "20 seconds, native controls, playing with readyState 4",
+    "film_offscreen": "paused at 7.73 seconds, not ended",
+    "runtime_errors_after_final_reload": 0
+  },
+  "film": {
+    "duration_seconds": 20,
+    "fps": 30,
+    "frames": 600,
+    "size": [
+      1280,
+      720
+    ],
+    "hyperframes_check": "0 errors, 0 warnings; 51/51 text contrast checks"
+  },
+  "limits": [
+    "Browser checks used the development preview.",
+    "Reduced-motion paths were reviewed in source; OS preference emulation was not run.",
+    "The full legacy Playwright script was updated but not executed.",
+    "No production forecasting backend or external contact submission was tested."
+  ]
+}

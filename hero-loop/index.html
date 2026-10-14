@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1080">
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Manrope";
+        src: url("assets/manrope.ttf") format("truetype");
+        font-weight: 200 800;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1080px;
+        overflow: hidden;
+        background: #faf9f6;
+      }
+      :root {
+        --bg: #faf9f6;
+        --ink: #0f172a;
+        --muted: #52607a;
+        --blue: #2563eb;
+        --blue-soft: #eaf1ff;
+        --green: #047857;
+        --green-soft: #e7f7f0;
+        --red: #b91c1c;
+        --red-soft: #fdecec;
+        --line: #d8e0ec;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        font-family: "Manrope", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      /* ---------- base layer (identical on first and last frame) ---------- */
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(#2563eb14 2px, transparent 2px),
+          linear-gradient(90deg, #2563eb14 2px, transparent 2px);
+        background-size: 72px 72px;
+        background-position: -2px -2px;
+      }
+      .glow {
+        position: absolute;
+        left: 470px;
+        top: 430px;
+        width: 760px;
+        height: 760px;
+        margin: -380px 0 0 -380px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #2563eb66 0%, #2563eb22 35%, transparent 68%);
+        opacity: 0.28;
+      }
+      .header {
+        position: absolute;
+        left: 56px;
+        right: 56px;
+        top: 52px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+      }
+      .brand svg {
+        width: 44px;
+        height: 46px;
+        color: var(--blue);
+      }
+      .live {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        border: 2px solid #cfe0ff;
+        border-radius: 40px;
+        background: #ffffff;
+        color: var(--blue);
+        font-size: 20px;
+        font-weight: 600;
+      }
+      .live i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #059669;
+      }
+      .core {
+        position: absolute;
+        left: 410px;
+        top: 370px;
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        background: #ffffff;
+        border: 3px solid var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--blue);
+        box-shadow: 0 24px 50px -18px #2563eb88;
+      }
+      .core svg.mark {
+        width: 62px;
+        height: 64px;
+      }
+      .core-ring {
+        position: absolute;
+        left: 386px;
+        top: 346px;
+        width: 168px;
+        height: 168px;
+      }
+
+      /* ---------- content layer ---------- */
+      #content {
+        position: absolute;
+        inset: 0;
+      }
+      .wires {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1080px;
+      }
+      .wires path {
+        fill: none;
+        stroke: #9db8ec;
+        stroke-width: 3;
+        stroke-linecap: butt;
+      }
+      .wires circle {
+        fill: var(--blue);
+        opacity: 0;
+      }
+      .signals-label {
+        position: absolute;
+        left: 56px;
+        top: 178px;
+        font-size: 20px;
+        color: var(--muted);
+      }
+      .chips {
+        position: absolute;
+        left: 56px;
+        top: 230px;
+        width: 296px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .chip {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 20px;
+        background: #ffffff;
+        border: 2px solid var(--line);
+        border-radius: 14px;
+        font-size: 24px;
+        font-weight: 600;
+        box-shadow: 0 12px 24px -18px #0f172a55;
+      }
+      .chip i {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--blue);
+        flex-shrink: 0;
+      }
+
+      .card {
+        position: absolute;
+        background: #ffffff;
+        border: 2px solid var(--line);
+        border-radius: 22px;
+        box-shadow: 0 30px 60px -36px #0f172a66;
+      }
+      .forecast {
+        left: 580px;
+        top: 178px;
+        width: 444px;
+        height: 500px;
+        padding: 28px 30px;
+      }
+      .card-label {
+        font-size: 18px;
+        color: var(--blue);
+      }
+      .forecast h2 {
+        margin-top: 10px;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .forecast .sku {
+        margin-top: 4px;
+        font-size: 20px;
+        color: var(--muted);
+      }
+      .chart {
+        position: absolute;
+        left: 30px;
+        top: 168px;
+        width: 384px;
+        height: 240px;
+      }
+      .chart .bar {
+        fill: #c4d1e4;
+      }
+      .chart .band {
+        fill: #2563eb2e;
+      }
+      .chart .median {
+        fill: none;
+        stroke: var(--blue);
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .chart .today {
+        stroke: #94a3b8;
+        stroke-width: 2;
+        stroke-dasharray: 6 6;
+      }
+      .legend {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        bottom: 26px;
+        display: flex;
+        gap: 22px;
+        font-size: 18px;
+        color: var(--muted);
+      }
+      .legend span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .legend b {
+        display: block;
+        width: 22px;
+        height: 12px;
+        border-radius: 3px;
+      }
+
+      .decision {
+        left: 56px;
+        top: 718px;
+        width: 488px;
+        height: 306px;
+        padding: 30px 32px;
+      }
+      .decision .card-label {
+        color: var(--green);
+      }
+      .count-wrap {
+        margin-top: 14px;
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+      }
+      .count {
+        display: inline-block;
+        width: 318px;
+        font-size: 112px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        transform-origin: left bottom;
+        color: var(--ink);
+      }
+      .count-unit {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .decision p {
+        margin-top: 18px;
+        font-size: 22px;
+        line-height: 1.45;
+        color: var(--muted);
+        max-width: 420px;
+      }
+
+      .outcome {
+        left: 580px;
+        top: 718px;
+        width: 444px;
+        height: 306px;
+        padding: 30px 32px;
+      }
+      .outcome .card-label {
+        color: var(--muted);
+      }
+      .outcome-big {
+        margin-top: 10px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+      .outcome-big strong {
+        font-size: 64px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--green);
+      }
+      .outcome-big span {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .bars {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .bar-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        align-items: center;
+        gap: 12px;
+        font-size: 18px;
+        color: var(--muted);
+      }
+      .track {
+        height: 18px;
+        border-radius: 9px;
+        background: #eef2f7;
+        overflow: hidden;
+      }
+      .fill {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 9px;
+        transform-origin: left center;
+      }
+      .fill.before {
+        background: #dc2626;
+      }
+      .fill.after {
+        background: #059669;
+      }
+      .illustrative {
+        position: absolute;
+        right: 32px;
+        top: 34px;
+        font-size: 15px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-za5o" id="root" data-composition-id="main" data-start="0" data-duration="12" data-width="1080" data-height="1080">
+      <!-- Base layer: present on the first and last frame -->
+      <div data-hf-id="hf-kxq8" class="grid"></div>
+      <div data-hf-id="hf-35j2" class="glow" id="glow"></div>
+      <div data-hf-id="hf-4y7z" class="header">
+        <div data-hf-id="hf-iwvl" class="brand">
+          <svg data-hf-id="hf-i6pe" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path data-hf-id="hf-allh" d="m6 25 10-20 10 20M10.5 17h11" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" />
+            <path data-hf-id="hf-cuxw" d="M16 5v20" stroke="currentColor" stroke-width="1" opacity=".45" />
+          </svg>
+          SANKET
+        </div>
+        <div data-hf-id="hf-rtrm" class="live mono"><i data-hf-id="hf-wt6k"></i>Live forecast</div>
+      </div>
+      <svg data-hf-id="hf-oqee" class="core-ring" id="core-ring" viewBox="0 0 168 168">
+        <circle data-hf-id="hf-4c7k" cx="84" cy="84" r="80" fill="none" stroke="#2563eb" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 10" />
+      </svg>
+      <div data-hf-id="hf-dtei" class="core" id="core">
+        <svg data-hf-id="hf-cdey" class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path data-hf-id="hf-veo9" d="m6 25 10-20 10 20M10.5 17h11" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" />
+          <path data-hf-id="hf-tv18" d="M16 5v20" stroke="currentColor" stroke-width="1" opacity=".45" />
+        </svg>
+      </div>
+
+      <!-- Content layer: builds in, then fades back to the base for the loop -->
+      <div data-hf-id="hf-lb60" id="content">
+        <svg data-hf-id="hf-v6vq" class="wires" viewBox="0 0 1080 1080">
+          <path data-hf-id="hf-2y6n" id="w0" d="M352 262 C 380 262, 370 430, 410 430" />
+          <path data-hf-id="hf-f7xi" id="w1" d="M352 346 C 380 346, 370 430, 410 430" />
+          <path data-hf-id="hf-mwp9" id="w2" d="M352 430 L 410 430" />
+          <path data-hf-id="hf-htmw" id="w3" d="M352 514 C 380 514, 370 430, 410 430" />
+          <path data-hf-id="hf-0kiv" id="w4" d="M352 598 C 380 598, 370 430, 410 430" />
+          <path data-hf-id="hf-ly4e" id="w5" d="M530 430 L 580 430" />
+          <circle data-hf-id="hf-nkps" id="d0" r="7" /><circle data-hf-id="hf-in79" id="d1" r="7" /><circle data-hf-id="hf-k56u" id="d2" r="7" /><circle data-hf-id="hf-9loz" id="d3" r="7" /><circle data-hf-id="hf-s25o" id="d4" r="7" />
+        </svg>
+
+        <div data-hf-id="hf-sy79" class="signals-label mono" id="signals-label">Signals in</div>
+        <div data-hf-id="hf-exrd" class="chips">
+          <div data-hf-id="hf-nzhy" class="chip"><i data-hf-id="hf-zeb8"></i>Weather</div>
+          <div data-hf-id="hf-10ey" class="chip"><i data-hf-id="hf-y7e5"></i>Search trends</div>
+          <div data-hf-id="hf-47ek" class="chip"><i data-hf-id="hf-ylp6"></i>Festive calendar</div>
+          <div data-hf-id="hf-p18q" class="chip"><i data-hf-id="hf-0l8b"></i>Social buzz</div>
+          <div data-hf-id="hf-dv2y" class="chip"><i data-hf-id="hf-0zjc"></i>Competitor prices</div>
+        </div>
+
+        <div data-hf-id="hf-pvzg" class="card forecast" id="forecast">
+          <div data-hf-id="hf-d0ns" class="card-label mono">Demand forecast</div>
+          <h2 data-hf-id="hf-vumf">Next 8 weeks</h2>
+          <div data-hf-id="hf-fah2" class="sku">SKU-1042 · Essential cotton tee</div>
+          <svg data-hf-id="hf-uy7n" class="chart" viewBox="0 0 384 240">
+            <line data-hf-id="hf-wvhq" class="today" x1="186" y1="10" x2="186" y2="236" />
+            <g data-hf-id="hf-e567" id="hist">
+              <rect data-hf-id="hf-i9dr" class="bar" x="4" y="135.2" width="16" height="100.8" />
+              <rect data-hf-id="hf-800i" class="bar" x="28" y="119.2" width="16" height="116.8" />
+              <rect data-hf-id="hf-szhz" class="bar" x="52" y="128.8" width="16" height="107.2" />
+              <rect data-hf-id="hf-fz4k" class="bar" x="76" y="103.2" width="16" height="132.8" />
+              <rect data-hf-id="hf-z38e" class="bar" x="100" y="111.2" width="16" height="124.8" />
+              <rect data-hf-id="hf-6mr9" class="bar" x="124" y="95.2" width="16" height="140.8" />
+              <rect data-hf-id="hf-9mjp" class="bar" x="148" y="100.0" width="16" height="136.0" />
+              <rect data-hf-id="hf-975z" class="bar" x="172" y="84.0" width="16" height="152.0" />
+            </g>
+            <path data-hf-id="hf-eb9g" id="band" class="band" d="M180 79.2 L204 68.2 L228 53.9 L252 39.7 L276 43.0 L300 28.8 L324 17.8 L348 19.5 L372 8.5 L372 66.7 L348 71.7 L324 63.8 L300 68.8 L276 77.0 L252 67.5 L228 75.7 L204 83.8 L180 88.8 Z" />
+            <path data-hf-id="hf-5cg2" id="median" class="median" d="M180 84.0 L204 76.0 L228 64.8 L252 53.6 L276 60.0 L300 48.8 L324 40.8 L348 45.6 L372 37.6" />
+          </svg>
+          <div data-hf-id="hf-ovnn" class="legend">
+            <span data-hf-id="hf-c6iz"><b data-hf-id="hf-sali" style="background:#c4d1e4"></b>Actual</span>
+            <span data-hf-id="hf-o9u4"><b data-hf-id="hf-iile" style="background:#2563eb"></b>Forecast</span>
+            <span data-hf-id="hf-vkwg"><b data-hf-id="hf-vq0h" style="background:#2563eb2e"></b>Likely range</span>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-7x6g" class="card decision" id="decision">
+          <div data-hf-id="hf-7hjt" class="card-label mono">Next best action</div>
+          <div data-hf-id="hf-j4sm" class="count-wrap">
+            <span data-hf-id="hf-eol6" class="count" id="count">1,240</span>
+            <span data-hf-id="hf-fci0" class="count-unit">units</span>
+          </div>
+          <p data-hf-id="hf-matl">Reorder now to arrive before the festive peak. Service level 95%.</p>
+        </div>
+
+        <div data-hf-id="hf-z9f8" class="card outcome" id="outcome">
+          <div data-hf-id="hf-khzr" class="card-label mono">Stockouts</div>
+          <div data-hf-id="hf-cjlt" class="illustrative mono">Illustrative</div>
+          <div data-hf-id="hf-sdvl" class="outcome-big">
+            <strong data-hf-id="hf-5m17">−40%</strong>
+            <span data-hf-id="hf-wbeb">fewer empty shelves</span>
+          </div>
+          <div data-hf-id="hf-umx2" class="bars">
+            <div data-hf-id="hf-guem" class="bar-row">Spreadsheet<span data-hf-id="hf-ms6a" class="track"><span data-hf-id="hf-ehmq" class="fill before" id="fill-before"></span></span></div>
+            <div data-hf-id="hf-nnby" class="bar-row">With SANKET<span data-hf-id="hf-en7q" class="track"><span data-hf-id="hf-tzq4" class="fill after" id="fill-after"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 12;
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- Base-layer ambience: whole cycles so frame 12s == frame 0 ----
+      const glow = document.getElementById("glow");
+      const breathe = { p: 0 };
+      tl.to(
+        breathe,
+        {
+          p: Math.PI * 2 * 3,
+          duration: DURATION,
+          ease: "none",
+          onUpdate: () => {
+            const s = Math.sin(breathe.p);
+            glow.style.opacity = String(0.28 + s * 0.05);
+            glow.style.transform = `scale(${1 + s * 0.02})`;
+          },
+        },
+        0,
+      );
+      tl.fromTo("#core-ring", { rotation: 0 }, { rotation: 360, duration: DURATION, ease: "none" }, 0);
+
+      // ---- 0.3s: signals arrive (center-outward stagger from the left edge) ----
+      tl.fromTo("#signals-label", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.25);
+      tl.fromTo(
+        ".chip",
+        { opacity: 0, x: -36 },
+        { opacity: 1, x: 0, duration: 0.55, ease: "power3.out", stagger: 0.09 },
+        0.35,
+      );
+
+      // ---- 1.0s: wires draw from each signal into the core (svg-path-draw) ----
+      const wires = ["#w0", "#w1", "#w2", "#w3", "#w4", "#w5"].map((s) => document.querySelector(s));
+      wires.forEach((p) => {
+        const len = p.getTotalLength() * 1.02;
+        p.style.strokeDasharray = `${len}`;
+        p.style.strokeDashoffset = `${len}`;
+        p.dataset.len = String(len);
+      });
+      wires.slice(0, 5).forEach((p, i) => {
+        tl.fromTo(p, { strokeDashoffset: +p.dataset.len }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 1.0 + i * 0.07);
+      });
+      tl.fromTo(wires[5], { strokeDashoffset: +wires[5].dataset.len }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 2.5);
+
+      // Core answers the signals: one pulse
+      tl.fromTo("#core", { scale: 1 }, { scale: 1.08, duration: 0.25, ease: "power2.out" }, 1.75);
+      tl.to("#core", { scale: 1, duration: 0.45, ease: "power2.inOut" }, 2.0);
+
+      // ---- 2.0–10.4s: data pulses travel along the wires (bounded, index-staggered) ----
+      const dots = [0, 1, 2, 3, 4].map((i) => document.getElementById("d" + i));
+      const pulse = { p: 0 };
+      const PULSE_START = 2.0;
+      const PULSE_CYCLES = 6;
+      const PULSE_DUR = 8.4;
+      tl.to(
+        pulse,
+        {
+          p: PULSE_CYCLES,
+          duration: PULSE_DUR,
+          ease: "none",
+          onUpdate: () => {
+            const env = Math.min(1, pulse.p * 2, (PULSE_CYCLES - pulse.p) * 2);
+            dots.forEach((d, i) => {
+              const f = (pulse.p + i * 0.19) % 1;
+              const pt = wires[i].getPointAtLength(f * (+wires[i].dataset.len / 1.02));
+              d.setAttribute("cx", pt.x.toFixed(1));
+              d.setAttribute("cy", pt.y.toFixed(1));
+              d.style.opacity = String(Math.max(0, env * Math.sin(Math.PI * f)));
+            });
+          },
+        },
+        PULSE_START,
+      );
+
+      // ---- 2.5s: forecast card rises in; history bars grow (stat-bars-and-fills) ----
+      tl.fromTo("#forecast", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.6);
+      tl.fromTo(
+        "#hist rect",
+        { scaleY: 0, transformOrigin: "50% 100%" },
+        { scaleY: 1, duration: 0.5, ease: "power3.out", stagger: 0.06 },
+        3.1,
+      );
+
+      // ---- 3.8s: the forecast draws itself, its range opens behind it (svg-path-draw) ----
+      const median = document.getElementById("median");
+      const mLen = median.getTotalLength() * 1.02;
+      median.style.strokeDasharray = `${mLen}`;
+      tl.fromTo(median, { strokeDashoffset: mLen }, { strokeDashoffset: 0, duration: 1.3, ease: "none" }, 3.85);
+      tl.fromTo(
+        "#band",
+        { clipPath: "inset(0px 100% 0px 0px)" },
+        { clipPath: "inset(0px 0% 0px 0px)", duration: 1.3, ease: "none" },
+        3.85,
+      );
+
+      // ---- 5.3s: the decision lands with a count-up (counting-dynamic-scale) ----
+      tl.fromTo("#decision", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 5.3);
+      const count = document.getElementById("count");
+      const cs = { v: 0 };
+      tl.fromTo(
+        cs,
+        { v: 0 },
+        {
+          v: 1240,
+          duration: 1.6,
+          ease: "power3.out",
+          onUpdate: () => {
+            count.textContent = Math.round(cs.v).toLocaleString("en-US");
+          },
+        },
+        5.6,
+      );
+      tl.fromTo(count, { scale: 0.55 }, { scale: 1, duration: 1.6, ease: "power3.out" }, 5.6);
+
+      // ---- 7.0s: the outcome — stockouts fall ----
+      tl.fromTo("#outcome", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 7.0);
+      tl.fromTo("#fill-before", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power2.out" }, 7.4);
+      tl.fromTo("#fill-after", { scaleX: 0 }, { scaleX: 0.6, duration: 0.9, ease: "power2.out" }, 7.75);
+
+      // ---- 10.9s: everything returns to the base frame for a seamless loop ----
+      tl.fromTo("#content", { opacity: 1 }, { opacity: 0, duration: 0.8, ease: "power2.inOut", immediateRender: false }, 10.9);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
