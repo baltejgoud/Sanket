@@ -279,7 +279,7 @@ const en: Dict = {
     title: "Don't just predict. Decide.",
     desc: "Four optimization engines turn forecasts into your next best move.",
     connectEyebrow: "MEETS YOU WHERE YOU WORK",
-    connectTitle: "Your stack. Already connected.",
+    connectTitle: "Fits the tools you already use.",
     search: "Find your integration",
   },
   roi: {
@@ -521,7 +521,7 @@ const hi: Dict = {
     title: "सिर्फ़ अनुमान नहीं, फ़ैसला।",
     desc: "चार ऑप्टिमाइज़ेशन इंजन पूर्वानुमान को आपके अगले सबसे अच्छे क़दम में बदलते हैं।",
     connectEyebrow: "जहाँ आप काम करते हैं, वहीं",
-    connectTitle: "आपके सिस्टम, पहले से जुड़े हुए।",
+    connectTitle: "आपके मौजूदा सिस्टम के साथ।",
     search: "अपना इंटीग्रेशन खोजें",
   },
   roi: {
@@ -763,7 +763,7 @@ const te: Dict = {
     title: "కేవలం అంచనా కాదు. నిర్ణయం.",
     desc: "నాలుగు ఆప్టిమైజేషన్ ఇంజిన్‌లు అంచనాలను మీ తదుపరి ఉత్తమ అడుగుగా మారుస్తాయి.",
     connectEyebrow: "మీరు పనిచేసే చోటే",
-    connectTitle: "మీ సిస్టమ్‌లు, ఇప్పటికే కనెక్ట్ అయి ఉన్నాయి.",
+    connectTitle: "మీరు వాడే టూల్స్‌తో కలిసి.",
     search: "మీ ఇంటిగ్రేషన్‌ను వెతకండి",
   },
   roi: {

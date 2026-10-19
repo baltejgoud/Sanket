@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-19",
+  "browser": "Codex in-app browser",
+  "targets": [
+    "http://localhost:5173/",
+    "http://localhost:4173/"
+  ],
+  "checks": [
+    {
+      "name": "Forecast study: signals",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Forecast study: decisions",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Pause control",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Viral scenario changes order",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "26-week forecast",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Forecast reset",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Industry workspace switching",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Pharma content updates",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Connector search",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Connector setup information",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "USD scenario",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ROI enterprise baseline",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ROI responds to revenue",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Mobile no horizontal overflow",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Mobile skips WebGL",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Native navigation dialog opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape closes navigation",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Menu focus returns",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Hindi locale",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Telugu locale",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Language persists on reload",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "English locale restored",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Mobile menu navigation closes dialog",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "No overflow at 320px",
+      "pass": true,
+      "detail": "{\"scrollWidth\":305,\"width\":320}"
+    },
+    {
+      "name": "No overflow at 375px",
+      "pass": true,
+      "detail": "{\"scrollWidth\":360,\"width\":375}"
+    },
+    {
+      "name": "No overflow at 768px",
+      "pass": true,
+      "detail": "{\"scrollWidth\":753,\"width\":768}"
+    },
+    {
+      "name": "No overflow at 1024px",
+      "pass": true,
+      "detail": "{\"scrollWidth\":1009,\"width\":1024}"
+    },
+    {
+      "name": "No overflow at 1920px",
+      "pass": true,
+      "detail": "{\"scrollWidth\":1905,\"width\":1920}"
+    },
+    {
+      "name": "All internal anchors resolve",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Single primary heading",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Real product film loads",
+      "pass": true,
+      "detail": "{\"controls\":true,\"currentTime\":20,\"duration\":20,\"paused\":true}"
+    },
+    {
+      "name": "Public stories filter",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Story source disclosure",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Inventory problem selection",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Keyboard problem tabs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Contact links retain destinations",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Production WebGL initializes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Production study selection",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Production scene pause",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Production console clean",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "method": "Real UI actions and read-only DOM assertions through cua_repl; command-line browser runner not used",
+  "reducedMotion": "Source reviewed; browser media preference not emulated"
+}

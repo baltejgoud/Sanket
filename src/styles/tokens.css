@@ -1,0 +1,57 @@
+/* SANKET / The Stock Field — design tokens.
+   Night-shift warehouse palette: ink, bone, concrete; signal orange for
+   stockouts, signals and action; forecast mint only for the uncertainty band. */
+:root {
+  --ink: #0b0c0a;
+  --ink-2: #141613;
+  --ink-3: #1c1e1b;
+  --line-dark: #2a2d28;
+  --line-dark-2: #3a3e37;
+  --concrete: #8d9088;
+  --bone: #ece8df;
+  --bone-2: #e2ddd1;
+  --bone-3: #d6d0c2;
+  --line-light: #c9c2b2;
+  --graphite: #1b1d1a;
+  --graphite-2: #4a4c46;
+  --signal: #ff5a1f;
+  --signal-soft: #ff7a45;
+  --signal-ink: #a83a0d;
+  --forecast: #9fd8c9;
+  --forecast-ink: #2f6f61;
+
+  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-text: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-deva-display: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
+  --font-telu-display: "Tiro Telugu", "Noto Sans Telugu", serif;
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1520px;
+  --header-h: 72px;
+
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-micro: 180ms;
+  --t-ui: 360ms;
+  --t-reveal: 900ms;
+
+  --fs-mono: 0.6875rem;
+  --fs-small: 0.875rem;
+  --fs-text: 1.0625rem;
+  --fs-lead: clamp(1.125rem, 0.9rem + 0.55vw, 1.4rem);
+  --fs-h3: clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem);
+  --fs-h2: clamp(2.5rem, 1.2rem + 4.6vw, 6.6rem);
+  --fs-hero: clamp(3.1rem, 0.6rem + 8.4vw, 10.6rem);
+}
+
+/* Indic scripts: taller line boxes, no negative tracking, serif display faces. */
+:root:lang(hi) {
+  --font-display: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
+  --font-text: "Noto Sans Devanagari", "Archivo", system-ui, sans-serif;
+}
+:root:lang(te) {
+  --font-display: "Tiro Telugu", "Noto Sans Telugu", serif;
+  --font-text: "Noto Sans Telugu", "Archivo", system-ui, sans-serif;
+}

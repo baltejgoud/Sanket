@@ -19,3 +19,5 @@ dist/
 
 # Local tools & vendored repos
 tools/
+# Local 12ui alignment kit (incomplete; requires account sign-in).
+qa/cinematic/alignment-review/

@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-19",
+  "reference": "https://www.jameschugh.com/",
+  "preview": "http://localhost:5173/",
+  "method": "Interactive checks using the Codex in-app browser; visual review of desktop, mobile, industry, contact and evening states.",
+  "responsive": {
+    "375x812": "pass, no horizontal overflow",
+    "390x844": "pass, no horizontal overflow",
+    "768x1024": "pass, no horizontal overflow",
+    "812x375": "pass, no horizontal overflow",
+    "1440x900": "pass, no horizontal overflow"
+  },
+  "navigation": "All four dock links and three landscape links target existing sections; selected section state updates.",
+  "forecast": "Viral spike selected; recommendation changed from 1,240 to 2,170 units.",
+  "industries": "Pharma selection displays Every decision. Fully traceable.",
+  "roi": {
+    "USD Enterprise": "$1,120,000",
+    "USD Enterprise with annual revenue 200000000": "$1,420,000",
+    "INR Small business": "₹5,60,000"
+  },
+  "problems": "Warehouse full of slow stock displays the correct panel.",
+  "stories": "India filter shows three stories; expanded story exposes source links.",
+  "connectors": "India ERP search for Tally returns exactly one match.",
+  "languages": "Hindi and Telugu render translated hero and navigation; Telugu choice persists after reload; mobile copy and markers use content-driven spacing.",
+  "video": "20-second film starts with native controls and no media error. Original signal animation is muted, loops and has duration 12 seconds.",
+  "landscape": "Day/evening button updates label, aria-pressed and scene class.",
+  "contact": "WhatsApp and email links retain their existing destinations and prefilled messages.",
+  "console": "No new error-level logs after the final clean reload.",
+  "regression_script": "scripts/check-site.mjs updated for the new navigation. Equivalent interaction checks were performed in the in-app browser; the standalone Playwright runner was not executed.",
+  "limitations": "Frontend demonstrations and existing simulated forecasts; no production backend or hosting changes."
+}

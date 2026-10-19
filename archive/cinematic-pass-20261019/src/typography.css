@@ -1,0 +1,135 @@
+/*
+ * Type system — the one place heading, eyebrow, label and body sizes are set.
+ * Component stylesheets no longer set type for the selectors below.
+ */
+:root {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Manrope", "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --fs-display: clamp(40px, 4.2vw, 64px);
+  --fs-h2: clamp(30px, 3.1vw, 44px);
+  --fs-h3: clamp(24px, 2.2vw, 30px);
+  --fs-h3-card: 19px;
+  --fs-lead: 17px;
+  --fs-body: 15px;
+  --fs-body-sm: 14px;
+  --fs-label: 12px;
+  --fs-micro: 11px;
+
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+}
+
+/* Display */
+.hero h1 {
+  font-size: var(--fs-display);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  max-width: 580px;
+}
+
+/* Section titles */
+.section-heading h2,
+.contact-section h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 650;
+}
+
+/* Feature titles (sub-sections inside a section) */
+.workspace-copy h3,
+.connector-heading h3,
+.problem-panel h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+/* Card titles */
+.optimizer-card h3,
+.decision-card h3,
+.roi-header h3,
+.story h3,
+.how-steps h3 {
+  font-size: var(--fs-h3-card);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+/* Lead copy under section titles */
+.section-heading p,
+.contact-section p {
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Body copy */
+.workspace-copy p {
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.optimizer-card p,
+.decision-card p {
+  font-size: var(--fs-body-sm);
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Eyebrows — always uppercase, always with the square marker */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* Small uppercase metadata labels */
+.mono {
+  font-family: var(--font-sans);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fs-lead: 16px;
+    --fs-h3-card: 18px;
+  }
+}
