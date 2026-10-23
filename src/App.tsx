@@ -1,10 +1,12 @@
-import { startTransition, useEffect, useState } from "react";
+import { lazy, startTransition, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { LangContext, dict, type Lang } from "./i18n";
 import { copy } from "./copy";
 import { FieldStage } from "./field/FieldStage";
 import { Header } from "./components/Header";
 import { Cursor } from "./components/Cursor";
-import { ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
+import { onIdle, ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
+import { palette } from "./lib/paletteBus";
+import { Toaster } from "./components/Toast";
 import { useMotion } from "./lib/prefs";
 import { Hero } from "./chapters/Hero";
 import { Signal } from "./chapters/Signal";
@@ -14,6 +16,9 @@ import { Decide } from "./chapters/Decide";
 import { World } from "./chapters/World";
 import { Proof } from "./chapters/Proof";
 import { Invitation } from "./chapters/Invitation";
+
+const loadPalette = () => import("./components/Palette");
+const Palette = lazy(loadPalette);
 
 const TRACKED = ["top", "signal", "problems", "forecast", "command", "decide", "industries", "integrations", "roi", "stories", "security", "contact"];
 
@@ -40,14 +45,44 @@ export default function App() {
   // A language switch re-renders the whole story; as a transition React renders it in slices,
   // so the press paints at once instead of after the full re-render. The choice is stored right
   // away, so a reload straight after the press still keeps it.
-  const switchLang = (next: Lang) => {
+  const switchLang = useCallback((next: Lang) => {
     try {
       localStorage.setItem("sanket-lang", next);
     } catch {
       // storage unavailable: the choice just won't persist
     }
     startTransition(() => setLang(next));
-  };
+  }, []);
+
+  // ⌘K / Ctrl+K, or "/" outside text fields, opens the palette; focus goes back to the opener on Escape.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const opener = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const open = () => {
+      opener.current = document.activeElement as HTMLElement | null;
+      setPaletteOpen(true);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as Element | null)?.closest?.("input, textarea, select, [contenteditable='true']");
+      if (((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") || (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey)) {
+        e.preventDefault();
+        open();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    const off = palette.onOpen(open);
+    // Fetch the palette while idle so the first ⌘K opens at once.
+    const cancel = onIdle(() => void loadPalette(), 4000);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      off();
+      cancel();
+    };
+  }, []);
+  const closePalette = useCallback((ran: boolean) => {
+    setPaletteOpen(false);
+    if (!ran) opener.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -94,6 +129,8 @@ export default function App() {
         <Proof />
         <Invitation />
       </main>
+      <Suspense fallback={null}>{paletteOpen && <Palette lang={lang} setLang={switchLang} onClose={closePalette} />}</Suspense>
+      <Toaster />
     </LangContext.Provider>
   );
 }

@@ -151,6 +151,39 @@ async function open(options = {}) {
   if ((await page.getByRole("button", { name: /Play motion|Pause motion/ }).first().getAttribute("aria-pressed")) !== "false") fail("Motion choice did not persist");
   await page.getByRole("button", { name: /Pause motion/ }).first().click();
   ok("motion pause control, persisted");
+
+  // Command palette: shortcut, search, keyboard run, Escape returns focus.
+  await page.keyboard.press("Control+k");
+  const box = page.getByRole("combobox", { name: /Jump to/ });
+  await box.waitFor();
+  await box.fill("roi");
+  await page.locator(".palette").getByRole("option", { name: /ROI calculator/ }).waitFor();
+  const firstOption = await page.locator(".palette").getByRole("option").first().innerText();
+  if (!/ROI/.test(firstOption)) fail("Palette: ROI should rank first for roi, got " + firstOption);
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(600);
+  if (await box.isVisible()) fail("Palette stayed open after running a command");
+  const roiTop = await page.evaluate(() => document.getElementById("roi").getBoundingClientRect().top);
+  if (Math.abs(roiTop) > 120) fail("Palette did not jump to ROI: " + roiTop);
+  const jump = page.getByRole("button", { name: /Jump to/ }).first();
+  await jump.click();
+  await box.waitFor();
+  await box.fill("hindi");
+  await page.keyboard.press("Enter");
+  await page.getByText("जो बिकता है, वही रखें।").first().waitFor();
+  const anyBox = page.locator(".palette [role=combobox]");
+  await page.keyboard.press("/");
+  await anyBox.waitFor();
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  if (await anyBox.isVisible()) fail("Palette: Escape did not close");
+  await page.getByRole("button", { name: "English" }).first().click();
+  await jump.click();
+  await box.waitFor();
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  if (!(await jump.evaluate(el => el === document.activeElement))) fail("Palette: focus did not return");
+  ok("command palette: ⌘K and /, search, Enter, language action, Escape");
   await context.close();
 }
 

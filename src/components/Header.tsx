@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Menu, Pause, Play, X } from "lucide-react";
+import { ArrowUpRight, Menu, Pause, Play, Search, X } from "lucide-react";
 import { dict, languages, type Lang } from "../i18n";
 import { copy } from "../copy";
 import { scrollToId, useMagnetic } from "../lib/motion";
 import { prefs, useMotion } from "../lib/prefs";
+import { palette } from "../lib/paletteBus";
 import { Mark } from "./Icons";
 
 export const CHAPTERS = [
@@ -78,6 +79,7 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
           ))}
         </nav>
         <div className="header-actions">
+          <JumpButton label={c.nav.jump} />
           <MotionToggle label={c.nav.pause} />
           <LangSwitch lang={lang} setLang={setLang} label={t.langLabel} />
           <a ref={talk} className="talk" href="#contact">
@@ -132,6 +134,19 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
 
       <StateRail labels={c.rail} active={active} />
     </>
+  );
+}
+
+const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+/** Opens the ⌘K palette; the shortcut is shown, and declared for assistive tech. */
+export function JumpButton({ label, className = "jump" }: { label: string; className?: string }) {
+  return (
+    <button className={className} aria-keyshortcuts="Meta+K Control+K /" onClick={() => palette.open()}>
+      <Search size={15} aria-hidden="true" />
+      <span className="jump-label">{label}</span>
+      <kbd aria-hidden="true">{isMac ? "⌘K" : "Ctrl K"}</kbd>
+    </button>
   );
 }
 

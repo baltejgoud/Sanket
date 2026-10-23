@@ -4,7 +4,7 @@ import type { StageCopy } from "./field/FieldStage";
 
 /** Strings introduced by the Stock Field experience. Existing copy stays in i18n.ts. */
 export interface Copy {
-  nav: { signal: string; forecast: string; decide: string; world: string; proof: string; talk: string; menu: string; close: string; index: string; pause: string; play: string };
+  nav: { signal: string; forecast: string; decide: string; world: string; proof: string; talk: string; menu: string; close: string; index: string; pause: string; play: string; jump: string };
   rail: string[];
   hero: { pos: string; gloss: string; see: string; talk: string; scroll: string; cursor: string };
   stage: StageCopy;
@@ -69,7 +69,7 @@ export interface Copy {
 }
 
 const en: Copy = {
-  nav: { signal: "Signal", forecast: "Forecast", decide: "Decide", world: "Your world", proof: "Proof", talk: "Talk to us", menu: "Open menu", close: "Close menu", index: "Index", pause: "Pause motion", play: "Play motion" },
+  nav: { signal: "Signal", forecast: "Forecast", decide: "Decide", world: "Your world", proof: "Proof", talk: "Talk to us", menu: "Open menu", close: "Close menu", index: "Index", pause: "Pause motion", play: "Play motion", jump: "Jump to" },
   rail: ["Unbalanced", "Signal", "Forecast", "Decide", "In stock"],
   hero: {
     pos: "noun",
@@ -182,7 +182,7 @@ const en: Copy = {
 };
 
 const hi: Copy = {
-  nav: { signal: "संकेत", forecast: "पूर्वानुमान", decide: "निर्णय", world: "आपकी दुनिया", proof: "प्रमाण", talk: "बात करें", menu: "मेन्यू खोलें", close: "मेन्यू बंद करें", index: "सूची", pause: "गति रोकें", play: "गति चालू करें" },
+  nav: { signal: "संकेत", forecast: "पूर्वानुमान", decide: "निर्णय", world: "आपकी दुनिया", proof: "प्रमाण", talk: "बात करें", menu: "मेन्यू खोलें", close: "मेन्यू बंद करें", index: "सूची", pause: "गति रोकें", play: "गति चालू करें", jump: "यहाँ जाएँ" },
   rail: ["असंतुलित", "संकेत", "पूर्वानुमान", "निर्णय", "स्टॉक में"],
   hero: {
     pos: "संज्ञा",
@@ -295,7 +295,7 @@ const hi: Copy = {
 };
 
 const te: Copy = {
-  nav: { signal: "సంకేతం", forecast: "అంచనా", decide: "నిర్ణయం", world: "మీ ప్రపంచం", proof: "రుజువు", talk: "మాట్లాడండి", menu: "మెనూ తెరవండి", close: "మెనూ మూసివేయండి", index: "సూచిక", pause: "కదలిక ఆపండి", play: "కదలిక ప్రారంభించండి" },
+  nav: { signal: "సంకేతం", forecast: "అంచనా", decide: "నిర్ణయం", world: "మీ ప్రపంచం", proof: "రుజువు", talk: "మాట్లాడండి", menu: "మెనూ తెరవండి", close: "మెనూ మూసివేయండి", index: "సూచిక", pause: "కదలిక ఆపండి", play: "కదలిక ప్రారంభించండి", jump: "ఇక్కడికి వెళ్లండి" },
   rail: ["అసమతుల్యం", "సంకేతం", "అంచనా", "నిర్ణయం", "స్టాక్‌లో"],
   hero: {
     pos: "నామవాచకం",
