@@ -113,6 +113,14 @@ npx hyperframes@0.8.156 preview --background
 
 `brag-output/brag.mp4`, `brag-output/brag.jpg`, and `brag-output/share-copy.txt` are the delivery artifacts. Manrope is from the Google Fonts repository under its OFL license. Kenney SFX are CC0; upstream Brag is MIT.
 
+## Validation (23 October 2026)
+
+- `npm run build` passes. Initial JS 148.8 kB gzip (index 52.6 + motion 50.8 + react 45.4; budget 150), CSS 13.9 kB gzip (budget 14). Lazy: field 144 kB, palette 5.6 kB (+0.9 kB CSS), explore 4.7 kB (+1.5 kB CSS), OrbitControls 4.6 kB. The Quick Look model (1.7 MB) loads only when tapped.
+- `npm run check` passes against the dev server and the production preview: 29 groups, including everything below plus the pause control, palette, dock, reading progress, contact context, counters, detents, toast, projector slides, sheen, explore (keyboard, announcements, timeline, focus return), the levelling title, mocked WebXR AR / Quick Look support, the USDZ package, and axe (WCAG 2.0–2.2 A/AA; en/hi/te at 1440, en at 390; page, palette, phone index and explore dialog): no issues of any impact.
+- Lab A/B against `95c153f` (`npm run perf`, hardware GPU, 2–3 runs each; `qa/perf/spatial-ab*.log`): CLS unchanged (0.005 mobile, 0.002 desktop); worst interaction median 176 ms mobile 1× and 56–104 ms desktop; hero and Decide frame times within run-to-run noise; first paint 50–90 ms later (the extra ~5 kB JS / 2 kB CSS). Runs at 4× CPU vary too much between runs to compare. The first A/B found a 0.055 mobile CLS, a whole-page re-render at field boot and doubled projector uploads; all fixed (commit `da1353e`).
+- Browser review at 1440, 768 and 390 px in English, Hindi and Telugu, plus calm mode: `qa/spatial/`.
+- Not verified here: placing the field with a real ARCore phone, Quest / Vision Pro or iPhone Quick Look; haptics on a physical Android phone; screen-reader walkthroughs beyond axe and the announced explore readouts.
+
 ## Validation (19 October 2026)
 
 - `npm run build` passes (TypeScript and Vite). Initial JS is about 143 kB gzip plus 12 kB of CSS; three.js is a separate lazy chunk of about 138 kB gzip.

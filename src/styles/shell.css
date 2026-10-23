@@ -815,7 +815,7 @@
   visibility: hidden;
 }
 @media (max-width: 699px) {
-  .hero-explore {
+  .hero-ctas .hero-explore {
     display: none;
   }
 }
