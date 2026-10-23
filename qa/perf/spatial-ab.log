@@ -1,0 +1,28 @@
+before desktop cpu1x r1  FCP 756  LCP 756 (span.line.line-full)  CLS 0.002  TBT 0  longest 0  ready 1140 webgl  | hero 60fps p95 17ms main 2ms/f  | decide 59.7fps p95 16.9ms main 7.8ms/f style 3.3  | INP~ 56
+after  desktop cpu1x r1  FCP 800  LCP 800 (span.line.line-full)  CLS 0.002  TBT 10  longest 60  ready 1196 webgl  | hero 60fps p95 16.9ms main 1.7ms/f  | decide 60fps p95 16.8ms main 8.4ms/f style 3.4  | INP~ 64
+after  desktop cpu1x r2  FCP 800  LCP 800 (span.line.line-full)  CLS 0.002  TBT 0  longest 0  ready 1165 webgl  | hero 60fps p95 17ms main 2.4ms/f  | decide 59.8fps p95 16.9ms main 7.9ms/f style 3.1  | INP~ 56
+before desktop cpu1x r2  FCP 624  LCP 624 (span.line.line-full)  CLS 0.037  TBT 0  longest 82  ready 1087 webgl  | hero 60fps p95 16.9ms main 2.2ms/f  | decide 60fps p95 16.9ms main 7.4ms/f style 2.9  | INP~ 56
+before desktop cpu4x r1  FCP 5168  LCP 5168 (span.line.line-full)  CLS 0.003  TBT 2397  longest 1216  ready 8566 webgl  | hero 47.2fps p95 33.4ms main 18ms/f  | decide 13.2fps p95 183.3ms main 76.2ms/f style 25.6  | INP~ 216
+after  desktop cpu4x r1  FCP 2996  LCP 2996 (span.line.line-full)  CLS 0.004  TBT 2501  longest 895  ready 6790 webgl  | hero 53.6fps p95 33.3ms main 14.5ms/f  | decide 19.7fps p95 133.4ms main 50.6ms/f style 16.7  | INP~ 424
+after  desktop cpu4x r2  FCP 3892  LCP 3892 (span.line.line-full)  CLS 0.004  TBT 2161  longest 506  ready 6609 webgl  | hero 24.6fps p95 100.1ms main 38.7ms/f  | decide 24fps p95 116.8ms main 40.4ms/f style 14.9  | INP~ 320
+before desktop cpu4x r2  FCP 4164  LCP 4164 (span.line.line-full)  CLS 0.003  TBT 5067  longest 1998  ready 9350 webgl  | hero 48fps p95 50ms main 14.8ms/f  | decide 26.7fps p95 116.9ms main 36.8ms/f style 14.8  | INP~ 264
+before mobile  cpu1x r1  FCP 2352  LCP 3268 (p.lead.fade)  CLS 0.005  TBT 199  longest 168  ready 5657 webgl  | hero 60fps p95 17ms main 2.7ms/f  | decide 59.8fps p95 16.9ms main 8.9ms/f style 1.8  | INP~ 168
+after  mobile  cpu1x r1  FCP 2408  LCP 3392 (p.lead.fade)  CLS 0.055  TBT 424  longest 196  ready 5862 webgl  | hero 60fps p95 17ms main 2ms/f  | decide 59.8fps p95 17ms main 9.3ms/f style 2  | INP~ 208
+after  mobile  cpu1x r2  FCP 2392  LCP 3376 (p.lead.fade)  CLS 0.055  TBT 374  longest 189  ready 5800 webgl  | hero 60fps p95 17ms main 1.8ms/f  | decide 59.8fps p95 17ms main 9.3ms/f style 1.9  | INP~ 208
+before mobile  cpu1x r2  FCP 2336  LCP 3304 (p.lead.fade)  CLS 0.005  TBT 180  longest 169  ready 5640 webgl  | hero 60fps p95 16.9ms main 2.7ms/f  | decide 60fps p95 17ms main 8.6ms/f style 1.8  | INP~ 168
+before mobile  cpu4x r1  FCP 14468  LCP 21584 (p.lead.fade)  CLS 0.004  TBT 7674  longest 3265  ready 24217 webgl  | hero 51.5fps p95 33.6ms main 16.7ms/f  | decide 11.8fps p95 233.3ms main 84.1ms/f style 22  | INP~ 672
+after  mobile  cpu4x r1  FCP 5152  LCP 8656 (p.lead.fade)  CLS 0.051  TBT 5189  longest 1442  ready 11884 webgl  | hero 48.6fps p95 50ms main 11.1ms/f  | decide 6.4fps p95 533.5ms main 158ms/f style 51.5  | INP~ 1688
+after  mobile  cpu4x r2  FCP 16828  LCP 23412 (p.lead.fade)  CLS 0.051  TBT 7791  longest 3116  ready 27306 webgl  | hero 49.6fps p95 49.7ms main 10.9ms/f  | decide 22.8fps p95 133.5ms main 42.2ms/f style 10  | INP~ 1232
+before mobile  cpu4x r2  FCP 6464  LCP 9432 (p.lead.fade)  CLS 0.004  TBT 1913  longest 506  ready 10205 webgl  | hero 49.4fps p95 33.4ms main 14.3ms/f  | decide 24.7fps p95 116.7ms main 38.2ms/f style 10.9  | INP~ 1672
+| build | profile | CPU | FCP | LCP | CLS | TBT | worst interaction | hero fps (main ms/frame) | Decide fps (main ms/frame) | runs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| before | desktop | 1x | 624 | 624 | 0.002 | 0 | 56 | 60 (2) | 59.7 (7.4) | 2 |
+| after | desktop | 1x | 800 | 800 | 0.002 | 0 | 56 | 60 (1.7) | 59.8 (7.9) | 2 |
+| before | desktop | 4x | 4164 | 4164 | 0.003 | 2397 | 216 | 47.2 (14.8) | 13.2 (36.8) | 2 |
+| after | desktop | 4x | 2996 | 2996 | 0.004 | 2161 | 320 | 24.6 (14.5) | 19.7 (40.4) | 2 |
+| before | mobile | 1x | 2336 | 3268 | 0.005 | 180 | 168 | 60 (2.7) | 59.8 (8.6) | 2 |
+| after | mobile | 1x | 2392 | 3376 | 0.055 | 374 | 208 | 60 (1.8) | 59.8 (9.3) | 2 |
+| before | mobile | 4x | 6464 | 9432 | 0.004 | 1913 | 672 | 49.4 (14.3) | 11.8 (38.2) | 2 |
+| after | mobile | 4x | 5152 | 8656 | 0.051 | 5189 | 1232 | 48.6 (10.9) | 6.4 (42.2) | 2 |
+gl: ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)
+wrote qa/perf/spatial-ab.json

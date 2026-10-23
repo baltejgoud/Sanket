@@ -3,6 +3,8 @@ import { ArrowRight, CornerDownLeft, LayoutList, Search, Wrench, Zap } from "luc
 import { paletteCopy } from "./paletteCopy";
 import { useContactLinks } from "../lib/contact";
 import { buildCommands, rankCommands, type Command, type Group } from "../lib/commands";
+import { explore as exploreBus } from "../lib/paletteBus";
+import { useField } from "../field/bridge";
 import type { Lang } from "../i18n";
 import "../styles/palette.css";
 
@@ -14,7 +16,7 @@ const ICONS = { chapters: LayoutList, tools: Wrench, actions: Zap };
  * is inert, arrows move the active option, Enter runs it, Escape closes. `onClose(ran)` tells the
  * opener whether a command ran (then focus belongs to the command's target, not the opener).
  */
-export default function Palette({ lang, setLang, explore, onClose }: { lang: Lang; setLang: (l: Lang) => void; explore?: () => void; onClose: (ran: boolean) => void }) {
+export default function Palette({ lang, setLang, onClose }: { lang: Lang; setLang: (l: Lang) => void; onClose: (ran: boolean) => void }) {
   const copy = paletteCopy[lang];
   const links = useContactLinks();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -22,6 +24,8 @@ export default function Palette({ lang, setLang, explore, onClose }: { lang: Lan
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const ran = useRef<Command | null>(null);
+  // Explore is on offer only while the field runs (not on the poster).
+  const explore = useField() ? exploreBus.open : undefined;
 
   const all = useMemo(() => buildCommands({ copy, lang, setLang, links, explore }), [copy, lang, setLang, links, explore]);
   const results = useMemo(() => rankCommands(all, query), [all, query]);

@@ -114,6 +114,7 @@ export class StockField {
   // Explore mode (setExplore): orbit controls own the camera; the timeline replaces the story's targets.
   private controls: OrbitControls | null = null;
   private explore: { v: number; selected: number } | null = null;
+  private exploreWanted = false;
   /** every mesh of the field; scaled and placed as one object in AR/VR */
   private root = new THREE.Group();
   private floorMesh: THREE.Object3D | null = null;
@@ -134,6 +135,8 @@ export class StockField {
     texture: null as THREE.CanvasTexture | null,
     drawn: "" as string,
     slide: "off" as Slide,
+    /** the slide's faces have loaded; until then nothing is drawn (one draw and upload, not two) */
+    ready: false,
     amt: 0,
     copy: { inStock: "In stock", signals: [], lang: "en" } as ProjectionCopy,
   };
@@ -350,8 +353,8 @@ export class StockField {
     const m = this.model;
     const r = projectionRect(m);
     const c = this.proj.canvas;
-    // Phones (small grids) get a 1024-wide slide; ground cells stay ~30px either way.
-    c.width = m.cols < 30 ? 1024 : 1536;
+    // Phones (small grids) get a 768-wide slide; ground cells stay ~30px either way.
+    c.width = m.cols < 30 ? 768 : 1536;
     c.height = Math.round((c.width * r.sizeZ) / r.sizeX);
     const tex = new THREE.CanvasTexture(c);
     tex.generateMipmaps = false;
@@ -362,7 +365,10 @@ export class StockField {
     this.uniforms.uProjTex.value = tex;
     (this.uniforms.uProjRect.value as THREE.Vector4).set(r.minX, r.minZ, r.sizeX, r.sizeZ);
     if (this.opts.projection) this.proj.copy = this.opts.projection;
-    loadFaces(this.proj.copy).then(() => this.redrawSlide());
+    loadFaces(this.proj.copy).then(() => {
+      this.proj.ready = true;
+      this.wake();
+    });
   }
 
   /** Slide key: the slide plus whatever changes its drawing (the focused problem). */
@@ -384,9 +390,9 @@ export class StockField {
     (this.uniforms.uProjColor.value as THREE.Color).setRGB(r, g, b);
   }
 
-  /** Redraw the current slide (fonts arrived, or the language changed). */
+  /** Redraw the current slide (the language changed and its faces have loaded). */
   private redrawSlide() {
-    if (this.disposed) return;
+    if (this.disposed || !this.proj.drawn) return;
     const t = fieldStore.get().target;
     this.drawProjection(this.proj.slide, t.focus);
     this.wake();
@@ -508,9 +514,11 @@ export class StockField {
    * which eases home from wherever the visitor left it. OrbitControls loads only now.
    */
   async setExplore(on: boolean, el?: HTMLElement) {
+    // The latest request wins: closing before OrbitControls has loaded must not open it after.
+    this.exploreWanted = on;
     if (on && !this.controls && el) {
       const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
-      if (this.disposed || this.controls) return;
+      if (this.disposed || this.controls || !this.exploreWanted) return;
       const c = new OrbitControls(this.camera, el);
       const k = this.model.width / 47;
       c.enableDamping = !this.still;
@@ -797,7 +805,7 @@ export class StockField {
     this.frame = 0;
     if (this.disposed) return;
     const s = fieldStore.get();
-    if (!s.visible && !this.opts.poster && !this.controls) return;
+    if ((!s.visible || s.covered) && !this.opts.poster && !this.controls) return;
     const still = this.still;
     if (!still) {
       this.govern(now);
@@ -897,7 +905,7 @@ export class StockField {
     let lit = wantKey === pj.drawn ? SLIDE_STRENGTH[want] : 0;
     // Out quickly (~0.4s), in at the same rate.
     pj.amt += (lit - pj.amt) * ease(9);
-    if (wantKey !== pj.drawn && pj.amt < 0.02) {
+    if (wantKey !== pj.drawn && pj.amt < 0.02 && pj.ready) {
       pj.amt = 0;
       this.drawProjection(want, t.focus);
       lit = SLIDE_STRENGTH[want]; // keeps the loop going to fade the new slide in

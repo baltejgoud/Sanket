@@ -206,3 +206,20 @@ request are verified; the owner tests placement on a device.
 
 New copy beyond labels for new controls; analytics or tracking; a backend; changes to the ROI formula,
 sandbox model or field model data; audio.
+
+## 10. Implementation record
+
+Built as specified in phases 0–4 (commits `95c153f` … `dcf388d`), with these decisions made during the build:
+
+- **Pause control naming.** The button keeps one name, "Pause motion", and `aria-pressed` carries the state (ARIA guidance: a toggle's name should not change with its state). Only the icon swaps.
+- **Header room.** With the search pill and pause button, the five chapter links need ~1200 px; below that they fold into the index dialog (was 1100 px). The search pill shows its shortcut, with "Jump to" kept as its accessible name.
+- **Budgets.** Palette and explore strings and CSS ship in their lazy chunks (`paletteCopy.ts`, `exploreCopy.ts`, `palette.css`, `explore.css`), OrbitControls is its own chunk, and the USDZ exporter is never shipped (the script imports it from the dev server). Result: initial JS 148.6 kB gzip, CSS 13.8 kB gzip.
+- **Contrast.** The first axe run found 14 contrast failures, all fixed: forecast-ink text (4.42 → 5.16:1), muted text in the dark industry card (1.95 → 5.24:1), 11 px range limits / footnote / legal line (4.0 → 5.2:1 via `--concrete-dim`).
+- **Projector geometry.** A parallel top-down projector rather than a perspective one, so Decide's markings land exactly on their cells; the fracture comes from the oblique story camera, which separates marks on columns of different heights. The floor takes a 50 % spill, which carries most of the legibility between columns. "IN / STOCK" is a stacked block just right of centre, where the story's copy leaves the field open.
+- **Decide markings** use one colour channel per decision so each set fades with its own window from one texture.
+- **Counters** render their glyphs with CSS, so the element's text stays exactly the value; existing checks that read numbers with `innerText` were unchanged.
+- **Explore** reuses the stage canvas (no second WebGL context); the page is hidden with `html.is-exploring` and un-hidden before focus returns (a hidden element cannot take focus). N works anywhere in the dialog; the flight keys belong to the viewport.
+- **Context-aware contact** compares instruments with their initial values instead of skipping the first effect, which StrictMode runs twice in development.
+- **Test harness.** Software WebGL renders a few frames a second, so projector checks wait for each slide; the reading-progress check confirms its scroll landed (Lenis can drop an immediate scroll that follows another).
+
+Not verified here: real AR/VR placement on devices, haptics on a physical Android phone, screen-reader walkthroughs beyond axe and the announced explore readouts.

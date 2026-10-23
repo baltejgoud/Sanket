@@ -32,6 +32,8 @@ const state = {
   decide: 0,
   /** at least one chapter that shows the field is on screen */
   visible: true,
+  /** an opaque full-screen layer (the phone index) hides the field: skip frames until it closes */
+  covered: false,
   pulses: [] as { u: number; v: number; strength: number }[],
   readout: null as Readout | null,
   version: 0,
@@ -55,6 +57,11 @@ export const fieldStore = {
     const v = Math.min(1, Math.max(0, n));
     if (Math.abs(v - state.decide) < 1e-4) return;
     state.decide = v;
+    emit();
+  },
+  setCovered(c: boolean) {
+    if (c === state.covered) return;
+    state.covered = c;
     emit();
   },
   setVisible(v: boolean) {

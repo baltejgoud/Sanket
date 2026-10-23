@@ -1,0 +1,2044 @@
+{
+  "targets": [
+    {
+      "label": "before",
+      "url": "http://localhost:4175"
+    },
+    {
+      "label": "after",
+      "url": "http://localhost:4173"
+    }
+  ],
+  "query": "",
+  "gpu": "hw",
+  "date": "2026-10-23T15:07:58.805Z",
+  "results": [
+    {
+      "label": "before",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2292,
+        "lcp": 3220,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5233,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  362.9375,
+                  42
+                ],
+                "to": [
+                  362.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 630,
+        "tti": 5942,
+        "longest": 602,
+        "longTasks": [
+          [
+            3412,
+            60
+          ],
+          [
+            5121,
+            118
+          ],
+          [
+            5340,
+            602
+          ]
+        ],
+        "fieldChunk": [
+          2383,
+          5336
+        ],
+        "timing": [
+          "document 0→604",
+          "css2?family=Archivo:wdth,wght@62 612→1309",
+          "react-Ds7D3P6J.js 612→2001",
+          "index-B1pZDdus.js 612→2032",
+          "index-JUwDd6R7.css 612→1466",
+          "motion-DzW93yBl.js 612→2048",
+          "StockField-C8QzLLuL.js 2383→5336"
+        ],
+        "ready": 5995,
+        "mode": "webgl",
+        "initLoaf": [],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 280,
+        "fps": 55.9,
+        "p50": 17.9,
+        "p95": 18.4,
+        "over33": 0,
+        "taskMs": 1.3,
+        "scriptMs": 0.5,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 312,
+        "fps": 51.9,
+        "p50": 18.1,
+        "p95": 34.8,
+        "over33": 5.1,
+        "taskMs": 10.6,
+        "scriptMs": 2.3,
+        "styleLayoutMs": 2.3
+      },
+      "loafs": [
+        {
+          "t": 615,
+          "d": 854,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 2238,
+          "d": 51,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 42
+            }
+          ]
+        },
+        {
+          "t": 2056,
+          "d": 180,
+          "block": 130,
+          "style": 149,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 30
+            }
+          ]
+        },
+        {
+          "t": 3396,
+          "d": 68,
+          "block": 4,
+          "style": 52,
+          "scripts": []
+        },
+        {
+          "t": 5037,
+          "d": 59,
+          "block": 0,
+          "style": 41,
+          "scripts": []
+        },
+        {
+          "t": 5101,
+          "d": 133,
+          "block": 81,
+          "style": 6,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "c",
+              "inv": "FrameRequestCallback",
+              "d": 106
+            }
+          ]
+        },
+        {
+          "t": 5258,
+          "d": 687,
+          "block": 555,
+          "style": 0,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 599
+            }
+          ]
+        },
+        {
+          "t": 18634,
+          "d": 128,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 12
+            }
+          ]
+        },
+        {
+          "t": 39259,
+          "d": 57,
+          "block": 0,
+          "style": 0,
+          "scripts": [
+            {
+              "src": "",
+              "fn": "",
+              "inv": "FrameRequestCallback",
+              "d": 21
+            },
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "c",
+              "inv": "FrameRequestCallback",
+              "d": 7
+            }
+          ]
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 160,
+          "delay": 80,
+          "proc": 1,
+          "present": 79,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 72,
+          "delay": 25,
+          "proc": 1,
+          "present": 45,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 64,
+          "delay": 15,
+          "proc": 1,
+          "present": 48,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 152,
+          "delay": 13,
+          "proc": 1,
+          "present": 138,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 96,
+          "delay": 30,
+          "proc": 1,
+          "present": 65,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 96,
+          "delay": 28,
+          "proc": 1,
+          "present": 67,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 64,
+          "delay": 1,
+          "proc": 33,
+          "present": 31,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    },
+    {
+      "label": "after",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2352,
+        "lcp": 3332,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5234,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  302.9375,
+                  42
+                ],
+                "to": [
+                  302.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 437,
+        "tti": 5821,
+        "longest": 196,
+        "longTasks": [
+          [
+            2301,
+            51
+          ],
+          [
+            3151,
+            82
+          ],
+          [
+            3238,
+            97
+          ],
+          [
+            3338,
+            75
+          ],
+          [
+            3415,
+            84
+          ],
+          [
+            5008,
+            73
+          ],
+          [
+            5084,
+            166
+          ],
+          [
+            5449,
+            196
+          ],
+          [
+            5757,
+            64
+          ]
+        ],
+        "fieldChunk": [
+          3016,
+          5441
+        ],
+        "timing": [
+          "document 0→582",
+          "css2?family=Archivo:wdth,wght@62 591→1301",
+          "index-OmCo88CF.js 592→2062",
+          "react-Ds7D3P6J.js 592→2001",
+          "index-JgpU5XP6.css 592→1472",
+          "motion-DzW93yBl.js 592→2046",
+          "StockField-DkEXlC_u.js 3016→5441",
+          "timeline-Dm-aGBkY.js 3017→3629",
+          "Palette-CJKixjnh.js 5831→6445",
+          "tilt-hL0H0zX-.js 5831→6414",
+          "Palette-BEFnvp_y.css 5831→6429"
+        ],
+        "ready": 5823,
+        "mode": "webgl",
+        "initLoaf": [
+          {
+            "t": 5251,
+            "d": 423,
+            "scripts": [
+              {
+                "src": "index-OmCo88CF.js",
+                "fn": "",
+                "inv": "import.then",
+                "d": 190
+              },
+              {
+                "src": "index-OmCo88CF.js",
+                "fn": "h",
+                "inv": "FrameRequestCallback",
+                "d": 26
+              },
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+                "d": 6
+              }
+            ]
+          },
+          {
+            "t": 5745,
+            "d": 73,
+            "scripts": [
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "FrameRequestCallback",
+                "d": 59
+              }
+            ]
+          }
+        ],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 281,
+        "fps": 56.1,
+        "p50": 17.9,
+        "p95": 18.2,
+        "over33": 0,
+        "taskMs": 1.1,
+        "scriptMs": 0.5,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 334,
+        "fps": 55.6,
+        "p50": 17.9,
+        "p95": 18.5,
+        "over33": 0.3,
+        "taskMs": 9.4,
+        "scriptMs": 1.6,
+        "styleLayoutMs": 2.1
+      },
+      "loafs": [
+        {
+          "t": 1475,
+          "d": 404,
+          "block": 0,
+          "style": 0,
+          "scripts": []
+        },
+        {
+          "t": 593,
+          "d": 881,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 2078,
+          "d": 210,
+          "block": 160,
+          "style": 160,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 50
+            }
+          ]
+        },
+        {
+          "t": 2293,
+          "d": 63,
+          "block": 5,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 52
+            }
+          ]
+        },
+        {
+          "t": 2403,
+          "d": 598,
+          "block": 0,
+          "style": 3,
+          "scripts": []
+        },
+        {
+          "t": 3136,
+          "d": 80,
+          "block": 16,
+          "style": 65,
+          "scripts": []
+        },
+        {
+          "t": 3234,
+          "d": 88,
+          "block": 35,
+          "style": 83,
+          "scripts": []
+        },
+        {
+          "t": 3335,
+          "d": 62,
+          "block": 11,
+          "style": 11,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "h",
+              "inv": "FrameRequestCallback",
+              "d": 48
+            }
+          ]
+        },
+        {
+          "t": 3413,
+          "d": 74,
+          "block": 23,
+          "style": 72,
+          "scripts": []
+        },
+        {
+          "t": 4473,
+          "d": 59,
+          "block": 0,
+          "style": 41,
+          "scripts": []
+        },
+        {
+          "t": 4580,
+          "d": 59,
+          "block": 0,
+          "style": 41,
+          "scripts": []
+        },
+        {
+          "t": 4991,
+          "d": 81,
+          "block": 15,
+          "style": 64,
+          "scripts": []
+        },
+        {
+          "t": 5082,
+          "d": 156,
+          "block": 105,
+          "style": 12,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "h",
+              "inv": "FrameRequestCallback",
+              "d": 141
+            }
+          ]
+        },
+        {
+          "t": 5251,
+          "d": 423,
+          "block": 175,
+          "style": 2,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 190
+            },
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "h",
+              "inv": "FrameRequestCallback",
+              "d": 26
+            },
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+              "d": 6
+            }
+          ]
+        },
+        {
+          "t": 5745,
+          "d": 73,
+          "block": 15,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "FrameRequestCallback",
+              "d": 59
+            }
+          ]
+        },
+        {
+          "t": 18456,
+          "d": 115,
+          "block": 0,
+          "style": 0,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 12
+            }
+          ]
+        },
+        {
+          "t": 18593,
+          "d": 67,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 22273,
+          "d": 1053,
+          "block": 0,
+          "style": 0,
+          "scripts": []
+        },
+        {
+          "t": 23376,
+          "d": 1046,
+          "block": 0,
+          "style": 0,
+          "scripts": []
+        },
+        {
+          "t": 25225,
+          "d": 1038,
+          "block": 971,
+          "style": 1021,
+          "scripts": []
+        },
+        {
+          "t": 26272,
+          "d": 62,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 36484,
+          "d": 72,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 120,
+          "delay": 58,
+          "proc": 3,
+          "present": 59,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 72,
+          "delay": 24,
+          "proc": 2,
+          "present": 45,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 112,
+          "delay": 12,
+          "proc": 3,
+          "present": 97,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 184,
+          "delay": 28,
+          "proc": 2,
+          "present": 155,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 472,
+          "delay": 10,
+          "proc": 2,
+          "present": 461,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 88,
+          "delay": 27,
+          "proc": 1,
+          "present": 60,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 56,
+          "delay": 1,
+          "proc": 37,
+          "present": 18,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    },
+    {
+      "label": "after",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2340,
+        "lcp": 3288,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5341,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  302.9375,
+                  42
+                ],
+                "to": [
+                  302.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 214,
+        "tti": 5728,
+        "longest": 149,
+        "longTasks": [
+          [
+            3178,
+            58
+          ],
+          [
+            3252,
+            67
+          ],
+          [
+            3321,
+            67
+          ],
+          [
+            3481,
+            56
+          ],
+          [
+            5127,
+            72
+          ],
+          [
+            5203,
+            149
+          ],
+          [
+            5472,
+            77
+          ],
+          [
+            5660,
+            68
+          ]
+        ],
+        "fieldChunk": [
+          2447,
+          5461
+        ],
+        "timing": [
+          "document 0→596",
+          "css2?family=Archivo:wdth,wght@62 604→1326",
+          "index-OmCo88CF.js 604→2103",
+          "react-Ds7D3P6J.js 604→2010",
+          "motion-DzW93yBl.js 605→2088",
+          "index-JgpU5XP6.css 605→1512",
+          "StockField-DkEXlC_u.js 2447→5461",
+          "timeline-Dm-aGBkY.js 2447→3084",
+          "Palette-CJKixjnh.js 5740→6354",
+          "tilt-hL0H0zX-.js 5741→6325",
+          "Palette-BEFnvp_y.css 5742→6326"
+        ],
+        "ready": 5730,
+        "mode": "webgl",
+        "initLoaf": [
+          {
+            "t": 5469,
+            "d": 107,
+            "scripts": [
+              {
+                "src": "index-OmCo88CF.js",
+                "fn": "",
+                "inv": "import.then",
+                "d": 70
+              },
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+                "d": 6
+              }
+            ]
+          },
+          {
+            "t": 5643,
+            "d": 81,
+            "scripts": [
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "FrameRequestCallback",
+                "d": 62
+              }
+            ]
+          }
+        ],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 276,
+        "fps": 55.2,
+        "p50": 18.1,
+        "p95": 19.2,
+        "over33": 0,
+        "taskMs": 1.9,
+        "scriptMs": 0.8,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 342,
+        "fps": 56.9,
+        "p50": 16.7,
+        "p95": 16.9,
+        "over33": 0.3,
+        "taskMs": 6.5,
+        "scriptMs": 0.9,
+        "styleLayoutMs": 1.4
+      },
+      "loafs": [
+        {
+          "t": 606,
+          "d": 915,
+          "block": 0,
+          "style": 3,
+          "scripts": []
+        },
+        {
+          "t": 2124,
+          "d": 173,
+          "block": 123,
+          "style": 142,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 31
+            }
+          ]
+        },
+        {
+          "t": 2301,
+          "d": 53,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 43
+            }
+          ]
+        },
+        {
+          "t": 3163,
+          "d": 63,
+          "block": 0,
+          "style": 47,
+          "scripts": []
+        },
+        {
+          "t": 3238,
+          "d": 70,
+          "block": 7,
+          "style": 56,
+          "scripts": []
+        },
+        {
+          "t": 3319,
+          "d": 59,
+          "block": 7,
+          "style": 56,
+          "scripts": []
+        },
+        {
+          "t": 3466,
+          "d": 62,
+          "block": 0,
+          "style": 47,
+          "scripts": []
+        },
+        {
+          "t": 4573,
+          "d": 53,
+          "block": 0,
+          "style": 41,
+          "scripts": []
+        },
+        {
+          "t": 4715,
+          "d": 55,
+          "block": 0,
+          "style": 39,
+          "scripts": []
+        },
+        {
+          "t": 5352,
+          "d": 65,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 5107,
+          "d": 84,
+          "block": 19,
+          "style": 63,
+          "scripts": []
+        },
+        {
+          "t": 5199,
+          "d": 144,
+          "block": 92,
+          "style": 10,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "h",
+              "inv": "FrameRequestCallback",
+              "d": 130
+            }
+          ]
+        },
+        {
+          "t": 5469,
+          "d": 107,
+          "block": 53,
+          "style": 24,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 70
+            },
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+              "d": 6
+            }
+          ]
+        },
+        {
+          "t": 5643,
+          "d": 81,
+          "block": 18,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "FrameRequestCallback",
+              "d": 62
+            }
+          ]
+        },
+        {
+          "t": 18401,
+          "d": 126,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 13
+            }
+          ]
+        },
+        {
+          "t": 18546,
+          "d": 54,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 12
+            }
+          ]
+        },
+        {
+          "t": 36416,
+          "d": 79,
+          "block": 0,
+          "style": 0,
+          "scripts": []
+        },
+        {
+          "t": 36629,
+          "d": 3904389,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 3941175,
+          "d": 309,
+          "block": 0,
+          "style": 0,
+          "scripts": []
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 88,
+          "delay": 28,
+          "proc": 2,
+          "present": 58,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 88,
+          "delay": 28,
+          "proc": 2,
+          "present": 58,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 56,
+          "delay": 12,
+          "proc": 1,
+          "present": 43,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 144,
+          "delay": 13,
+          "proc": 1,
+          "present": 130,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 40,
+          "delay": 11,
+          "proc": 1,
+          "present": 28,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 88,
+          "delay": 29,
+          "proc": 1,
+          "present": 58,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 56,
+          "delay": 1,
+          "proc": 36,
+          "present": 19,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    },
+    {
+      "label": "before",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2288,
+        "lcp": 3224,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5351,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  362.9375,
+                  42
+                ],
+                "to": [
+                  362.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 364,
+        "tti": 5871,
+        "longest": 336,
+        "longTasks": [
+          [
+            3236,
+            51
+          ],
+          [
+            5077,
+            57
+          ],
+          [
+            5238,
+            120
+          ],
+          [
+            5535,
+            336
+          ]
+        ],
+        "fieldChunk": [
+          2408,
+          5386
+        ],
+        "timing": [
+          "document 0→592",
+          "css2?family=Archivo:wdth,wght@62 593→1314",
+          "react-Ds7D3P6J.js 593→1975",
+          "index-B1pZDdus.js 593→1991",
+          "motion-DzW93yBl.js 593→2021",
+          "index-JUwDd6R7.css 593→1438",
+          "StockField-C8QzLLuL.js 2408→5386"
+        ],
+        "ready": 5964,
+        "mode": "webgl",
+        "initLoaf": [
+          {
+            "t": 5535,
+            "d": 338,
+            "scripts": [
+              {
+                "src": "index-B1pZDdus.js",
+                "fn": "",
+                "inv": "import.then",
+                "d": 321
+              },
+              {
+                "src": "StockField-C8QzLLuL.js",
+                "fn": "",
+                "inv": "http://localhost:4175/assets/StockField-C8QzLLuL.js",
+                "d": 15
+              }
+            ]
+          }
+        ],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 300,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 17,
+        "over33": 0,
+        "taskMs": 1.2,
+        "scriptMs": 0.5,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 360,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 16.9,
+        "over33": 0,
+        "taskMs": 8.3,
+        "scriptMs": 1.1,
+        "styleLayoutMs": 1.7
+      },
+      "loafs": [
+        {
+          "t": 592,
+          "d": 850,
+          "block": 0,
+          "style": 2,
+          "scripts": []
+        },
+        {
+          "t": 2030,
+          "d": 220,
+          "block": 164,
+          "style": 170,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 44
+            }
+          ]
+        },
+        {
+          "t": 3407,
+          "d": 51,
+          "block": 0,
+          "style": 36,
+          "scripts": []
+        },
+        {
+          "t": 4654,
+          "d": 63,
+          "block": 0,
+          "style": 31,
+          "scripts": []
+        },
+        {
+          "t": 5059,
+          "d": 71,
+          "block": 13,
+          "style": 52,
+          "scripts": []
+        },
+        {
+          "t": 5208,
+          "d": 143,
+          "block": 75,
+          "style": 113,
+          "scripts": []
+        },
+        {
+          "t": 5535,
+          "d": 338,
+          "block": 288,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 321
+            },
+            {
+              "src": "StockField-C8QzLLuL.js",
+              "fn": "",
+              "inv": "http://localhost:4175/assets/StockField-C8QzLLuL.js",
+              "d": 15
+            }
+          ]
+        },
+        {
+          "t": 18600,
+          "d": 144,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 18
+            }
+          ]
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 88,
+          "delay": 26,
+          "proc": 0,
+          "present": 62,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 88,
+          "delay": 27,
+          "proc": 2,
+          "present": 59,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 56,
+          "delay": 7,
+          "proc": 1,
+          "present": 48,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 152,
+          "delay": 22,
+          "proc": 1,
+          "present": 130,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 96,
+          "delay": 29,
+          "proc": 1,
+          "present": 67,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 72,
+          "delay": 26,
+          "proc": 1,
+          "present": 45,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 56,
+          "delay": 1,
+          "proc": 34,
+          "present": 21,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    },
+    {
+      "label": "before",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2284,
+        "lcp": 3216,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5247,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  362.9375,
+                  42
+                ],
+                "to": [
+                  362.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  397.40625,
+                  42
+                ],
+                "to": [
+                  397.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 82,
+        "tti": 5251,
+        "longest": 130,
+        "longTasks": [
+          [
+            5065,
+            52
+          ],
+          [
+            5121,
+            130
+          ]
+        ],
+        "fieldChunk": [
+          2388,
+          5370
+        ],
+        "timing": [
+          "document 0→591",
+          "css2?family=Archivo:wdth,wght@62 604→1337",
+          "react-Ds7D3P6J.js 604→2006",
+          "index-B1pZDdus.js 604→2021",
+          "index-JUwDd6R7.css 605→1460",
+          "motion-DzW93yBl.js 605→2052",
+          "StockField-C8QzLLuL.js 2388→5370"
+        ],
+        "ready": 5516,
+        "mode": "webgl",
+        "initLoaf": [],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 300,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 17,
+        "over33": 0,
+        "taskMs": 1.6,
+        "scriptMs": 0.5,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 360,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 16.9,
+        "over33": 0,
+        "taskMs": 7.2,
+        "scriptMs": 0.9,
+        "styleLayoutMs": 1.5
+      },
+      "loafs": [
+        {
+          "t": 606,
+          "d": 860,
+          "block": 0,
+          "style": 3,
+          "scripts": []
+        },
+        {
+          "t": 2061,
+          "d": 175,
+          "block": 125,
+          "style": 145,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 30
+            }
+          ]
+        },
+        {
+          "t": 3184,
+          "d": 53,
+          "block": 0,
+          "style": 37,
+          "scripts": []
+        },
+        {
+          "t": 3418,
+          "d": 52,
+          "block": 0,
+          "style": 37,
+          "scripts": []
+        },
+        {
+          "t": 5049,
+          "d": 63,
+          "block": 0,
+          "style": 47,
+          "scripts": []
+        },
+        {
+          "t": 5117,
+          "d": 130,
+          "block": 78,
+          "style": 6,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "c",
+              "inv": "FrameRequestCallback",
+              "d": 120
+            }
+          ]
+        },
+        {
+          "t": 5366,
+          "d": 68,
+          "block": 9,
+          "style": 12,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 41
+            }
+          ]
+        },
+        {
+          "t": 18119,
+          "d": 133,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-B1pZDdus.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 12
+            }
+          ]
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 88,
+          "delay": 28,
+          "proc": 0,
+          "present": 60,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 88,
+          "delay": 24,
+          "proc": 2,
+          "present": 62,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 56,
+          "delay": 10,
+          "proc": 1,
+          "present": 45,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 128,
+          "delay": 12,
+          "proc": 1,
+          "present": 115,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 88,
+          "delay": 25,
+          "proc": 1,
+          "present": 62,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 72,
+          "delay": 26,
+          "proc": 2,
+          "present": 45,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 64,
+          "delay": 0,
+          "proc": 37,
+          "present": 27,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    },
+    {
+      "label": "after",
+      "profile": "mobile",
+      "cpu": 1,
+      "lab": {
+        "fcp": 2304,
+        "lcp": 3256,
+        "lcpEl": "p.lead.fade",
+        "cls": 0.005,
+        "shifts": [
+          {
+            "t": 5294,
+            "v": 0.004,
+            "src": [
+              {
+                "n": "#text",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              },
+              {
+                "n": "span.w",
+                "from": [
+                  302.9375,
+                  42
+                ],
+                "to": [
+                  302.9375,
+                  42
+                ]
+              },
+              {
+                "n": "span.c",
+                "from": [
+                  337.40625,
+                  42
+                ],
+                "to": [
+                  337.40625,
+                  42
+                ]
+              }
+            ]
+          }
+        ],
+        "tbt": 167,
+        "tti": 5683,
+        "longest": 148,
+        "longTasks": [
+          [
+            3154,
+            55
+          ],
+          [
+            3303,
+            63
+          ],
+          [
+            3454,
+            55
+          ],
+          [
+            5087,
+            67
+          ],
+          [
+            5158,
+            148
+          ],
+          [
+            5441,
+            66
+          ],
+          [
+            5620,
+            63
+          ]
+        ],
+        "fieldChunk": [
+          2399,
+          5426
+        ],
+        "timing": [
+          "document 0→582",
+          "css2?family=Archivo:wdth,wght@62 588→1317",
+          "react-Ds7D3P6J.js 588→1986",
+          "index-OmCo88CF.js 588→2064",
+          "motion-DzW93yBl.js 589→2063",
+          "index-JgpU5XP6.css 589→1472",
+          "StockField-DkEXlC_u.js 2399→5426",
+          "timeline-Dm-aGBkY.js 2399→3040",
+          "Palette-CJKixjnh.js 5693→6311",
+          "tilt-hL0H0zX-.js 5694→6281",
+          "Palette-BEFnvp_y.css 5695→6281"
+        ],
+        "ready": 5685,
+        "mode": "webgl",
+        "initLoaf": [
+          {
+            "t": 5441,
+            "d": 89,
+            "scripts": [
+              {
+                "src": "index-OmCo88CF.js",
+                "fn": "",
+                "inv": "import.then",
+                "d": 59
+              },
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+                "d": 7
+              }
+            ]
+          },
+          {
+            "t": 5610,
+            "d": 68,
+            "scripts": [
+              {
+                "src": "StockField-DkEXlC_u.js",
+                "fn": "",
+                "inv": "FrameRequestCallback",
+                "d": 56
+              }
+            ]
+          }
+        ],
+        "gl": "ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.75,
+        "canvas": [
+          618,
+          1234
+        ]
+      },
+      "hero": {
+        "frames": 300,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 17.1,
+        "over33": 0,
+        "taskMs": 1.3,
+        "scriptMs": 0.5,
+        "styleLayoutMs": 0
+      },
+      "heroHover": null,
+      "decide": {
+        "frames": 359,
+        "fps": 59.8,
+        "p50": 16.7,
+        "p95": 16.8,
+        "over33": 0,
+        "taskMs": 8.2,
+        "scriptMs": 1,
+        "styleLayoutMs": 1.6
+      },
+      "loafs": [
+        {
+          "t": 590,
+          "d": 884,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        },
+        {
+          "t": 2076,
+          "d": 182,
+          "block": 127,
+          "style": 144,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 33
+            }
+          ]
+        },
+        {
+          "t": 2262,
+          "d": 54,
+          "block": 2,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "react-Ds7D3P6J.js",
+              "fn": "un",
+              "inv": "MessagePort.onmessage",
+              "d": 50
+            }
+          ]
+        },
+        {
+          "t": 3138,
+          "d": 61,
+          "block": 0,
+          "style": 44,
+          "scripts": []
+        },
+        {
+          "t": 3302,
+          "d": 53,
+          "block": 2,
+          "style": 51,
+          "scripts": []
+        },
+        {
+          "t": 3441,
+          "d": 59,
+          "block": 0,
+          "style": 46,
+          "scripts": []
+        },
+        {
+          "t": 4555,
+          "d": 55,
+          "block": 0,
+          "style": 39,
+          "scripts": []
+        },
+        {
+          "t": 4678,
+          "d": 56,
+          "block": 0,
+          "style": 39,
+          "scripts": []
+        },
+        {
+          "t": 5079,
+          "d": 67,
+          "block": 11,
+          "style": 59,
+          "scripts": []
+        },
+        {
+          "t": 5155,
+          "d": 141,
+          "block": 90,
+          "style": 11,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "h",
+              "inv": "FrameRequestCallback",
+              "d": 127
+            }
+          ]
+        },
+        {
+          "t": 5441,
+          "d": 89,
+          "block": 37,
+          "style": 20,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "",
+              "inv": "import.then",
+              "d": 59
+            },
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "http://localhost:4173/assets/StockField-DkEXlC_u.js",
+              "d": 7
+            }
+          ]
+        },
+        {
+          "t": 5610,
+          "d": 68,
+          "block": 10,
+          "style": 2,
+          "scripts": [
+            {
+              "src": "StockField-DkEXlC_u.js",
+              "fn": "",
+              "inv": "FrameRequestCallback",
+              "d": 56
+            }
+          ]
+        },
+        {
+          "t": 18307,
+          "d": 94,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 11
+            }
+          ]
+        },
+        {
+          "t": 18427,
+          "d": 56,
+          "block": 0,
+          "style": 1,
+          "scripts": [
+            {
+              "src": "index-OmCo88CF.js",
+              "fn": "k",
+              "inv": "IdleRequestCallback",
+              "d": 11
+            }
+          ]
+        },
+        {
+          "t": 36357,
+          "d": 89,
+          "block": 0,
+          "style": 1,
+          "scripts": []
+        }
+      ],
+      "inp": {
+        "hero tap (signal wave)": {
+          "ms": 72,
+          "delay": 27,
+          "proc": 4,
+          "present": 42,
+          "event": "pointerdown"
+        },
+        "problem tab": {
+          "ms": 64,
+          "delay": 23,
+          "proc": 3,
+          "present": 38,
+          "event": "pointerdown"
+        },
+        "sandbox scenario": {
+          "ms": 72,
+          "delay": 11,
+          "proc": 2,
+          "present": 60,
+          "event": "pointerdown"
+        },
+        "open index menu": {
+          "ms": 176,
+          "delay": 10,
+          "proc": 2,
+          "present": 164,
+          "event": "pointerdown"
+        },
+        "language → हिन्दी": {
+          "ms": 48,
+          "delay": 13,
+          "proc": 1,
+          "present": 34,
+          "event": "pointerdown"
+        },
+        "language → English": {
+          "ms": 80,
+          "delay": 26,
+          "proc": 2,
+          "present": 53,
+          "event": "pointerdown"
+        },
+        "close menu (Escape)": {
+          "ms": 72,
+          "delay": 0,
+          "proc": 35,
+          "present": 37,
+          "event": "keydown"
+        }
+      },
+      "errors": []
+    }
+  ]
+}

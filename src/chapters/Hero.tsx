@@ -145,12 +145,11 @@ export function Hero({ lang }: { lang: string }) {
               <WhatsAppIcon size={18} />
               {c.hero.talk}
             </a>
-            {field && (
-              <button className="btn btn-text" onClick={() => explore.open()}>
-                <Box size={17} aria-hidden="true" />
-                {c.hero.explore}
-              </button>
-            )}
+            {/* Always laid out, shown once the field runs, so its arrival moves nothing. */}
+            <button className="btn btn-text hero-explore" data-ready={!!field} disabled={!field} onClick={() => explore.open()}>
+              <Box size={17} aria-hidden="true" />
+              {c.hero.explore}
+            </button>
           </div>
           <p className="hero-meta mono fade" style={{ ["--d" as string]: "1000ms" }}>
             <span>{t.hero.pill}</span>

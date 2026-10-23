@@ -32,8 +32,10 @@ export function usePuck<T extends HTMLElement>() {
     if (!el) return;
     const place = () => {
       const on = el.querySelector<HTMLElement>('[aria-pressed="true"], [aria-selected="true"]');
+      // has-puck makes the group the positioning context, so it must be on before measuring.
       el.classList.toggle("has-puck", !!on);
       if (!on) return;
+      if (on.offsetParent !== el) el.style.position = "relative";
       el.style.setProperty("--x", `${on.offsetLeft}px`);
       el.style.setProperty("--y", `${on.offsetTop}px`);
       el.style.setProperty("--w", `${on.offsetWidth}px`);

@@ -4,7 +4,7 @@ Demand-intelligence website for retailers, brands and distributors. One continuo
 
 *Sanket* (संकेत / సంకేతం) means "a signal; a sign of what comes next". The site is built on that meaning.
 
-Design record: `docs/superpowers/specs/2026-10-19-sanket-stock-field-design.md` (audit, three directions, selection, architecture, visual and motion system). QA screenshots: `qa/stock-field/`. The previous uncommitted "Cinematic Intelligence" pass is archived in `archive/cinematic-pass-20261019/`.
+Design records: `docs/superpowers/specs/2026-10-19-sanket-stock-field-design.md` (audit, three directions, selection, architecture, visual and motion system) and `docs/superpowers/specs/2026-10-23-sanket-spatial-motion-design.md` (the projection, motion and spatial pass; plan in `docs/superpowers/plans/`). QA screenshots: `qa/stock-field/`, `qa/spatial/`. The previous uncommitted "Cinematic Intelligence" pass is archived in `archive/cinematic-pass-20261019/`.
 
 ## Run
 
@@ -13,8 +13,11 @@ npm install
 npm run dev          # http://localhost:5173
 npm run build        # static site in dist/
 npm run preview      # serve the build
-npm run check        # regression check (set SANKET_TEST_URL if not on :5173)
+npm run check        # regression check incl. axe WCAG 2.2 audit (set SANKET_TEST_URL if not on :5173)
+npm run a11y         # detailed axe report: every issue, element, colours and ratio
+npm run perf         # lab performance: throttled loads, field frame times, interactions (A/B with --urls)
 npm run poster:render  # re-render the static fallback from the live scene
+npm run usdz:render  # rebuild the Quick Look model public/assets/stock-field.usdz (needs the dev server)
 ```
 
 React 18, TypeScript, Vite, three.js (vanilla, lazy-loaded), GSAP + ScrollTrigger, Lenis, Lucide. Plain CSS design system in `src/styles/` (tokens, base, shell, chapters, story, instruments). Framer Motion, Recharts and Tailwind were removed.
@@ -39,12 +42,17 @@ React 18, TypeScript, Vite, three.js (vanilla, lazy-loaded), GSAP + ScrollTrigge
 - `src/field/FieldStage.tsx`: capability gate (WebGL2, `saveData`, `deviceMemory`), lazy import, pointer input, readout HUD, projected labels.
 - `src/field/store.ts`, `useFieldScene.ts`: chapters push targets to the field via ScrollTrigger; scroll never re-renders React.
 - `src/chapters/*`: one file per chapter; `Sandbox.tsx` is the bespoke SVG forecast chart (same data model as before).
-- `src/copy.ts`: new strings in English, Hindi and Telugu; existing copy stays in `src/i18n.ts`.
+- `src/field/projection.ts`: what the projector casts per chapter (slides drawn to a canvas; decide markings per colour channel).
+- `src/field/timeline.ts`, `bridge.ts`, `tilt.ts`, `usdz.ts`: explore timeline, the running field for non-stage code, device tilt, the Quick Look exporter.
+- `src/explore/`: explore mode (lazy): `Explore.tsx` dialog, `xr.ts` WebXR detection and sessions, strings.
+- `src/components/Palette.tsx` (lazy), `Odometer.tsx`, `Dock.tsx`, `Toast.tsx`; `src/lib/prefs.ts` (motion choice), `visit.ts` (what the visitor explored), `commands.ts`, `detents.ts`.
+- `src/copy.ts`: new strings in English, Hindi and Telugu; existing copy stays in `src/i18n.ts`. Palette and explore strings live in their lazy chunks.
 
 ## Behaviour notes
 
 - **Fallbacks.** No WebGL2, data saving on, or less than 4 GB of reported memory: the field becomes `public/assets/stock-field.jpg`, rendered from the real scene. Reduced motion: no smooth scroll, reveals or idle motion; the field still shows each chapter's state as a still frame.
 - **Phones.** A 24 × 16 field at a lower pixel ratio, a full-screen index dialog (focus is contained, Escape closes it, focus returns to the button), no hover-only behaviour, and native touch scrolling.
+- **Motion choice.** The header's pause button (also in the phone index and the palette) stops everything that moves on its own: idle field motion, waves, the signal cycle, loops, cursor and magnetic effects, smooth scroll. Remembered; starts paused under reduced motion. One-shot reveals still run unless the system asks for reduced motion.
 - **Honesty.** Field readouts, the sandbox, engine results and industry telemetry are labelled illustrative. The public stories are labelled as not SANKET customer results and link their sources. No testimonials, logos, pricing or new statistics were added.
 
 ## Working interactions
@@ -53,7 +61,16 @@ React 18, TypeScript, Vite, three.js (vanilla, lazy-loaded), GSAP + ScrollTrigge
 - **ROI:** INR/USD sample businesses with Small business, Growing business and Enterprise presets. Currency changes load separate scenarios, not exchange-rate conversions. Default INR small business: ₹5,60,000. USD Enterprise: $1,120,000; with revenue at 200,000,000 it becomes $1,420,000. Typed amounts commit on blur or Enter; the formula is shown.
 - Problem tabs and the industry accordion are keyboard-operable; the connector search covers all three categories and has an empty state.
 - **Languages:** English, Hindi and Telugu, remembered in the browser, and `<html lang>` is set. Industry details and the film remain in English, as labelled.
-- **Contact:** no forms. WhatsApp (wa.me) and email (mailto) links carry a pre-written message in the visitor's language; the email address can be copied.
+- **Contact:** no forms. WhatsApp (wa.me) and email (mailto) links carry a pre-written message in the visitor's language, plus what they explored (industry opened, ROI estimate, sandbox decision), shown as removable chips. Kept in memory only: never stored or sent except inside the link the visitor presses. The email address can be copied (with a toast).
+
+## Projection, motion and spatial (23 October 2026)
+
+- **Navigation.** ⌘K / Ctrl+K, `/` or the header's search pill opens a palette of every chapter, tool (ROI, sandbox, connector search, stories, film) and action (language, motion, explore, WhatsApp, email, copy address, tilt). Header links fill with reading progress. Phones get a dock (Talk to us, Jump to) after the hero; it hides at Contact.
+- **Projection mapping.** A top-down projector casts light onto the stock: "IN / STOCK" fractured and faint on the unbalanced hero field, crisp on the level field at Contact; signal names and ripples; a reticle on the focused problem; Decide's floor markings (+ orders, dashed routes for transfers, % markdowns) fading with each decision window. The stage mirrors the slide in `data-slide`.
+- **Spatial.** Off-axis window parallax (pointer, or phone tilt on request); labels scale with depth; panels catch a pointer-following sheen and tip up to 2°.
+- **Explore the warehouse** (hero or palette): fly the live field (drag, pinch, keys), scrub the timeline Unbalanced → In stock, inspect columns (N = next stockout, announced), send signals. Escape returns to the story.
+- **Place it on your desk.** In explore: WebXR AR on ARCore phones (tap a surface, 40 cm wide, timeline in a DOM overlay), VR on Quest / Vision Pro (table height), Apple Quick Look on iPhone / iPad (`stock-field.usdz`). Buttons appear only with support.
+- **Motion system.** Mechanical counters (ROI, sandbox, Decide board, story figures); machined sliders with detents and Android haptics; springing segment pucks; pressable buttons; headings that drop in like cartons; a contact title whose letters level as you arrive; animated disclosures and focus rings; a gliding tab indicator.
 
 ## Retained product film
 

@@ -350,8 +350,9 @@ async function open(options = {}) {
     await page.locator(".palette [role=combobox]").waitFor();
     await scan(" palette", ".palette");
     await page.keyboard.press("Escape");
-    if (lang === "en" && width === 1440 && (await page.locator(".hero .btn-text").count())) {
-      await page.locator(".hero .btn-text").click();
+    const explorable = page.locator('.hero-explore[data-ready="true"]');
+    if (lang === "en" && width === 1440 && (await explorable.waitFor({ timeout: 20000 }).then(() => true, () => false))) {
+      await explorable.click();
       await page.locator(".explore[open]").waitFor();
       await scan(" explore", ".explore");
       await page.keyboard.press("Escape");
@@ -430,7 +431,7 @@ for (const device of ["webxr-ar", "quicklook"]) {
   const page = await context.newPage();
   page.on("pageerror", e => errors.push(e.message));
   await page.goto(baseUrl, { waitUntil: "networkidle" });
-  await page.locator(".hero .btn-text").click();
+  await page.locator('.hero-explore[data-ready="true"]').click();
   const dlg = page.locator(".explore[open]");
   await dlg.waitFor();
   if (device === "webxr-ar") {
@@ -438,6 +439,7 @@ for (const device of ["webxr-ar", "quicklook"]) {
     await dlg.getByRole("status").filter({ hasText: /Couldn’t start AR or VR/ }).waitFor();
   } else {
     const link = dlg.locator('a[rel="ar"][href="/assets/stock-field.usdz"]');
+    await link.waitFor({ timeout: 5000 }).catch(() => {}); // feature detection is async
     if ((await link.count()) !== 1 || (await link.locator("img").count()) !== 1) fail("Quick Look needs one rel=ar link wrapping an img");
   }
   await context.close();

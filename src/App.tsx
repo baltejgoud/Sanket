@@ -5,8 +5,9 @@ import { FieldStage } from "./field/FieldStage";
 import { Header } from "./components/Header";
 import { Cursor } from "./components/Cursor";
 import { onIdle, ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
-import { explore, palette } from "./lib/paletteBus";
-import { useField } from "./field/bridge";
+import { palette } from "./lib/paletteBus";
+import { fieldBridge } from "./field/bridge";
+import { ExploreHost } from "./explore/ExploreHost";
 import { Toaster } from "./components/Toast";
 import { Dock } from "./components/Dock";
 import { useMotion } from "./lib/prefs";
@@ -21,7 +22,6 @@ import { Invitation } from "./chapters/Invitation";
 
 const loadPalette = () => import("./components/Palette");
 const Palette = lazy(loadPalette);
-const Explore = lazy(() => import("./explore/Explore"));
 
 const TRACKED = ["top", "signal", "problems", "forecast", "command", "decide", "industries", "integrations", "roi", "stories", "security", "contact"];
 
@@ -75,11 +75,21 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     const off = palette.onOpen(open);
-    // Fetch the palette while idle so the first ⌘K opens at once.
-    const cancel = onIdle(() => void loadPalette(), 4000);
+    // Fetch the palette in real idle time once the field has booted (or after 8s without it), so
+    // the first ⌘K opens at once without competing with the page's start-up.
+    let cancel = () => {};
+    const prefetch = () => {
+      off2();
+      clearTimeout(late);
+      cancel = onIdle(() => void loadPalette(), 20000);
+    };
+    const off2 = fieldBridge.subscribe(() => fieldBridge.get() && prefetch());
+    const late = window.setTimeout(prefetch, 8000);
     return () => {
       window.removeEventListener("keydown", onKey);
       off();
+      off2();
+      clearTimeout(late);
       cancel();
     };
   }, []);
@@ -88,22 +98,6 @@ export default function App() {
     if (!ran) opener.current?.focus({ preventScroll: true });
   }, []);
 
-  // Explore mode: only while the field is running (not on the poster).
-  const field = useField();
-  const [exploring, setExploring] = useState(false);
-  const exploreOpener = useRef<HTMLElement | null>(null);
-  useEffect(
-    () =>
-      explore.onOpen(() => {
-        exploreOpener.current = document.activeElement as HTMLElement | null;
-        setExploring(true);
-      }),
-    [],
-  );
-  const closeExplore = useCallback(() => {
-    setExploring(false);
-    exploreOpener.current?.focus({ preventScroll: true });
-  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -152,9 +146,9 @@ export default function App() {
       </main>
       <Dock />
       <Suspense fallback={null}>
-        {paletteOpen && <Palette lang={lang} setLang={switchLang} explore={field ? explore.open : undefined} onClose={closePalette} />}
-        {exploring && field && <Explore lang={lang} onClose={closeExplore} />}
+        {paletteOpen && <Palette lang={lang} setLang={switchLang} onClose={closePalette} />}
       </Suspense>
+      <ExploreHost lang={lang} />
       <Toaster />
     </LangContext.Provider>
   );

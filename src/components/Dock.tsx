@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Box, Search } from "lucide-react";
 import { useCopy } from "../copy";
 import { useContactLinks } from "../lib/contact";
 import { useMedia } from "../lib/motion";
-import { palette } from "../lib/paletteBus";
+import { explore, palette } from "../lib/paletteBus";
+import { useField } from "../field/bridge";
 import { WhatsAppIcon } from "./Icons";
 
 /**
@@ -14,6 +15,7 @@ export function Dock() {
   const phone = useMedia("(max-width: 699px)");
   const c = useCopy();
   const links = useContactLinks();
+  const field = useField();
   const [pastHero, setPastHero] = useState(false);
   const [atContact, setAtContact] = useState(false);
 
@@ -45,6 +47,12 @@ export function Dock() {
         <Search size={18} aria-hidden="true" />
         <span>{c.nav.jump}</span>
       </button>
+      {field && (
+        <button className="dock-jump dock-icon" onClick={() => explore.open()}>
+          <Box size={18} aria-hidden="true" />
+          <span className="sr-only">{c.hero.explore}</span>
+        </button>
+      )}
     </nav>
   );
 }

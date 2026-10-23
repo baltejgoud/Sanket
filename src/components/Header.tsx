@@ -6,6 +6,7 @@ import { ScrollTrigger, scrollToId, useMagnetic } from "../lib/motion";
 import { prefs, useMotion } from "../lib/prefs";
 import { palette } from "../lib/paletteBus";
 import { usePuck } from "../lib/detents";
+import { fieldStore } from "../field/store";
 import { Mark } from "./Icons";
 
 export const CHAPTERS = [
@@ -51,6 +52,8 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
     if (!d) return;
     if (open && !d.open) d.showModal();
     if (!open && d.open) d.close();
+    // The index covers the whole screen: the field need not draw behind it.
+    fieldStore.setCovered(open);
   }, [open]);
 
   const closeMenu = (thenScrollTo?: string) => {
@@ -240,9 +243,14 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
     });
     ro.observe(document.body);
     // Pins re-space the page on refresh (fonts, language) without always resizing the body.
+    // Measured on the next frame, once that layout has happened, rather than forcing it now.
+    let refreshRaf = 0;
     const onRefresh = () => {
-      measure();
-      onScroll();
+      cancelAnimationFrame(refreshRaf);
+      refreshRaf = requestAnimationFrame(() => {
+        measure();
+        update();
+      });
     };
     ScrollTrigger.addEventListener("refresh", onRefresh);
     measure();
@@ -252,6 +260,7 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
     return () => {
       ro.disconnect();
       ScrollTrigger.removeEventListener("refresh", onRefresh);
+      cancelAnimationFrame(refreshRaf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
       cancelAnimationFrame(raf);

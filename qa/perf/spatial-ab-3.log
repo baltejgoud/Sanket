@@ -1,0 +1,12 @@
+before mobile  cpu1x r1  FCP 2292  LCP 3220 (p.lead.fade)  CLS 0.005  TBT 630  longest 602  ready 5995 webgl  | hero 55.9fps p95 18.4ms main 1.3ms/f  | decide 51.9fps p95 34.8ms main 10.6ms/f style 2.3  | INP~ 160
+after  mobile  cpu1x r1  FCP 2352  LCP 3332 (p.lead.fade)  CLS 0.005  TBT 437  longest 196  ready 5823 webgl  | hero 56.1fps p95 18.2ms main 1.1ms/f  | decide 55.6fps p95 18.5ms main 9.4ms/f style 2.1  | INP~ 472
+after  mobile  cpu1x r2  FCP 2340  LCP 3288 (p.lead.fade)  CLS 0.005  TBT 214  longest 149  ready 5730 webgl  | hero 55.2fps p95 19.2ms main 1.9ms/f  | decide 56.9fps p95 16.9ms main 6.5ms/f style 1.4  | INP~ 144
+before mobile  cpu1x r2  FCP 2288  LCP 3224 (p.lead.fade)  CLS 0.005  TBT 364  longest 336  ready 5964 webgl  | hero 60fps p95 17ms main 1.2ms/f  | decide 60fps p95 16.9ms main 8.3ms/f style 1.7  | INP~ 152
+before mobile  cpu1x r3  FCP 2284  LCP 3216 (p.lead.fade)  CLS 0.005  TBT 82  longest 130  ready 5516 webgl  | hero 60fps p95 17ms main 1.6ms/f  | decide 60fps p95 16.9ms main 7.2ms/f style 1.5  | INP~ 128
+after  mobile  cpu1x r3  FCP 2304  LCP 3256 (p.lead.fade)  CLS 0.005  TBT 167  longest 148  ready 5685 webgl  | hero 60fps p95 17.1ms main 1.3ms/f  | decide 59.8fps p95 16.8ms main 8.2ms/f style 1.6  | INP~ 176
+| build | profile | CPU | FCP | LCP | CLS | TBT | worst interaction | hero fps (main ms/frame) | Decide fps (main ms/frame) | runs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| before | mobile | 1x | 2288 | 3220 | 0.005 | 364 | 152 | 60 (1.3) | 60 (8.3) | 3 |
+| after | mobile | 1x | 2340 | 3288 | 0.005 | 214 | 176 | 56.1 (1.3) | 56.9 (8.2) | 3 |
+gl: ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11)
+wrote qa/perf/spatial-ab-3.json
