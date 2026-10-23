@@ -78,9 +78,9 @@ async function open(options = {}) {
   ok("sandbox scenarios, horizon, reset, slider → decision");
 
   // Industries accordion.
-  await page.getByRole("button", { name: /Pharma/ }).click();
+  await page.locator(".industry-list").getByRole("button", { name: /Pharma/ }).click();
   await page.getByText("Every decision. Fully traceable.").first().waitFor();
-  if ((await page.getByRole("button", { name: /Pharma/ }).getAttribute("aria-expanded")) !== "true") fail("Pharma did not expand");
+  if ((await page.locator(".industry-list").getByRole("button", { name: /Pharma/ }).getAttribute("aria-expanded")) !== "true") fail("Pharma did not expand");
   ok("industry accordion");
 
   // Connector search and setup details.
@@ -104,6 +104,16 @@ async function open(options = {}) {
   if ((await total()) !== "$1,420,000") fail("Revenue change should give $1,420,000, got " + (await total()));
   await page.locator("#roi").screenshot({ path: `${out}/roi.png` });
   ok("ROI ₹5,60,000 / $1,120,000 / $1,420,000");
+
+  // Contact carries what the visitor explored (Pharma is open, ROI and sandbox were used), and each item can be removed.
+  const wa = async () => decodeURIComponent(await page.locator("#contact a[href^='https://wa.me/']").first().getAttribute("href"));
+  await page.locator("#contact .context-chips li").nth(2).waitFor();
+  const waText = await wa();
+  if (!/Pharma/.test(waText) || !/\$1,420,000/.test(waText) || !/Baseline/.test(waText)) fail("WhatsApp message lacks context: " + waText);
+  if (!/Pharma/.test(decodeURIComponent(await page.locator("#contact a[href^='mailto:']").first().getAttribute("href")))) fail("Email lacks context");
+  await page.locator("#contact .context-chips").getByRole("button", { name: /Remove.*Pharma/ }).click();
+  if (/Pharma/.test(await wa())) fail("Removed chip still in the message");
+  ok("contact message carries removable context");
 
   // Public stories: filter and sources.
   if ((await page.locator(".ledger-entry").count()) !== 6) fail("Six stories expected");

@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, Lock, Plus, Search, X } from "lucide-react";
 import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { connectors, industries } from "../data";
 import { useReveal } from "../lib/motion";
+import { visit } from "../lib/visit";
 import { RevealHeading } from "../components/Words";
 import { series, smooth } from "./Sandbox";
 
@@ -27,8 +28,15 @@ function Spark({ phase, scenario }: { phase: number; scenario: number }) {
 }
 
 function Industries() {
-  const c = useCopy().world;
+  const { world: c, contact } = useCopy();
   const [open, setOpen] = useState(0);
+  // Apparel opens by default; only an industry the visitor picks goes into their message.
+  const picked = useRef(false);
+  useEffect(() => {
+    if (!picked.current) return;
+    const ind = industries[open];
+    visit.set("industry", ind ? { label: ind.short, line: contact.industry(ind.name) } : null);
+  }, [open, contact]);
   return (
     <div className="industry-list">
       {industries.map((ind, i) => {
@@ -40,7 +48,10 @@ function Industries() {
                 id={`industry-${i}`}
                 aria-expanded={isOpen}
                 aria-controls={`industry-panel-${i}`}
-                onClick={() => setOpen(isOpen ? -1 : i)}
+                onClick={() => {
+                  picked.current = true;
+                  setOpen(isOpen ? -1 : i);
+                }}
               >
                 <span className="mono">0{i + 1}</span>
                 <span className="industry-name">{ind.short}</span>

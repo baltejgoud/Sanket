@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { PackageCheck, RefreshCw, TrendingDown, TrendingUp, Zap } from "lucide-react";
 import { useCopy } from "../copy";
 import { prefersReducedMotion } from "../lib/motion";
+import { visit } from "../lib/visit";
 
 export interface Point {
   week: number;
@@ -77,7 +78,7 @@ function useTween(data: Point[], instant: boolean) {
 }
 
 export function Sandbox() {
-  const c = useCopy().forecast;
+  const { forecast: c, contact } = useCopy();
   const [scenario, setScenario] = useState(0);
   const [horizon, setHorizon] = useState(13);
   const [offset, setOffset] = useState(0);
@@ -90,6 +91,17 @@ export function Sandbox() {
   const shown = useTween(data, drag !== null);
   const quantity = reorderQuantity(data);
   const last = data[data.length - 1];
+
+  // Once the visitor changes anything, the scenario and its decision go into the contact message.
+  // (Compared with the first values rather than "skip the first effect", which StrictMode runs twice.)
+  const initial = useRef(`${scenario}/${quantity}`);
+  const touched = useRef(false);
+  useEffect(() => {
+    touched.current ||= `${scenario}/${quantity}` !== initial.current;
+    if (!touched.current) return;
+    const qty = quantity.toLocaleString("en-US");
+    visit.set("sandbox", { label: `${c.scenarios[scenario]} · ${qty}`, line: contact.sandbox(c.scenarios[scenario], qty) });
+  }, [scenario, quantity, c, contact]);
 
   useEffect(() => {
     const el = box.current;

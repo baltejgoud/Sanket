@@ -55,7 +55,16 @@ export interface Copy {
     all: string;
   };
   proof: { plate: string; read: string; evidence: string; year: string; company: string; what: string };
-  contact: { plate: string };
+  contact: {
+    plate: string;
+    include: string;
+    remove: string;
+    /** heading for the context lines inside the message */
+    lead: string;
+    industry: (name: string) => string;
+    roi: (value: string, size: string) => string;
+    sandbox: (scenario: string, qty: string) => string;
+  };
   footer: { signature: string };
 }
 
@@ -160,7 +169,15 @@ const en: Copy = {
     all: "All",
   },
   proof: { plate: "Proof", read: "Read the story and sources", evidence: "Public industry examples, not SANKET customer results", year: "Year", company: "Who", what: "What happened" },
-  contact: { plate: "Talk to us" },
+  contact: {
+    plate: "Talk to us",
+    include: "Your message will mention what you explored:",
+    remove: "Remove",
+    lead: "What I looked at on your site:",
+    industry: name => `Industry: ${name}`,
+    roi: (value, size) => `ROI estimate: ${value} a year (${size} sample)`,
+    sandbox: (scenario, qty) => `Forecast sandbox: ${scenario}, reorder ${qty} units`,
+  },
   footer: { signature: "A signal of what comes next." },
 };
 
@@ -265,7 +282,15 @@ const hi: Copy = {
     all: "सभी",
   },
   proof: { plate: "प्रमाण", read: "कहानी और स्रोत पढ़ें", evidence: "सार्वजनिक उद्योग उदाहरण, SANKET ग्राहकों के परिणाम नहीं", year: "वर्ष", company: "कौन", what: "क्या हुआ" },
-  contact: { plate: "बात करें" },
+  contact: {
+    plate: "बात करें",
+    include: "आपके संदेश में वह भी होगा जो आपने यहाँ देखा:",
+    remove: "हटाएँ",
+    lead: "आपकी साइट पर मैंने यह देखा:",
+    industry: name => `उद्योग: ${name}`,
+    roi: (value, size) => `ROI अनुमान: ${value} प्रति वर्ष (${size} का उदाहरण)`,
+    sandbox: (scenario, qty) => `पूर्वानुमान सैंडबॉक्स: ${scenario}, ${qty} यूनिट का दोबारा ऑर्डर`,
+  },
   footer: { signature: "आगे क्या होने वाला है, उसका संकेत।" },
 };
 
@@ -370,7 +395,15 @@ const te: Copy = {
     all: "అన్నీ",
   },
   proof: { plate: "రుజువు", read: "కథ మరియు మూలాలను చదవండి", evidence: "బహిరంగ పరిశ్రమ ఉదాహరణలు; SANKET కస్టమర్ ఫలితాలు కావు", year: "సంవత్సరం", company: "ఎవరు", what: "ఏం జరిగింది" },
-  contact: { plate: "మాట్లాడండి" },
+  contact: {
+    plate: "మాట్లాడండి",
+    include: "మీరు ఇక్కడ చూసినవి మీ సందేశంలో ఉంటాయి:",
+    remove: "తీసివేయండి",
+    lead: "మీ సైట్‌లో నేను చూసినవి:",
+    industry: name => `పరిశ్రమ: ${name}`,
+    roi: (value, size) => `ROI అంచనా: సంవత్సరానికి ${value} (${size} ఉదాహరణ)`,
+    sandbox: (scenario, qty) => `అంచనా శాండ్‌బాక్స్: ${scenario}, ${qty} యూనిట్ల రీఆర్డర్`,
+  },
   footer: { signature: "రాబోయేదాని సంకేతం." },
 };
 

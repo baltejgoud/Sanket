@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, Check, Copy, Mail } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Check, Copy, Mail, X } from "lucide-react";
 import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
 import { fieldStore } from "../field/store";
 import { useMagnetic, useReveal } from "../lib/motion";
-import { EMAIL, mailLink, WHATSAPP_DISPLAY, whatsappLink } from "../lib/contact";
+import { EMAIL, WHATSAPP_DISPLAY, useContactLinks } from "../lib/contact";
+import { useVisit, visit } from "../lib/visit";
 import { Mark, WhatsAppIcon } from "../components/Icons";
 import { RevealHeading } from "../components/Words";
 
@@ -17,6 +18,8 @@ export function Invitation() {
   const timer = useRef<number>();
   const wa = useMagnetic<HTMLAnchorElement>(0.12);
   const mail = useMagnetic<HTMLAnchorElement>(0.12);
+  const links = useContactLinks();
+  const explored = useVisit();
   useFieldScene(section, { shot: "level", signal: 0, forecast: 0, level: 1, focus: -1 });
 
   // One last signal crosses the now-level field.
@@ -63,7 +66,7 @@ export function Invitation() {
             {t.contact.p}
           </p>
           <div className="contact-rows fade" style={{ ["--d" as string]: "420ms" }}>
-            <a ref={wa} className="contact-row" href={whatsappLink(t.cta.waMessage)} target="_blank" rel="noreferrer">
+            <a ref={wa} className="contact-row" href={links.wa} target="_blank" rel="noreferrer">
               <span className="contact-icon">
                 <WhatsAppIcon size={24} />
               </span>
@@ -74,7 +77,7 @@ export function Invitation() {
               </span>
               <ArrowUpRight className="contact-arrow" size={26} aria-hidden="true" />
             </a>
-            <a ref={mail} className="contact-row" href={mailLink}>
+            <a ref={mail} className="contact-row" href={links.mail}>
               <span className="contact-icon">
                 <Mail size={22} aria-hidden="true" />
               </span>
@@ -86,6 +89,21 @@ export function Invitation() {
               <ArrowUpRight className="contact-arrow" size={26} aria-hidden="true" />
             </a>
           </div>
+          {explored.length > 0 && (
+            <div className="context">
+              <p className="mono muted">{c.contact.include}</p>
+              <ul className="context-chips">
+                {explored.map(item => (
+                  <li key={item.key}>
+                    <span>{item.label}</span>
+                    <button aria-label={`${c.contact.remove}: ${item.label}`} onClick={() => visit.remove(item.key)}>
+                      <X size={14} aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button className="link-line copy-email" onClick={copyEmail}>
             {copied === "ok" ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
             {copied === "ok" ? t.contact.copied : copied === "fail" ? t.contact.copyFail : t.contact.copy}
@@ -111,10 +129,10 @@ export function Invitation() {
               </span>
             </span>
             <nav className="footer-links" aria-label="Contact">
-              <a className="link-line" href={mailLink}>
+              <a className="link-line" href={links.mail}>
                 {t.cta.email}
               </a>
-              <a className="link-line" href={whatsappLink(t.cta.waMessage)} target="_blank" rel="noreferrer">
+              <a className="link-line" href={links.wa} target="_blank" rel="noreferrer">
                 WhatsApp
               </a>
               <a className="link-line" href="#top">

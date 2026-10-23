@@ -880,6 +880,56 @@
   justify-self: start;
   color: var(--concrete);
 }
+/* What the visitor explored, as removable chips under the contact rows. */
+.context {
+  display: grid;
+  gap: 10px;
+}
+.context-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.context-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 4px 0 14px;
+  border: 1px solid var(--line-dark-2);
+  border-radius: 999px;
+  background: rgb(20 22 19 / 0.8);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--bone);
+  animation: chip-in var(--t-ui) var(--ease-settle) both;
+}
+.context-chips button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--concrete);
+  transition:
+    color var(--t-micro),
+    background-color var(--t-micro);
+}
+.context-chips button:hover {
+  color: var(--ink);
+  background: var(--signal);
+}
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .context-chips li {
+    animation: none;
+  }
+}
 
 .site-footer {
   position: relative;

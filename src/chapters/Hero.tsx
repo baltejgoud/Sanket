@@ -4,7 +4,7 @@ import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
 import { prefersReducedMotion, useMagnetic } from "../lib/motion";
-import { whatsappLink } from "../lib/contact";
+import { useContactLinks } from "../lib/contact";
 import { WhatsAppIcon } from "../components/Icons";
 import { Words } from "../components/Words";
 
@@ -92,6 +92,7 @@ export function Hero({ lang }: { lang: string }) {
   const section = useRef<HTMLElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const cta = useMagnetic<HTMLAnchorElement>(0.2);
+  const links = useContactLinks();
   const latin = lang === "en";
   useFieldScene(section, { shot: "hero", signal: 0, forecast: 0, level: 0, focus: -1 });
   useRise(title, latin);
@@ -137,7 +138,7 @@ export function Hero({ lang }: { lang: string }) {
                 <ArrowDownRight size={20} />
               </span>
             </a>
-            <a className="btn btn-ghost" href={whatsappLink(t.cta.waMessage)} target="_blank" rel="noreferrer">
+            <a className="btn btn-ghost" href={links.wa} target="_blank" rel="noreferrer">
               <WhatsAppIcon size={18} />
               {c.hero.talk}
             </a>

@@ -4,6 +4,7 @@ import { LangContext, useT } from "../i18n";
 import { useCopy } from "../copy";
 import { storyMeta } from "../data";
 import { useReveal } from "../lib/motion";
+import { visit } from "../lib/visit";
 import { RevealHeading } from "../components/Words";
 
 type Currency = "INR" | "USD";
@@ -57,6 +58,7 @@ function EditableNumber({ value, commit, min, max, label, id }: { value: number;
 function ROI() {
   const lang = useContext(LangContext);
   const c = roiCopy[lang];
+  const contact = useCopy().contact;
   const [currency, setCurrency] = useState<Currency>("INR");
   const [size, setSize] = useState(0);
   const [revenue, setRevenue] = useState(5e7);
@@ -103,6 +105,16 @@ function ROI() {
     }
     setPulse(n => n + 1);
   }, [total]);
+  // Once the visitor has worked the calculator, their estimate goes into the contact message.
+  const initial = useRef(`${total}/${currency}/${size}`);
+  const touched = useRef(false);
+  useEffect(() => {
+    touched.current ||= `${total}/${currency}/${size}` !== initial.current;
+    if (!touched.current) return;
+    const id = window.setTimeout(() => visit.set("roi", { label: format(total), line: contact.roi(format(total), c.sizes[size]) }), 400);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total, currency, size, lang]);
   const p = presets[currency][size];
   const sliders = [
     { key: "revenue", label: c.revenue, value: revenue, set: setRevenue, min: p.revenue / 10, max: p.revenue * 5, step: p.revenue / 100, money: true },
