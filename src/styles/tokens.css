@@ -38,6 +38,10 @@
   --t-micro: 180ms;
   --t-ui: 360ms;
   --t-reveal: 900ms;
+  --t-roll: 760ms;
+  /* A damped spring (one overshoot, settles) for physical things: pucks, counters, cartons. */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --ease-drop: cubic-bezier(0.3, 1.25, 0.45, 1);
 
   --fs-mono: 0.6875rem;
   --fs-small: 0.875rem;
@@ -49,6 +53,12 @@
 }
 
 /* Indic scripts: taller line boxes, no negative tracking, serif display faces. */
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(0, 0.013 0.6%, 0.05 1.2%, 0.2 2.8%, 0.42 4.7%, 0.82 8.6%, 0.95 10.4%, 1.04 12.1%, 1.1 13.9%, 1.13 15.6%, 1.14 17.4%, 1.13 19.4%, 1.1 21.6%, 1.02 27%, 0.99 30.4%, 0.98 34%, 0.99 41%, 1 54%, 1);
+  }
+}
+
 :root:lang(hi) {
   --font-display: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
   --font-text: "Noto Sans Devanagari", "Archivo", system-ui, sans-serif;

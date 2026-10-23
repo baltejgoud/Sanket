@@ -106,6 +106,10 @@ async function open(options = {}) {
   await page.getByRole("spinbutton", { name: "Annual revenue", exact: true }).fill("200000000");
   await page.getByRole("spinbutton", { name: "Annual revenue", exact: true }).press("Enter");
   if ((await total()) !== "$1,420,000") fail("Revenue change should give $1,420,000, got " + (await total()));
+  if (!(await page.getByTestId("roi-total").locator(".odo-face").count())) fail("ROI total should be a mechanical counter");
+  if ((await page.locator(".decision-qty .odo-board").count()) !== 1) fail("Reorder quantity should be a board counter");
+  if ((await page.locator(".ledger-stat .odo").count()) !== 6) fail("Story figures should be counters");
+  ok("mechanical counters keep exact text");
   await page.locator("#roi").screenshot({ path: `${out}/roi.png` });
   ok("ROI ₹5,60,000 / $1,120,000 / $1,420,000");
 

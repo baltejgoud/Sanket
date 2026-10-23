@@ -3,6 +3,7 @@ import { PackageCheck, RefreshCw, TrendingDown, TrendingUp, Zap } from "lucide-r
 import { useCopy } from "../copy";
 import { prefersReducedMotion } from "../lib/motion";
 import { visit } from "../lib/visit";
+import { Odometer } from "../components/Odometer";
 
 export interface Point {
   week: number;
@@ -167,7 +168,7 @@ export function Sandbox() {
         <div>
           <span className="mono">{c.expected}</span>
           <strong>
-            {last.median.toLocaleString("en-US")} <small>{c.perWeek}</small>
+            <Odometer value={last.median.toLocaleString("en-US")} /> <small>{c.perWeek}</small>
           </strong>
         </div>
         <span className={`delta ${scenario === 1 ? "down" : ""}`}>
@@ -302,7 +303,9 @@ export function Sandbox() {
         </span>
         <p className="decision-qty">
           <PackageCheck size={26} aria-hidden="true" />
-          <strong key={quantity}>{quantity.toLocaleString("en-US")}</strong>
+          <strong>
+            <Odometer value={quantity.toLocaleString("en-US")} variant="board" />
+          </strong>
           <span>{c.reorder}</span>
         </p>
         <span className="mono muted">{c.leadTime}</span>

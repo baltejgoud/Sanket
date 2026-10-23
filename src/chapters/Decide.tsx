@@ -4,6 +4,7 @@ import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
 import { fieldStore } from "../field/store";
 import { ScrollTrigger, onIdle, useReveal } from "../lib/motion";
+import { OdometerPhrase } from "../components/Odometer";
 
 /** Text steps inside the 0..1 scrub; the field's decision windows overlap these. */
 const STEPS: [number, number][] = [
@@ -157,7 +158,9 @@ export function Decide() {
             {c.decide.verbs.map((v, i) => (
               <div key={i} className={`decision-body ${i === step ? "is-active" : ""}`}>
                 <p className="decision-desc">{v.desc}</p>
-                <p className="decision-result display">{v.result}</p>
+                <p className="decision-result display">
+                  <OdometerPhrase text={v.result} variant="board" active={i === step} />
+                </p>
                 <p className="mono muted">{v.detail}</p>
               </div>
             ))}

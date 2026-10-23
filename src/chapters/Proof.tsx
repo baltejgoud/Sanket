@@ -6,6 +6,7 @@ import { storyMeta } from "../data";
 import { useReveal } from "../lib/motion";
 import { visit } from "../lib/visit";
 import { RevealHeading } from "../components/Words";
+import { Odometer } from "../components/Odometer";
 
 type Currency = "INR" | "USD";
 const presets = {
@@ -72,8 +73,6 @@ function ROI() {
   const [markdownSpend, setMarkdownSpend] = useState(600000);
   const [freightRate, setFreightRate] = useState(40);
   const [markdownRate, setMarkdownRate] = useState(15);
-  const [pulse, setPulse] = useState(0);
-  const mounted = useRef(false);
   const carrying = (((inventory * holding) / 100) * inventoryReduction) / 100;
   const recovered = (((((revenue * stockouts) / 100) * margin) / 100) * stockReduction) / 100;
   const freight = (freightSpend * freightRate) / 100;
@@ -98,13 +97,6 @@ function ROI() {
     setFreightRate(40);
     setMarkdownRate(15);
   };
-  useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
-    setPulse(n => n + 1);
-  }, [total]);
   // Once the visitor has worked the calculator, their estimate goes into the contact message.
   const initial = useRef(`${total}/${currency}/${size}`);
   const touched = useRef(false);
@@ -219,15 +211,17 @@ function ROI() {
       </div>
       <div className="roi-result">
         <span className="mono accent">{c.impact}</span>
-        <p className="roi-total display" data-testid="roi-total" key={pulse}>
-          {format(total)}
+        <p className="roi-total display" data-testid="roi-total">
+          <Odometer value={format(total)} />
         </p>
         <span className="muted">{c.sub}</span>
         <ul className="roi-rows">
           {values.map((n, i) => (
             <li key={c.rows[i]}>
               <span>{c.rows[i]}</span>
-              <strong>+{format(n)}</strong>
+              <strong>
+                +<Odometer value={format(n)} />
+              </strong>
               <i style={{ transform: `scaleX(${total ? n / total : 0})` }} aria-hidden="true" />
             </li>
           ))}
@@ -297,7 +291,9 @@ function Stories() {
                 </span>
                 <span className="ledger-company">{text.company}</span>
                 <span className="ledger-stat">
-                  <strong>{text.stat}</strong>
+                  <strong>
+                    <Odometer value={text.stat} from="zero" />
+                  </strong>
                   <span className="mono">{text.statLabel}</span>
                 </span>
                 <span className="ledger-what">

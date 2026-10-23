@@ -1134,3 +1134,7 @@
     height: 46px;
   }
 }
+/* Board counters inside a sentence ("Transfer 360 units") keep clear of the words. */
+.decision-result .odo-board {
+  margin-inline: 0.14em;
+}

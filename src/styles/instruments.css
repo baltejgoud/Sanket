@@ -329,14 +329,6 @@
   letter-spacing: -0.035em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  animation: qty-in 0.6s var(--ease-settle);
-}
-@keyframes qty-in {
-  from {
-    opacity: 0.2;
-    transform: translateY(8px);
-    color: var(--signal);
-  }
 }
 .decision .muted {
   color: var(--concrete);
@@ -641,7 +633,6 @@ input[type="range"]:active::-webkit-slider-thumb {
   line-height: 0.95;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
-  animation: qty-in 0.5s var(--ease-settle);
 }
 .roi-rows {
   display: grid;

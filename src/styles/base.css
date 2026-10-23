@@ -418,3 +418,75 @@ details > summary::-webkit-details-marker {
     opacity: 1;
   }
 }
+
+/* ---------- Mechanical counter (Odometer.tsx) ---------- */
+.odo {
+  position: relative;
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+}
+/* The real text: what innerText, copy and screen readers get. Visually it is the face. */
+.odo-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.odo-face {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.odo-c::before {
+  content: attr(data-c);
+  white-space: pre;
+}
+.odo-d {
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+  vertical-align: top;
+  align-self: center;
+}
+.odo-d::before {
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  display: block;
+  white-space: pre;
+  line-height: 1;
+  transform: translateY(calc(var(--v, 0) * -1em));
+  transition: transform var(--t-roll) var(--ease-spring) calc(var(--k, 0) * 32ms);
+}
+/* Board: split-flap cells with a hinge line, like a departures board in a depot. The cell's
+   margin is a spread shadow, so the strip's clip window stays exactly one digit tall. */
+.odo-board .odo-face {
+  gap: 0.2em;
+  align-items: center;
+}
+.odo-board .odo-d {
+  position: relative;
+  border-radius: 0.03em;
+  background: #222526;
+  color: var(--bone);
+  box-shadow:
+    0 0 0 0.08em #222526,
+    0 0.09em 0 0.08em rgb(0 0 0 / 0.28);
+}
+.odo-board .odo-d::after {
+  content: "";
+  position: absolute;
+  inset: 50% -0.08em auto;
+  height: 1px;
+  background: rgb(0 0 0 / 0.6);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .odo-d::before {
+    transition: none;
+  }
+}
+.is-calm .odo-d::before {
+  transition: none;
+}
