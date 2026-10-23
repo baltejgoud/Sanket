@@ -123,6 +123,54 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.28) {
   return ref;
 }
 
+/**
+ * A panel catches light: a soft highlight follows the pointer across it and the panel tips up to
+ * 2° toward it (individual `rotate`, so existing transforms still apply). Fine pointers and full
+ * motion only; sets --mx/--my (percent) and --rx/--ry on the element.
+ */
+export function useSheen<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const calm = useMotion() === "calm";
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || calm || prefersReducedMotion() || !window.matchMedia("(pointer: fine)").matches) return;
+    el.classList.add("sheen");
+    if (getComputedStyle(el).position === "static") el.style.position = "relative";
+    let raf = 0;
+    let mx = 0.5;
+    let my = 0.5;
+    const paint = () => {
+      raf = 0;
+      el.style.setProperty("--mx", `${(mx * 100).toFixed(1)}%`);
+      el.style.setProperty("--my", `${(my * 100).toFixed(1)}%`);
+      el.style.setProperty("--rx", ((0.5 - my) * 4).toFixed(2));
+      el.style.setProperty("--ry", ((mx - 0.5) * 4).toFixed(2));
+    };
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      mx = (e.clientX - r.left) / r.width;
+      my = (e.clientY - r.top) / r.height;
+      if (!raf) raf = requestAnimationFrame(paint);
+    };
+    const leave = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      el.style.setProperty("--rx", "0");
+      el.style.setProperty("--ry", "0");
+    };
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerleave", leave);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerleave", leave);
+      el.classList.remove("sheen");
+      for (const v of ["--mx", "--my", "--rx", "--ry"]) el.style.removeProperty(v);
+    };
+  }, [calm]);
+  return ref;
+}
+
 type IdleWindow = Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (n: number) => void };
 
 /** Run `fn` in the next idle slice (or soon, if the page never idles); returns a cancel. */

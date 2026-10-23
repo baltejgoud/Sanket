@@ -594,3 +594,30 @@ details > summary::-webkit-details-marker {
 .is-calm .odo-d::before {
   transition: none;
 }
+
+/* ---------- Sheen (useSheen): a panel catches light and tips toward the pointer ---------- */
+/* rotateX(rx)·rotateY(ry) for small angles is one rotation about (rx, ry, 0) by hypot(rx, ry). */
+.sheen {
+  rotate: var(--rx, 0) var(--ry, 0) 0 calc(hypot(var(--rx, 0), var(--ry, 0)) * 1deg);
+  transition: rotate 520ms var(--ease-settle);
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 0%), rgb(255 255 255 / 0.5), transparent 62%);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 420ms var(--ease-settle);
+}
+.sheen:hover::after {
+  opacity: 1;
+}
+.problems-grid,
+.instrument-grid,
+.decide-grid,
+.roi-grid {
+  perspective: 1400px;
+}

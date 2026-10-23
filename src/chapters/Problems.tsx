@@ -3,7 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { fieldStore } from "../field/store";
-import { ScrollTrigger, useReveal } from "../lib/motion";
+import { ScrollTrigger, useReveal, useSheen } from "../lib/motion";
 import { RevealHeading } from "../components/Words";
 import { tabKeys } from "../lib/tabs";
 import { usePuck } from "../lib/detents";
@@ -15,6 +15,7 @@ export function Problems() {
   const [active, setActive] = useState(0);
   const activeRef = useRef(active);
   const tabs = usePuck<HTMLDivElement>();
+  const panel = useSheen<HTMLDivElement>();
   activeRef.current = active;
   const p = t.problems.items[active];
 
@@ -72,7 +73,7 @@ export function Problems() {
             ))}
           </div>
         </div>
-        <div className="problem-panel" id="problem-panel" role="tabpanel" aria-labelledby={`problem-tab-${active}`} aria-live="polite">
+        <div ref={panel} className="problem-panel" id="problem-panel" role="tabpanel" aria-labelledby={`problem-tab-${active}`} aria-live="polite">
           <div className="problem-panel-inner" key={active}>
             <p className="mono field-caption">
               <i aria-hidden="true" />

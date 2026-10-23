@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useIdle, useReducedMotion } from "../lib/motion";
 import { isCalm, prefs } from "../lib/prefs";
+import { fieldBridge } from "./bridge";
 import { fieldStore, type Readout } from "./store";
 import type { StockField } from "./StockField";
 import type { FieldModel } from "./model";
@@ -105,12 +106,14 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
         return booted.warm().then(() => {
           if (cancelled) return;
           booted.start();
+          fieldBridge.set(booted);
           requestAnimationFrame(() => setReady(true));
         });
       })
       .catch(() => setMode("poster"));
     return () => {
       cancelled = true;
+      fieldBridge.set(null);
       field?.dispose();
       fieldRef.current = null;
       setReady(false);

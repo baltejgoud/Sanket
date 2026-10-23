@@ -4,6 +4,10 @@ import { scrollToId } from "./motion";
 import { prefs } from "./prefs";
 import { EMAIL } from "./contact";
 import { toast } from "../components/Toast";
+import { fieldBridge } from "../field/bridge";
+import { startTilt, tiltSupported } from "../field/tilt";
+
+let stopTilt: (() => void) | null = null;
 
 export type Group = "chapters" | "tools" | "actions";
 
@@ -112,6 +116,25 @@ export function buildCommands({ copy, lang, setLang, links, explore }: CommandCo
       run: () => prefs.setMotion(calm ? "full" : "calm"),
     },
     ...(explore ? [{ id: "explore", group: "actions" as const, label: copy.actions.explore, keywords: "explore 3d warehouse field ar vr place desk spatial", run: explore }] : []),
+    ...(tiltSupported() && fieldBridge.get()
+      ? [
+          {
+            id: "tilt",
+            group: "actions" as const,
+            label: stopTilt ? copy.actions.tiltOff : copy.actions.tilt,
+            keywords: "tilt gyroscope phone look around 3d spatial parallax",
+            run: async () => {
+              if (stopTilt) {
+                stopTilt();
+                stopTilt = null;
+                return;
+              }
+              const field = fieldBridge.get();
+              stopTilt = field ? await startTilt((x, y) => field.setTilt(x, y)) : null;
+            },
+          },
+        ]
+      : []),
     {
       id: "whatsapp",
       group: "actions",

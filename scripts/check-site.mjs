@@ -240,6 +240,18 @@ async function open(options = {}) {
   if (!read || read[0] !== "#decide" || !(read[1] > 0.3 && read[1] < 0.7)) fail("Header reading progress: " + JSON.stringify(read));
   ok("header link fills with reading progress");
 
+  // Panels catch a sheen that follows the pointer (fine pointers, full motion).
+  await page.evaluate(() => {
+    const y = document.getElementById("problems").offsetTop;
+    window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+  });
+  await page.waitForTimeout(600);
+  await page.locator(".problem-panel").hover({ position: { x: 40, y: 40 } });
+  await page.waitForTimeout(300);
+  const sheen = await page.locator(".problem-panel").evaluate(el => [el.classList.contains("sheen"), el.style.getPropertyValue("--mx")]);
+  if (!sheen[0] || !sheen[1]) fail("Panel sheen not tracking the pointer: " + sheen);
+  ok("panel sheen follows the pointer");
+
   // The projector follows the story: signal names, decide floor markings, "in stock" on the level field.
   // (Software WebGL renders a few frames a second, so wait for each slide rather than sleeping.)
   const slideAt = async (id, want) => {

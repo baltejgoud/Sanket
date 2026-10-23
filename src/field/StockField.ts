@@ -81,6 +81,10 @@ export class StockField {
   private camLook = new THREE.Vector3();
   private pointerNdc = new THREE.Vector2(0, 0);
   private pointerSmooth = new THREE.Vector2(0, 0);
+  /** device tilt, -1..1, added to the pointer's parallax (phones, when the visitor allows it) */
+  private tilt = new THREE.Vector2(0, 0);
+  private lookNdc = new THREE.Vector3();
+  private look = new THREE.Vector2();
   private pointerOnField = false;
   private hoverStrength = 0;
   private waveCursor = 0;
@@ -436,6 +440,12 @@ export class StockField {
     this.wake();
   }
 
+  /** device tilt in -1..1 (x: roll right, y: tip back), smoothed with the pointer's parallax */
+  setTilt(x: number, y: number) {
+    this.tilt.set(x, y);
+    this.wake();
+  }
+
   /** send a signal from the cell under the pointer */
   signalAtPointer() {
     if (this.hoverCell < 0) return;
@@ -640,19 +650,25 @@ export class StockField {
       if (!still) this.addWave(p.u * m.width - m.width / 2, p.v * m.depth - m.depth / 2, p.strength);
     }
 
-    // Camera glide plus pointer parallax.
+    // Camera glide plus a window-like parallax: the eye moves with the pointer (or the phone's
+    // tilt) without turning, and the frustum shifts so the look point stays pinned on screen.
+    // Near, tall stock swings against the floor, as through a pane of glass.
     const [pos, look] = this.shot(t.shot, t.focus);
     this.camPos.lerp(pos, ease(1.9));
     this.camLook.lerp(look, ease(2.2));
-    this.pointerSmooth.lerp(this.pointerNdc, ease(3));
+    this.look.set(this.pointerNdc.x + this.tilt.x, this.pointerNdc.y + this.tilt.y).clampScalar(-1.2, 1.2);
+    this.pointerSmooth.lerp(this.look, ease(3));
     this.hoverStrength += ((this.pointerOnField ? 1 : 0) - this.hoverStrength) * ease(6);
     const cam = this.camera;
     cam.position.copy(this.camPos);
     cam.lookAt(this.camLook);
+    cam.clearViewOffset();
     if (!still) {
-      cam.translateX(this.pointerSmooth.x * 1.4);
-      cam.translateY(this.pointerSmooth.y * 0.8);
-      cam.lookAt(this.camLook);
+      cam.translateX(this.pointerSmooth.x * 2.2);
+      cam.translateY(this.pointerSmooth.y * 1.2);
+      cam.updateMatrixWorld();
+      this.lookNdc.copy(this.camLook).project(cam);
+      cam.setViewOffset(this.width, this.height, (this.lookNdc.x * this.width) / 2, (-this.lookNdc.y * this.height) / 2, this.width, this.height);
     }
     if (this.hoverCell >= 0) {
       const p = u.uPointer.value as THREE.Vector3;
@@ -665,11 +681,14 @@ export class StockField {
     if (this.opts.anchors?.length) {
       const v = new THREE.Vector3();
       this.opts.anchors.forEach((a, n) => {
-        v.set(...a.at(m)).project(cam);
+        v.set(...a.at(m));
+        // Labels scale with depth, so they sit in the scene rather than on the glass.
+        const depth = Math.min(1.25, Math.max(0.75, 34 / Math.max(1, cam.position.distanceTo(v))));
+        v.project(cam);
         const x = (v.x * 0.5 + 0.5) * this.width;
         const y = (-v.y * 0.5 + 0.5) * this.height;
         // Skip identical writes: an idle camera would otherwise restyle the labels every frame.
-        const tf = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        const tf = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${depth.toFixed(2)})`;
         if (this.anchorTf[n] !== tf) a.el.style.transform = this.anchorTf[n] = tf;
         const behind = v.z > 1 ? "true" : "false";
         if (a.el.dataset.behind !== behind) a.el.dataset.behind = behind;

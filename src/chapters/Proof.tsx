@@ -3,7 +3,7 @@ import { ArrowUpRight, Plus, RefreshCw } from "lucide-react";
 import { LangContext, useT } from "../i18n";
 import { useCopy } from "../copy";
 import { storyMeta } from "../data";
-import { useReveal } from "../lib/motion";
+import { useReveal, useSheen } from "../lib/motion";
 import { visit } from "../lib/visit";
 import { snapToDetent, tick, usePuck } from "../lib/detents";
 import { RevealHeading } from "../components/Words";
@@ -63,6 +63,7 @@ function ROI() {
   const contact = useCopy().contact;
   const currencySeg = usePuck<HTMLDivElement>();
   const sizeSeg = usePuck<HTMLDivElement>();
+  const result = useSheen<HTMLDivElement>();
   const [currency, setCurrency] = useState<Currency>("INR");
   const [size, setSize] = useState(0);
   const [revenue, setRevenue] = useState(5e7);
@@ -220,7 +221,7 @@ function ROI() {
           </div>
         </details>
       </div>
-      <div className="roi-result">
+      <div ref={result} className="roi-result">
         <span className="mono accent">{c.impact}</span>
         <p className="roi-total display" data-testid="roi-total">
           <Odometer value={format(total)} />

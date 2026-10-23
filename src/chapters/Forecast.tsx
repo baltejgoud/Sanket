@@ -3,7 +3,7 @@ import { Play } from "lucide-react";
 import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
-import { useReveal } from "../lib/motion";
+import { useReveal, useSheen } from "../lib/motion";
 import { RevealHeading } from "../components/Words";
 import { Sandbox } from "./Sandbox";
 
@@ -56,6 +56,7 @@ export function Forecast() {
   const c = useCopy();
   const scene = useReveal<HTMLElement>(0.2);
   const instrument = useReveal<HTMLElement>(0.08);
+  const panel = useSheen<HTMLDivElement>();
   useFieldScene(scene, { shot: "forecast", signal: 0.2, forecast: 1, level: 0, focus: -1 });
 
   return (
@@ -97,7 +98,7 @@ export function Forecast() {
             <p className="muted measure fade">{t.command.desc}</p>
           </header>
           <div className="instrument-grid">
-            <div className="instrument-panel fade">
+            <div ref={panel} className="instrument-panel fade">
               <Sandbox />
             </div>
             <Film />

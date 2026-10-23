@@ -10,7 +10,7 @@ export interface PaletteCopy {
   keys: string;
   chapters: Record<string, string>;
   tools: { roi: string; sandbox: string; connectors: string; stories: string; film: string };
-  actions: { pause: string; play: string; explore: string; whatsapp: string; email: string; copy: string; copied: string; copyFail: string };
+  actions: { pause: string; play: string; explore: string; tilt: string; tiltOff: string; whatsapp: string; email: string; copy: string; copied: string; copyFail: string };
 }
 
 export const paletteCopy: Record<Lang, PaletteCopy> = {
@@ -40,6 +40,8 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
       pause: "Pause motion",
       play: "Play motion",
       explore: "Explore the warehouse",
+      tilt: "Tilt your phone to look around",
+      tiltOff: "Stop tilt to look",
       whatsapp: "Chat on WhatsApp",
       email: "Send an email",
       copy: "Copy email address",
@@ -73,6 +75,8 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
       pause: "गति रोकें",
       play: "गति चालू करें",
       explore: "गोदाम में घूमें",
+      tilt: "फ़ोन झुकाकर चारों ओर देखें",
+      tiltOff: "झुकाकर देखना बंद करें",
       whatsapp: "WhatsApp पर बात करें",
       email: "ईमेल भेजें",
       copy: "ईमेल पता कॉपी करें",
@@ -106,6 +110,8 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
       pause: "కదలిక ఆపండి",
       play: "కదలిక ప్రారంభించండి",
       explore: "గోదాములో తిరగండి",
+      tilt: "ఫోన్ వంచి చుట్టూ చూడండి",
+      tiltOff: "వంచి చూడటం ఆపండి",
       whatsapp: "WhatsAppలో మాట్లాడండి",
       email: "ఈమెయిల్ పంపండి",
       copy: "ఈమెయిల్ చిరునామా కాపీ చేయండి",
