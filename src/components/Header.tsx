@@ -5,6 +5,7 @@ import { copy } from "../copy";
 import { scrollToId, useMagnetic } from "../lib/motion";
 import { prefs, useMotion } from "../lib/prefs";
 import { palette } from "../lib/paletteBus";
+import { usePuck } from "../lib/detents";
 import { Mark } from "./Icons";
 
 export const CHAPTERS = [
@@ -162,8 +163,9 @@ function MotionToggle({ label }: { label: string }) {
 }
 
 function LangSwitch({ lang, setLang, label }: { lang: Lang; setLang: (l: Lang) => void; label: string }) {
+  const puck = usePuck<HTMLDivElement>();
   return (
-    <div className="lang-switch" role="group" aria-label={label}>
+    <div ref={puck} className="lang-switch" role="group" aria-label={label}>
       {languages.map(l => (
         <button key={l.code} lang={l.code} aria-label={l.name} aria-pressed={lang === l.code} onClick={() => setLang(l.code)}>
           {l.label}

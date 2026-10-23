@@ -5,6 +5,7 @@ import { useCopy } from "../copy";
 import { storyMeta } from "../data";
 import { useReveal } from "../lib/motion";
 import { visit } from "../lib/visit";
+import { snapToDetent, tick, usePuck } from "../lib/detents";
 import { RevealHeading } from "../components/Words";
 import { Odometer } from "../components/Odometer";
 
@@ -60,6 +61,8 @@ function ROI() {
   const lang = useContext(LangContext);
   const c = roiCopy[lang];
   const contact = useCopy().contact;
+  const currencySeg = usePuck<HTMLDivElement>();
+  const sizeSeg = usePuck<HTMLDivElement>();
   const [currency, setCurrency] = useState<Currency>("INR");
   const [size, setSize] = useState(0);
   const [revenue, setRevenue] = useState(5e7);
@@ -109,23 +112,24 @@ function ROI() {
   }, [total, currency, size, lang]);
   const p = presets[currency][size];
   const sliders = [
-    { key: "revenue", label: c.revenue, value: revenue, set: setRevenue, min: p.revenue / 10, max: p.revenue * 5, step: p.revenue / 100, money: true },
-    { key: "inventory", label: c.inventory, value: inventory, set: setInventory, min: p.inventory / 10, max: p.inventory * 5, step: p.inventory / 100, money: true },
-    { key: "holding", label: c.holding, value: holding, set: setHolding, min: 5, max: 40, step: 1 },
-    { key: "margin", label: c.margin, value: margin, set: setMargin, min: 5, max: 80, step: 1 },
-    { key: "stockouts", label: c.stockouts, value: stockouts, set: setStockouts, min: 1, max: 20, step: 1 },
+    // detents: the sample business's own values, so it is easy to return to them by feel
+    { key: "revenue", label: c.revenue, value: revenue, set: setRevenue, min: p.revenue / 10, max: p.revenue * 5, step: p.revenue / 100, money: true, detents: [p.revenue] },
+    { key: "inventory", label: c.inventory, value: inventory, set: setInventory, min: p.inventory / 10, max: p.inventory * 5, step: p.inventory / 100, money: true, detents: [p.inventory] },
+    { key: "holding", label: c.holding, value: holding, set: setHolding, min: 5, max: 40, step: 1, detents: [25] },
+    { key: "margin", label: c.margin, value: margin, set: setMargin, min: 5, max: 80, step: 1, detents: [30] },
+    { key: "stockouts", label: c.stockouts, value: stockouts, set: setStockouts, min: 1, max: 20, step: 1, detents: [5] },
   ];
   return (
     <div className="roi-grid">
       <div className="roi-controls">
-        <div className="seg seg-dark" role="group" aria-label={c.currency}>
+        <div ref={currencySeg} className="seg seg-dark" role="group" aria-label={c.currency}>
           {(["INR", "USD"] as const).map(curr => (
             <button key={curr} aria-pressed={currency === curr} onClick={() => load(curr, size)}>
               {curr === "INR" ? "₹ INR" : "$ USD"}
             </button>
           ))}
         </div>
-        <div className="seg seg-dark" role="group" aria-label={c.preset}>
+        <div ref={sizeSeg} className="seg seg-dark" role="group" aria-label={c.preset}>
           {c.sizes.map((label, i) => (
             <button key={i} aria-pressed={size === i} onClick={() => load(currency, i)}>
               {label}
@@ -159,8 +163,15 @@ function ROI() {
               max={Math.max(s.max, s.value)}
               step={s.step}
               value={s.value}
-              onChange={e => s.set(+e.target.value)}
-              style={{ ["--progress" as string]: `${Math.max(0, Math.min(100, ((s.value - s.min) / (s.max - s.min)) * 100))}%` }}
+              onChange={e => {
+                const r = snapToDetent(+e.target.value, s.detents, s.max - s.min);
+                if (r.snapped && r.value !== s.value) tick();
+                s.set(r.value);
+              }}
+              style={{
+                ["--progress" as string]: `${Math.max(0, Math.min(100, ((s.value - s.min) / (s.max - s.min)) * 100))}%`,
+                ["--detent" as string]: `${Math.max(0, Math.min(100, ((s.detents[0] - s.min) / (s.max - s.min)) * 100))}%`,
+              }}
             />
             <span className="range-limits mono">
               <span>{s.money ? short(s.min) : `${s.min}%`}</span>
@@ -256,6 +267,7 @@ function Stories() {
   const t = useT();
   const c = useCopy().proof;
   const [region, setRegion] = useState<"all" | "india" | "global">("all");
+  const regionSeg = usePuck<HTMLDivElement>();
   const rows = storyMeta.map((meta, i) => ({ meta, text: t.stories.items[i] })).filter(({ meta }) => region === "all" || meta.region === region);
   return (
     <section id="stories" className="chapter light ledger" aria-labelledby="stories-title">
@@ -266,7 +278,7 @@ function Stories() {
           </p>
           <RevealHeading id="stories-title" className="display ledger-title" lines={[t.stories.title]} />
           <p className="muted measure">{c.evidence}. {t.stories.footnote}</p>
-          <div className="seg" role="group" aria-label={t.stories.eyebrow}>
+          <div ref={regionSeg} className="seg" role="group" aria-label={t.stories.eyebrow}>
             {(["all", "india", "global"] as const).map(r => (
               <button key={r} aria-pressed={region === r} onClick={() => setRegion(r)}>
                 {t.stories[r]}

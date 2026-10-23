@@ -336,45 +336,77 @@
   letter-spacing: 0.04em;
 }
 
-/* Range input: a stock column lying on its side. */
+/* Range input: a stock column lying on its side, on a machined groove with tick marks and a
+   notch at its detent (--detent). Ticks mark every tenth of the thumb's travel (9px in from each
+   end); the pattern box runs 10% long so the last tick, at 100%, is drawn too. */
 input[type="range"] {
   --progress: 50%;
+  --tick: rgb(27 29 26 / 0.22);
+  --groove: rgb(27 29 26 / 0.16);
+  --fill: var(--graphite);
   appearance: none;
   width: 100%;
-  height: 28px;
-  background: transparent;
+  height: 30px;
   cursor: pointer;
+  background:
+    linear-gradient(90deg, transparent calc(var(--detent, -10%) - 1px), var(--signal) calc(var(--detent, -10%) - 1px) calc(var(--detent, -10%) + 1px), transparent calc(var(--detent, -10%) + 1px)) 9px 100% / calc(100% - 18px) 8px no-repeat,
+    repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px calc(100% / 11)) 8.5px 100% / calc((100% - 18px) * 1.1) 5px no-repeat;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--graphite) var(--progress), rgb(27 29 26 / 0.16) var(--progress));
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--fill) var(--progress), var(--groove) var(--progress));
+  box-shadow:
+    inset 0 1px 2px rgb(0 0 0 / 0.28),
+    0 1px 0 rgb(255 255 255 / 0.06);
 }
 input[type="range"]::-moz-range-track {
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--graphite) var(--progress), rgb(27 29 26 / 0.16) var(--progress));
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--fill) var(--progress), var(--groove) var(--progress));
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.28);
 }
+/* The thumb: a raised orange slab with three grip lines; it presses down while held. */
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 18px;
-  height: 22px;
-  margin-top: -9px;
-  border-radius: 3px;
-  background: var(--signal);
-  border: 2px solid #f3f0e9;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
-  transition: transform 0.25s var(--ease-settle);
+  height: 24px;
+  margin-top: -10px;
+  border-radius: 4px;
+  border: 0;
+  background:
+    linear-gradient(90deg, transparent 5px, rgb(0 0 0 / 0.28) 5px 6px, transparent 6px 8.5px, rgb(0 0 0 / 0.28) 8.5px 9.5px, transparent 9.5px 12px, rgb(0 0 0 / 0.28) 12px 13px, transparent 13px) center / 100% 10px no-repeat,
+    linear-gradient(#ff7a45, var(--signal) 55%, #e2480f);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -2px 0 rgb(0 0 0 / 0.18),
+    0 3px 6px rgb(0 0 0 / 0.3),
+    0 0 0 2px #f3f0e9;
+  transition:
+    transform 0.2s var(--ease-settle),
+    box-shadow 0.2s var(--ease-settle);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 20px;
-  border-radius: 3px;
-  background: var(--signal);
-  border: 2px solid #f3f0e9;
+  width: 18px;
+  height: 24px;
+  border-radius: 4px;
+  border: 0;
+  background: linear-gradient(#ff7a45, var(--signal) 55%, #e2480f);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    0 3px 6px rgb(0 0 0 / 0.3),
+    0 0 0 2px #f3f0e9;
 }
 input[type="range"]:active::-webkit-slider-thumb {
-  transform: scaleY(1.2);
+  transform: translateY(1px) scale(0.94);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -1px 0 rgb(0 0 0 / 0.18),
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 0 0 2px #f3f0e9;
+}
+input[type="range"]:focus-visible {
+  outline-offset: 6px;
 }
 
 /* ---------- Film ---------- */
@@ -488,6 +520,9 @@ input[type="range"]:active::-webkit-slider-thumb {
   background: var(--bone);
   color: var(--ink);
 }
+.seg-dark.has-puck::before {
+  background: var(--bone);
+}
 .roi-inputs,
 .roi-result {
   display: grid;
@@ -556,14 +591,17 @@ input[type="range"]:active::-webkit-slider-thumb {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.roi .range::-webkit-slider-runnable-track {
-  background: linear-gradient(90deg, var(--bone) var(--progress), rgb(236 232 223 / 0.14) var(--progress));
-}
-.roi .range::-moz-range-track {
-  background: linear-gradient(90deg, var(--bone) var(--progress), rgb(236 232 223 / 0.14) var(--progress));
+.roi .range {
+  --fill: var(--bone);
+  --groove: rgb(236 232 223 / 0.14);
+  --tick: rgb(236 232 223 / 0.2);
 }
 .roi input[type="range"]::-webkit-slider-thumb {
-  border-color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -2px 0 rgb(0 0 0 / 0.18),
+    0 3px 8px rgb(0 0 0 / 0.5),
+    0 0 0 2px var(--ink);
 }
 .range-limits {
   display: flex;

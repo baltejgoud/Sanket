@@ -4,6 +4,7 @@ import { useCopy } from "../copy";
 import { prefersReducedMotion } from "../lib/motion";
 import { visit } from "../lib/visit";
 import { Odometer } from "../components/Odometer";
+import { snapToDetent, tick, usePuck } from "../lib/detents";
 
 export interface Point {
   week: number;
@@ -87,6 +88,7 @@ export function Sandbox() {
   const [hover, setHover] = useState<number | null>(null);
   const [width, setWidth] = useState(720);
   const box = useRef<HTMLDivElement>(null);
+  const scenarioSeg = usePuck<HTMLDivElement>();
   const gid = useId().replace(/:/g, "");
   const data = useMemo(() => series(scenario, horizon, offset), [scenario, horizon, offset]);
   const shown = useTween(data, drag !== null);
@@ -146,7 +148,7 @@ export function Sandbox() {
         </span>
       </div>
       <div className="sandbox-toolbar">
-        <div className="seg" role="group" aria-label="Forecast scenario">
+        <div ref={scenarioSeg} className="seg" role="group" aria-label="Forecast scenario">
           {c.scenarios.map((s, i) => (
             <button key={s} aria-pressed={scenario === i} onClick={() => setScenario(i)}>
               {i === 2 && <Zap size={13} aria-hidden="true" />} {s}
@@ -272,8 +274,13 @@ export function Sandbox() {
           min={-350}
           max={350}
           value={offset}
-          onChange={e => setOffset(+e.target.value)}
-          style={{ ["--progress" as string]: `${((offset + 350) / 700) * 100}%` }}
+          onChange={e => {
+            // Zero (the model's own forecast) is a detent.
+            const r = snapToDetent(+e.target.value, [0], 700, 0.02);
+            if (r.snapped && offset !== 0) tick();
+            setOffset(r.value);
+          }}
+          style={{ ["--progress" as string]: `${((offset + 350) / 700) * 100}%`, ["--detent" as string]: "50%" }}
         />
         <output className="mono" htmlFor={`adjust-${gid}`}>
           {offset > 0 ? "+" : ""}

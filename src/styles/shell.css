@@ -332,6 +332,13 @@
   color: var(--ink);
   background: var(--bone);
 }
+.lang-switch.has-puck::before {
+  background: var(--bone);
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.15);
+}
+.lang-switch.has-puck button[aria-pressed="true"] {
+  background: transparent;
+}
 .jump {
   flex: none;
   display: inline-flex;

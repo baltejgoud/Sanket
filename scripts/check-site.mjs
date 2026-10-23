@@ -123,6 +123,17 @@ async function open(options = {}) {
   if (/Pharma/.test(await wa())) fail("Removed chip still in the message");
   ok("contact message carries removable context");
 
+  // Detents: a revenue slider value close to the preset snaps to it; pressed segments carry a puck.
+  await page.getByRole("button", { name: "₹ INR", exact: true }).click();
+  await page.getByRole("button", { name: "Small business", exact: true }).click();
+  await page.getByRole("slider", { name: "Annual revenue slider" }).fill("52500000");
+  if ((await total()) !== "₹5,60,000") fail("Revenue slider should snap to the preset, got " + (await total()));
+  await page.getByRole("slider", { name: "Annual revenue slider" }).fill(String(1e8));
+  if ((await total()) === "₹5,60,000") fail("Revenue slider far from a detent should move freely");
+  const puck = await page.locator(".roi-controls .seg").first().evaluate(el => [el.classList.contains("has-puck"), el.style.getPropertyValue("--w")]);
+  if (!puck[0] || !parseFloat(puck[1])) fail("Segment puck not positioned: " + puck);
+  ok("slider detents and segment puck");
+
   // Public stories: filter and sources.
   if ((await page.locator(".ledger-entry").count()) !== 6) fail("Six stories expected");
   await page.locator(".ledger").getByRole("button", { name: "India", exact: true }).click();
