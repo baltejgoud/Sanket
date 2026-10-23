@@ -50,6 +50,8 @@ function useRise(ref: React.RefObject<HTMLElement>, enabled: boolean) {
     let py = -9999;
     const paint = () => {
       raf = 0;
+      // A scroll or resize clears the boxes; pointerleave can then paint before the next move.
+      if (!boxes.length) measure();
       chars.forEach((c, n) => {
         const b = boxes[n];
         const d2 = (b.x - px) ** 2 / (110 * 110) + (b.y - py) ** 2 / (180 * 180);

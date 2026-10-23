@@ -155,6 +155,15 @@
   opacity: 0;
   transform: translateY(-50%) translateY(-30%);
 }
+/* Off-screen copy that builds the verb font instances ahead of the scrub (Decide.tsx). */
+.verb.verb-probe {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+}
 :lang(hi) .verb,
 :lang(te) .verb {
   font-weight: 400;

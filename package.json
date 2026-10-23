@@ -11,6 +11,7 @@
     "hero:render": "node scripts/render-hero.mjs",
     "film:render": "node scripts/render-order-film.mjs",
     "check": "node scripts/check-site.mjs",
+    "perf": "node scripts/perf.mjs",
     "poster:render": "node scripts/render-field-poster.mjs"
   },
   "dependencies": {

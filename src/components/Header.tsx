@@ -167,18 +167,30 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
     const el = rail.current;
     if (!el) return;
     let raf = 0;
+    // Page height is measured on resize, not per scroll frame: reading scrollHeight right after
+    // the Decide scrub's style writes forced an extra layout on every frame.
+    let max = 0;
+    const measure = () => (max = document.documentElement.scrollHeight - window.innerHeight);
     const update = () => {
       raf = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
       el.style.setProperty("--progress", String(max > 0 ? window.scrollY / max : 0));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
+    const ro = new ResizeObserver(() => {
+      measure();
+      onScroll();
+    });
+    ro.observe(document.body);
+    measure();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure);
     return () => {
+      ro.disconnect();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", measure);
       cancelAnimationFrame(raf);
     };
   }, []);

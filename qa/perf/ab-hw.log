@@ -1,0 +1,29 @@
+before desktop cpu1x r1  FCP 792  LCP 792 (span.line.line-full)  CLS 0.083  TBT 110  longest 128  ready 1521 webgl  | hero 60fps p95 17ms main 2.2ms/f  | decide 28.5fps p95 50.1ms main 34.9ms/f style 25.9  | INP~ 720
+after  desktop cpu1x r1  FCP 684  LCP 684 (span.line.line-full)  CLS 0.002  TBT 0  longest 110  ready 1198 webgl  | hero 60fps p95 17.1ms main 2ms/f  | decide 59.7fps p95 16.9ms main 11.1ms/f style 4.5  | INP~ 80
+after  desktop cpu1x r2  FCP 648  LCP 648 (span.line.line-full)  CLS 0.002  TBT 0  longest 115  ready 1163 webgl  | hero 60fps p95 17ms main 2ms/f  | decide 60fps p95 16.9ms main 7.7ms/f style 3.2  | INP~ 56
+before desktop cpu1x r2  FCP 632  LCP 632 (span.line.line-full)  CLS 0.083  TBT 68  longest 104  ready 1324 webgl  | hero 60fps p95 16.9ms main 2ms/f  | decide 26.8fps p95 50.1ms main 37.2ms/f style 27.5  | INP~ 800
+before desktop cpu1x r3  FCP 812  LCP 812 (span.line.line-full)  CLS 0.083  TBT 104  longest 128  ready 1546 webgl  | hero 60fps p95 16.9ms main 2ms/f  | decide 28.1fps p95 50.1ms main 35.2ms/f style 25.5  | INP~ 752
+after  desktop cpu1x r3  FCP 796  LCP 796 (span.line.line-full)  CLS 0.002  TBT 0  longest 120  ready 1291 webgl  | hero 60fps p95 17ms main 2ms/f  | decide 57.5fps p95 17ms main 11.3ms/f style 4.6  | INP~ 80
+before desktop cpu4x r1  FCP 3752  LCP 3752 (span.line.line-full)  CLS 0.081  TBT 2505  longest 881  ready 7202 webgl  | hero 50fps p95 33.4ms main 10.6ms/f  | decide 13fps p95 166.6ms main 77ms/f style 55.2  | INP~ 1816
+after  desktop cpu4x r1  FCP 3348  LCP 3348 (span.line.line-full)  CLS 0.003  TBT 931  longest 468  ready 5311 webgl  | hero 58.2fps p95 16.8ms main 6.8ms/f  | decide 7.3fps p95 266.7ms main 140.1ms/f style 50.5  | INP~ 208
+after  desktop cpu4x r2  FCP 5344  LCP 5344 (span.line.line-full)  CLS 0.003  TBT 5801  longest 1614  ready 11248 webgl  | hero 52fps p95 33.4ms main 14.7ms/f  | decide 10fps p95 300ms main 99.6ms/f style 32.9  | INP~ 184
+before desktop cpu4x r2  FCP 6760  LCP 6760 (span.line.line-full)  CLS 0.083  TBT 1740  longest 369  ready 10626 webgl  | hero 35.8fps p95 66.7ms main 25.6ms/f  | decide 3.1fps p95 867ms main 337.5ms/f style 211.4  | INP~ 5488
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.scrollIntoViewIfNeeded: Target page, context or browser has been closed
+Browser logs:
+
+<launching> C:\Program Files\Google\Chrome\Application\chrome.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --ignore-gpu-blocklist --enable-gpu --user-data-dir=C:\Users\admin\AppData\Local\Temp\playwright_chromiumdev_profile-ljnBoi --remote-debugging-pipe --no-startup-window
+<launched> pid=7984
+Call log:
+[2m  - waiting for getByRole('button', { name: /Viral spike/ })[22m
+
+    at interactions (D:\Sanket Website Page\scripts\perf.mjs:229:15)
+    at async one (D:\Sanket Website Page\scripts\perf.mjs:345:15)
+    at async file:///D:/Sanket%20Website%20Page/scripts/perf.mjs:356:34 {
+  log: [ "  - waiting for getByRole('button', { name: /Viral spike/ })" ]
+}
+
+Node.js v24.14.0

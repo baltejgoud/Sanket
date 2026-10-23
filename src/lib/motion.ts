@@ -119,22 +119,25 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.28) {
   return ref;
 }
 
+type IdleWindow = Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (n: number) => void };
+
+/** Run `fn` in the next idle slice (or soon, if the page never idles); returns a cancel. */
+export function onIdle(fn: () => void, timeout = 600) {
+  const w = window as IdleWindow;
+  if (w.requestIdleCallback) {
+    const n = w.requestIdleCallback(fn, { timeout });
+    return () => w.cancelIdleCallback?.(n);
+  }
+  const n = window.setTimeout(fn, 200);
+  return () => clearTimeout(n);
+}
+
 /** True once the document has painted and is idle; used to defer heavy work. */
 export function useIdle(delay = 0) {
   const [idle, setIdle] = useState(false);
   useEffect(() => {
     let cancel = () => {};
-    const go = () => {
-      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (n: number) => void };
-      if (w.requestIdleCallback) {
-        const n = w.requestIdleCallback(() => setIdle(true), { timeout: 900 });
-        cancel = () => w.cancelIdleCallback?.(n);
-      } else {
-        const n = window.setTimeout(() => setIdle(true), 200);
-        cancel = () => clearTimeout(n);
-      }
-    };
-    const t = window.setTimeout(go, delay);
+    const t = window.setTimeout(() => (cancel = onIdle(() => setIdle(true), 900)), delay);
     return () => {
       clearTimeout(t);
       cancel();

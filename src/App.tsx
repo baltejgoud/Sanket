@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { LangContext, dict, type Lang } from "./i18n";
 import { copy } from "./copy";
 import { FieldStage } from "./field/FieldStage";
@@ -35,14 +35,20 @@ export default function App() {
   const t = dict[lang];
   const c = copy[lang];
   useSmoothScroll(!reduced && !posterMode);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
+  // A language switch re-renders the whole story; as a transition React renders it in slices,
+  // so the press paints at once instead of after the full re-render. The choice is stored right
+  // away, so a reload straight after the press still keeps it.
+  const switchLang = (next: Lang) => {
     try {
-      localStorage.setItem("sanket-lang", lang);
+      localStorage.setItem("sanket-lang", next);
     } catch {
       // storage unavailable: the choice just won't persist
     }
+    startTransition(() => setLang(next));
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
     // Line lengths change with the language; re-measure every trigger.
     const id = requestAnimationFrame(() => ScrollTrigger.refresh());
     return () => cancelAnimationFrame(id);
@@ -74,7 +80,7 @@ export default function App() {
         {t.skip}
       </a>
       <FieldStage copy={c.stage} />
-      <Header lang={lang} setLang={setLang} active={active} />
+      <Header lang={lang} setLang={switchLang} active={active} />
       <Cursor fieldLabel={c.hero.cursor} />
       <main id="main" className={`lang-${lang}`}>
         <Hero lang={lang} />

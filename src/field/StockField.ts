@@ -30,6 +30,8 @@ export interface StockFieldOptions {
   poster?: boolean;
   anchors?: Anchor[];
   onFail?: () => void;
+  /** the device cannot hold the frame rate even at reduced quality */
+  onSlow?: () => void;
 }
 
 const UNITS_PER_HEIGHT = 40;
@@ -86,9 +88,20 @@ export class StockField {
   private unsubscribe: () => void;
   private width = 1;
   private height = 1;
+  private anchorTf: string[] = [];
+  private dpr: number;
+  // Frame governor (see govern()).
+  private gov = { frames: 0, slow: 0, skip: 90 };
+  private lastRaf = 0;
+  private lastDraw = 0;
+  private paced = false;
+  private settling = true;
+  private governed = false;
+  private inTick = false;
 
   constructor(opts: StockFieldOptions) {
     this.opts = opts;
+    this.dpr = opts.dpr;
     this.model = createField(opts.cols, opts.rows);
     const m = this.model;
     this.renderer = new THREE.WebGLRenderer({
@@ -396,6 +409,16 @@ export class StockField {
     this.wake();
   }
 
+  /** Compile every program before the first frame, off the main thread where the driver allows
+   *  (KHR_parallel_shader_compile), so the first render is not one long blocking task. */
+  async warm() {
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } catch {
+      // Older drivers: the first render compiles synchronously instead.
+    }
+  }
+
   start() {
     this.running = true;
     this.wake();
@@ -403,7 +426,10 @@ export class StockField {
 
   wake() {
     this.needsFrame = true;
-    if (this.disposed || !this.running || this.frame || document.hidden) return;
+    // Inside tick, the tick itself schedules the next frame. Scheduling here too (a queued pulse
+    // becoming a wave mid-update did) started a second loop, then a third: the field rendered
+    // once more per frame for every signal the page sent.
+    if (this.disposed || !this.running || this.frame || this.inTick || document.hidden) return;
     this.last = performance.now();
     this.frame = requestAnimationFrame(this.tick);
   }
@@ -413,14 +439,63 @@ export class StockField {
     if (this.disposed) return;
     const s = fieldStore.get();
     if (!s.visible && !this.opts.poster) return;
+    const still = this.opts.reducedMotion || !!this.opts.poster;
+    if (!still) {
+      this.govern(now);
+      // Paced: with nothing easing and no input, the idle field (breathing, waves) draws at ~30 fps.
+      if (this.paced && !this.settling && !this.needsFrame && now - this.lastDraw < 30) {
+        this.frame = requestAnimationFrame(this.tick);
+        return;
+      }
+    }
     const dt = Math.min((now - this.last) / 1000, 1 / 20);
     this.last = now;
-    const still = this.opts.reducedMotion || !!this.opts.poster;
-    const settling = this.update(still ? 0 : dt, still);
-    this.renderer.render(this.scene, this.camera);
+    this.inTick = true;
+    let settling = false;
+    try {
+      settling = this.settling = this.update(still ? 0 : dt, still);
+      this.renderer.render(this.scene, this.camera);
+    } finally {
+      this.inTick = false;
+    }
+    this.lastDraw = now;
     this.needsFrame = false;
     if (!still || settling) this.frame = requestAnimationFrame(this.tick);
   };
+
+  /**
+   * Frame governor. Judged on 90-frame samples of the rAF interval while the field runs:
+   * if most frames miss ~36 fps, drop to pixel ratio 1 and pace idle frames to 30 fps; if most
+   * still miss ~22 fps after that, hand over to the poster (onSlow). Pauses and long tasks
+   * (gaps over 250 ms) are not counted, and the first 90 frames (boot, intro) are skipped.
+   */
+  private govern(now: number) {
+    const interval = now - this.lastRaf;
+    this.lastRaf = now;
+    const g = this.gov;
+    if (this.governed || interval > 250) return;
+    if (g.skip > 0) {
+      g.skip--;
+      return;
+    }
+    g.frames++;
+    if (interval > (this.paced ? 45 : 28)) g.slow++;
+    if (g.frames < 90) return;
+    const slow = g.slow > g.frames / 2;
+    g.frames = g.slow = 0;
+    if (!slow) return;
+    if (!this.paced) {
+      this.paced = true;
+      g.skip = 30;
+      if (this.dpr > 1) {
+        this.dpr = 1;
+        this.renderer.setPixelRatio(1); // resizes the drawing buffer
+      }
+    } else {
+      this.governed = true;
+      this.opts.onSlow?.();
+    }
+  }
 
   /** returns true while anything is still moving */
   private update(dt: number, still: boolean) {
@@ -483,13 +558,16 @@ export class StockField {
     // Projected anchors for HTML labels.
     if (this.opts.anchors?.length) {
       const v = new THREE.Vector3();
-      for (const a of this.opts.anchors) {
+      this.opts.anchors.forEach((a, n) => {
         v.set(...a.at(m)).project(cam);
         const x = (v.x * 0.5 + 0.5) * this.width;
         const y = (-v.y * 0.5 + 0.5) * this.height;
-        a.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-        a.el.dataset.behind = v.z > 1 ? "true" : "false";
-      }
+        // Skip identical writes: an idle camera would otherwise restyle the labels every frame.
+        const tf = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        if (this.anchorTf[n] !== tf) a.el.style.transform = this.anchorTf[n] = tf;
+        const behind = v.z > 1 ? "true" : "false";
+        if (a.el.dataset.behind !== behind) a.el.dataset.behind = behind;
+      });
     }
 
     const moving =

@@ -78,14 +78,19 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
             poster,
             anchors,
             onFail: () => setMode("poster"),
+            onSlow: () => setMode("poster"),
           });
         } catch {
           setMode("poster");
           return;
         }
         fieldRef.current = field;
-        field.start();
-        requestAnimationFrame(() => setReady(true));
+        const booted = field;
+        return booted.warm().then(() => {
+          if (cancelled) return;
+          booted.start();
+          requestAnimationFrame(() => setReady(true));
+        });
       })
       .catch(() => setMode("poster"));
     return () => {
@@ -154,11 +159,13 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
 
   // Mirror the current shot onto the stage so labels can show per chapter.
   useEffect(() => {
+    // The store emits on every scroll frame in Decide; only touch the DOM when a value changes.
     const sync = () => {
       const s = fieldStore.get();
-      if (!rootRef.current) return;
-      rootRef.current.dataset.shot = s.target.shot;
-      rootRef.current.dataset.visible = String(s.visible);
+      const d = rootRef.current?.dataset;
+      if (!d) return;
+      if (d.shot !== s.target.shot) d.shot = s.target.shot;
+      if (d.visible !== String(s.visible)) d.visible = String(s.visible);
     };
     sync();
     return fieldStore.subscribe(sync);

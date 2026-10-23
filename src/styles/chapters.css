@@ -133,6 +133,12 @@
   color: #d6d2c8;
   max-width: 40ch;
 }
+/* The same 40ch, measured in Archivo ("0" = 0.573125em). `ch` follows whichever face has loaded,
+   so with the fallback the lead wrapped differently and the bottom-anchored hero jumped when
+   Archivo swapped in. */
+.hero-foot .lead:lang(en) {
+  max-width: 22.925em;
+}
 .hero-ctas {
   display: flex;
   flex-wrap: wrap;

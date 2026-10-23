@@ -31,6 +31,20 @@ async function open(options = {}) {
   if ((await page.locator("h1").count()) !== 1) fail("Exactly one h1 expected");
   ok("hero headline, single h1");
 
+  // The Archivo preload must be a file Google Fonts' CSS still serves, or it is a wasted download.
+  const preload = await page.evaluate(async () => {
+    const href = document.querySelector('link[rel="preload"][as="font"]')?.getAttribute("href");
+    const css = document.querySelector('link[rel="stylesheet"][href*="fonts.googleapis.com"]')?.getAttribute("href");
+    if (!href || !css) return "missing";
+    try {
+      return (await fetch(css).then(r => r.text())).includes(href) ? "ok" : "stale: " + href;
+    } catch {
+      return "offline";
+    }
+  });
+  if (preload !== "ok" && preload !== "offline") fail("Archivo font preload " + preload);
+  ok(preload === "ok" ? "Archivo preload matches Google Fonts CSS" : "Archivo preload (not verified: Google Fonts unreachable)");
+
   // The field renders still frames under reduced motion (or falls back to the poster).
   await page.waitForSelector(".stage.is-ready canvas, .stage-poster", { timeout: 15000 });
   ok("field stage ready (WebGL or poster)");

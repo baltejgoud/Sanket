@@ -1,0 +1,20 @@
+desktop cpu1x r1  FCP 560  LCP 560 (span.line.line-full)  CLS 0.083  TBT 68  longest 108  ready 1297 webgl  | hero 60fps p95 17ms main 1.7ms/f  | decide 59.8fps p95 16.8ms main 13ms/f style 9.4  | INP~ 176
+desktop cpu1x r2  FCP 504  LCP 504 (span.line.line-full)  CLS 0.083  TBT 1  longest 51  ready 1164 webgl  | hero 60fps p95 16.9ms main 1.8ms/f  | decide 60fps p95 16.9ms main 9.6ms/f style 6.6  | INP~ 192
+desktop cpu1x r3  FCP 520  LCP 520 (span.line.line-full)  CLS 0.083  TBT 4  longest 54  ready 1182 webgl  | hero 60fps p95 16.9ms main 2.4ms/f  | decide 60fps p95 16.9ms main 9.4ms/f style 6.5  | INP~ 208
+desktop cpu4x r1  FCP 1596  LCP 1596 (span.line.line-full)  CLS 0.081  TBT 493  longest 320  ready 2675 webgl  | hero 60fps p95 17ms main 6.5ms/f  | decide 19.9fps p95 116.7ms main 50.1ms/f style 36.1  | INP~ 2032
+desktop cpu4x r2  FCP 3104  LCP 3104 (span.line.line-full)  CLS 0.081  TBT 3765  longest 2042  ready 7600 webgl  | hero 48.4fps p95 33.4ms main 19.3ms/f  | decide 3fps p95 816.6ms main 343.8ms/f style 236  | INP~ 6848
+desktop cpu4x r3  FCP 4912  LCP 4912 (span.line.line-full)  CLS 0.083  TBT 3879  longest 1372  ready 9384 webgl  | hero 41fps p95 50.2ms main 20.1ms/f  | decide 7.3fps p95 266.6ms main 139.1ms/f style 99.5  | INP~ 3296
+desktop cpu6x r1  FCP 3920  LCP 3920 (span.line.line-full)  CLS 0.083  TBT 4462  longest 1083  ready 8421 webgl  | hero 30.4fps p95 83.4ms main 29.8ms/f  | decide 3.6fps p95 449.9ms main 283.9ms/f style 201  | INP~ 2488
+desktop cpu6x r2  FCP 4628  LCP 4628 (span.line.line-full)  CLS 0.081  TBT 3302  longest 962  ready 9271 webgl  | hero 37.8fps p95 83.1ms main 22.7ms/f  | decide 5.5fps p95 500ms main 188.8ms/f style 147.2  | INP~ 3792
+desktop cpu6x r3  FCP 17540  LCP 17540 (span.line.line-full)  CLS 0.083  TBT 7233  longest 1706  ready 25612 webgl  | hero 9.4fps p95 299.8ms main 108.2ms/f  | decide 3.5fps p95 533.5ms main 297.5ms/f style 215.3  | INP~ 1696
+mobile  cpu1x r1  FCP 2328  LCP 3364 (p.lead.fade)  CLS 0.005  TBT 276  longest 187  ready 5603 webgl  | hero 60fps p95 17.2ms main 1.4ms/f  | decide 41.5fps p95 33.5ms main 23.8ms/f style 16  | INP~ 184
+mobile  cpu1x r2  FCP 2348  LCP 3396 (p.lead.fade)  CLS 0.005  TBT 335  longest 193  ready 5653 webgl  | hero 60fps p95 17ms main 1.5ms/f  | decide 36.5fps p95 33.5ms main 27.4ms/f style 18.6  | INP~ 216
+mobile  cpu1x r3  FCP 2356  LCP 3292 (p.lead.fade)  CLS 0.005  TBT 276  longest 204  ready 5610 webgl  | hero 60fps p95 16.9ms main 1.4ms/f  | decide 38.3fps p95 33.5ms main 25.9ms/f style 17.7  | INP~ 208
+mobile  cpu4x r1  FCP 4124  LCP 7956 (p.lead.fade)  CLS 0.004  TBT 3973  longest 2076  ready 10523 webgl  | hero 46.1fps p95 49.9ms main 15.4ms/f  | decide 9.2fps p95 250ms main 109.8ms/f style 74.1  | INP~ 512
+mobile  cpu4x r2  FCP 6844  LCP 11612 (p.lead.fade)  CLS 0.004  TBT 4837  longest 1552  ready 14750 webgl  | hero 58.6fps p95 17ms main 10.5ms/f  | decide 7.6fps p95 266.5ms main 131.4ms/f style 89.4  | INP~ 1088
+mobile  cpu4x r3  FCP 10504  LCP 16268 (p.lead.fade)  CLS 0.004  TBT 4498  longest 1357  ready 17490 webgl  | hero 44.2fps p95 49.9ms main 18.8ms/f  | decide 4fps p95 433.3ms main 252.8ms/f style 182.3  | INP~ 416
+mobile  cpu6x r1  FCP 6620  LCP 10204 (p.lead.fade)  CLS 0.004  TBT 3965  longest 641  ready 11574 webgl  | hero 25.7fps p95 99.8ms main 37.2ms/f  | decide 4.6fps p95 733.2ms main 222.1ms/f style 145.7  | INP~ 632
+mobile  cpu6x r2  FCP 13316  LCP 21736 (p.lead.fade)  CLS 0.004  TBT 7263  longest 3409  ready 22967 webgl  | hero 38.3fps p95 50ms main 23.7ms/f  | decide 3.3fps p95 616.7ms main 312.4ms/f style 213.6  | INP~ 1584
+mobile  cpu6x r3  FCP 13196  LCP 22064 (p.lead.fade)  CLS 0.004  TBT 9130  longest 4324  ready 24630 webgl  | hero 35.6fps p95 66.7ms main 25.4ms/f  | decide 4.6fps p95 500.1ms main 230.5ms/f style 144.6  | INP~ 1064
+gl: ANGLE (Intel, Intel(R) Graphics (0x0000A7AC) Direct3D11 vs_5_0 ps_5_0, D3D11) 
+wrote qa/perf/baseline-hw.json
