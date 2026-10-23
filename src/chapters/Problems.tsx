@@ -6,6 +6,7 @@ import { fieldStore } from "../field/store";
 import { ScrollTrigger, useReveal } from "../lib/motion";
 import { RevealHeading } from "../components/Words";
 import { tabKeys } from "../lib/tabs";
+import { usePuck } from "../lib/detents";
 
 export function Problems() {
   const t = useT();
@@ -13,6 +14,7 @@ export function Problems() {
   const section = useReveal<HTMLElement>(0.15);
   const [active, setActive] = useState(0);
   const activeRef = useRef(active);
+  const tabs = usePuck<HTMLDivElement>();
   activeRef.current = active;
   const p = t.problems.items[active];
 
@@ -51,7 +53,7 @@ export function Problems() {
           </p>
           <RevealHeading id="problems-title" className="display problems-title" lines={[t.problems.title]} />
           <p className="muted problems-desc fade">{t.problems.desc}</p>
-          <div className="problem-tabs" role="tablist" aria-label={t.problems.eyebrow}>
+          <div ref={tabs} className="problem-tabs" role="tablist" aria-label={t.problems.eyebrow}>
             {t.problems.items.map((item, i) => (
               <button
                 key={i}

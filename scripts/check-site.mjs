@@ -151,6 +151,10 @@ async function open(options = {}) {
   if (/pricing|per month|\/mo\b/i.test(body)) fail("Pricing content found");
   ok("direct contact, no pricing");
 
+  await page.getByRole("button", { name: "Copy email address" }).click();
+  await page.locator(".toast").waitFor();
+  ok("copying the address confirms with a toast");
+
   // Languages persist and set <html lang>.
   await page.getByRole("button", { name: "हिन्दी" }).first().click();
   await page.getByText("जो बिकता है, वही रखें।").first().waitFor();
@@ -235,6 +239,23 @@ async function open(options = {}) {
   });
   if (!read || read[0] !== "#decide" || !(read[1] > 0.3 && read[1] < 0.7)) fail("Header reading progress: " + JSON.stringify(read));
   ok("header link fills with reading progress");
+
+  // The contact title's letters start uneven and level as the chapter arrives.
+  await page.evaluate(() => {
+    const y = document.getElementById("contact").offsetTop - innerHeight * 0.9;
+    window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+  });
+  await page.waitForTimeout(700);
+  const spreadAt = () => page.locator(".level-line .lc").evaluateAll(els => Math.max(...els.map(e => Math.abs(new DOMMatrix(getComputedStyle(e).transform).m42))));
+  const before = await spreadAt();
+  await page.evaluate(() => {
+    const y = document.getElementById("contact").offsetTop;
+    window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+  });
+  await page.waitForTimeout(900);
+  const after = await spreadAt();
+  if (!(before > 4) || after > 1) fail(`Contact title should level: spread ${before} → ${after}`);
+  ok("contact title levels on arrival");
   await context.close();
 }
 

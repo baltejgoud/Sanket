@@ -29,12 +29,15 @@ export function RevealHeading({
   className,
   id,
   accentLine,
+  renderLine,
 }: {
   as?: ElementType;
   lines: string[];
   className?: string;
   id?: string;
   accentLine?: number;
+  /** replaces a line's word reveal with something else (Invitation's levelling line) */
+  renderLine?: (line: string, n: number) => ReactNode;
 }) {
   const ref = useReveal<HTMLElement>(0.2);
   let count = 0;
@@ -43,7 +46,7 @@ export function RevealHeading({
       {lines.map((line, n) => {
         const node: ReactNode = (
           <span key={n} className={`line ${n === accentLine ? "accent-line" : ""}`}>
-            <Words text={line} start={count} />
+            {renderLine?.(line, n) ?? <Words text={line} start={count} />}
           </span>
         );
         count += line.split(/\s+/).length;

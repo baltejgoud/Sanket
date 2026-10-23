@@ -333,9 +333,30 @@
   max-width: 44ch;
 }
 .problem-tabs {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--line-dark-2);
+}
+/* One indicator that glides between tabs (usePuck), instead of one per tab. */
+.problem-tabs.has-puck::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--w) - 14px);
+  height: 2px;
+  background: var(--signal);
+  transform: translate(var(--x), calc(var(--y) + var(--h) - 1px));
+  pointer-events: none;
+}
+.problem-tabs.puck-ready::after {
+  transition:
+    transform 560ms var(--ease-spring),
+    width 560ms var(--ease-spring);
+}
+.problem-tabs.has-puck button[aria-selected="true"] i {
+  transform: scaleX(0);
 }
 .problem-tabs button {
   position: relative;

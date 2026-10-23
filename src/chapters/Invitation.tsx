@@ -1,17 +1,73 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, Check, Copy, Mail, X } from "lucide-react";
-import { useT } from "../i18n";
+import { LangContext, useT } from "../i18n";
 import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
 import { fieldStore } from "../field/store";
-import { useMagnetic, useReveal } from "../lib/motion";
+import { prefersReducedMotion, ScrollTrigger, useMagnetic, useReveal } from "../lib/motion";
+import { useMotion } from "../lib/prefs";
+import { toast } from "../components/Toast";
 import { EMAIL, WHATSAPP_DISPLAY, useContactLinks } from "../lib/contact";
 import { useVisit, visit } from "../lib/visit";
 import { Mark, WhatsAppIcon } from "../components/Icons";
 import { RevealHeading } from "../components/Words";
 
+/** A stable pseudo-random offset per position, in -1..1. */
+const jitter = (n: number) => {
+  const x = Math.sin(n * 12.9898 + 4.1) * 43758.5453;
+  return (x - Math.floor(x)) * 2 - 1;
+};
+
+/**
+ * The first line of the contact title is uneven stock: each letter (each word in Hindi and
+ * Telugu, so conjuncts stay whole) sits at its own height and levels as the chapter scrolls in,
+ * flush by the time the field reads "in stock". Transform only; level at once when calm.
+ */
+function LevelLine({ text, latin }: { text: string; latin: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const calm = useMotion() === "calm";
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (calm || prefersReducedMotion()) {
+      el.style.setProperty("--lv", "0");
+      return;
+    }
+    const st = ScrollTrigger.create({
+      trigger: el.closest("section"),
+      start: "top bottom",
+      end: "top 25%",
+      onUpdate: self => el.style.setProperty("--lv", (1 - self.progress).toFixed(3)),
+      onRefresh: self => el.style.setProperty("--lv", (1 - self.progress).toFixed(3)),
+    });
+    return () => st.kill();
+  }, [calm]);
+  // Latin: letters, grouped per word so lines only break between words. Indic: whole words.
+  let i = 0;
+  const lc = (u: string) => (
+    <span key={i} className="lc" style={{ ["--off" as string]: `${(jitter(i++) * 0.36).toFixed(3)}em` }}>
+      {u}
+    </span>
+  );
+  const words = text.split(" ");
+  return (
+    <span ref={ref} className="level-line">
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {words.map((w, n) => (
+          <Fragment key={n}>
+            {latin ? <span className="lw">{[...w].map(lc)}</span> : lc(w)}
+            {n < words.length - 1 ? " " : null}
+          </Fragment>
+        ))}
+      </span>
+    </span>
+  );
+}
+
 export function Invitation() {
   const t = useT();
+  const lang = useContext(LangContext);
   const c = useCopy();
   const section = useReveal<HTMLElement>(0.25);
   const [copied, setCopied] = useState<"" | "ok" | "fail">("");
@@ -41,8 +97,10 @@ export function Invitation() {
     try {
       await navigator.clipboard.writeText(EMAIL);
       setCopied("ok");
+      toast(t.contact.copied);
     } catch {
       setCopied("fail");
+      toast(`${t.contact.copyFail} ${EMAIL}`);
     }
     clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setCopied(""), 3200);
@@ -61,6 +119,7 @@ export function Invitation() {
             className="display invitation-title"
             lines={[t.contact.h2a, `${t.contact.h2b}SANKET${t.contact.h2c}`.trim()]}
             accentLine={1}
+            renderLine={(line, n) => (n === 0 ? <LevelLine text={line} latin={lang === "en"} /> : undefined)}
           />
           <p className="lead invitation-lead fade" style={{ ["--d" as string]: "300ms" }}>
             {t.contact.p}
@@ -108,9 +167,6 @@ export function Invitation() {
             {copied === "ok" ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
             {copied === "ok" ? t.contact.copied : copied === "fail" ? t.contact.copyFail : t.contact.copy}
           </button>
-          <p className="sr-only" role="status">
-            {copied === "ok" ? t.contact.copied : copied === "fail" ? t.contact.copyFail : ""}
-          </p>
         </div>
       </section>
       <footer className="site-footer">

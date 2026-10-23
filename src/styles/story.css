@@ -812,6 +812,15 @@
 .invitation-title .accent-line {
   color: var(--signal);
 }
+/* LevelLine: uneven letters that level as Contact arrives (--lv 1 → 0). */
+.level-line .lw {
+  display: inline-block;
+  white-space: nowrap;
+}
+.level-line .lc {
+  display: inline-block;
+  transform: translateY(calc(var(--off, 0em) * var(--lv, 0)));
+}
 :lang(hi) .invitation-title,
 :lang(te) .invitation-title {
   font-size: clamp(2.2rem, 1rem + 3.6vw, 5.4rem);
