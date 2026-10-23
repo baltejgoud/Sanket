@@ -5,6 +5,7 @@ import { FieldStage } from "./field/FieldStage";
 import { Header } from "./components/Header";
 import { Cursor } from "./components/Cursor";
 import { ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
+import { useMotion } from "./lib/prefs";
 import { Hero } from "./chapters/Hero";
 import { Signal } from "./chapters/Signal";
 import { Problems } from "./chapters/Problems";
@@ -32,9 +33,10 @@ export default function App() {
   const [lang, setLang] = useState<Lang>(readLang);
   const [active, setActive] = useState("top");
   const reduced = useReducedMotion();
+  const calm = useMotion() === "calm";
   const t = dict[lang];
   const c = copy[lang];
-  useSmoothScroll(!reduced && !posterMode);
+  useSmoothScroll(!reduced && !calm && !posterMode);
   // A language switch re-renders the whole story; as a transition React renders it in slices,
   // so the press paints at once instead of after the full re-render. The choice is stored right
   // away, so a reload straight after the press still keeps it.

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, Pause, Play, X } from "lucide-react";
 import { dict, languages, type Lang } from "../i18n";
 import { copy } from "../copy";
 import { scrollToId, useMagnetic } from "../lib/motion";
+import { prefs, useMotion } from "../lib/prefs";
 import { Mark } from "./Icons";
 
 export const CHAPTERS = [
@@ -77,6 +78,7 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
           ))}
         </nav>
         <div className="header-actions">
+          <MotionToggle label={c.nav.pause} />
           <LangSwitch lang={lang} setLang={setLang} label={t.langLabel} />
           <a ref={talk} className="talk" href="#contact">
             {c.nav.talk}
@@ -120,13 +122,27 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
           ))}
         </nav>
         <div className="index-foot">
-          <LangSwitch lang={lang} setLang={setLang} label={t.langLabel} />
+          <div className="index-controls">
+            <LangSwitch lang={lang} setLang={setLang} label={t.langLabel} />
+            <MotionToggle label={c.nav.pause} />
+          </div>
           <p>{t.footer.tagline}</p>
         </div>
       </dialog>
 
       <StateRail labels={c.rail} active={active} />
     </>
+  );
+}
+
+/** Pause, Stop, Hide (WCAG 2.2.2). The name stays "Pause motion"; aria-pressed says whether it is paused. */
+function MotionToggle({ label }: { label: string }) {
+  const calm = useMotion() === "calm";
+  return (
+    <button className="motion-toggle" aria-pressed={calm} title={label} onClick={() => prefs.setMotion(calm ? "full" : "calm")}>
+      {calm ? <Play size={15} aria-hidden="true" /> : <Pause size={15} aria-hidden="true" />}
+      <span className="sr-only">{label}</span>
+    </button>
   );
 }
 

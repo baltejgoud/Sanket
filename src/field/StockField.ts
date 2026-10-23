@@ -98,6 +98,8 @@ export class StockField {
   private settling = true;
   private governed = false;
   private inTick = false;
+  /** the visitor paused motion: render still frames, as for reduced motion */
+  private stillPref = false;
 
   constructor(opts: StockFieldOptions) {
     this.opts = opts;
@@ -402,7 +404,7 @@ export class StockField {
     this.camera.updateProjectionMatrix();
     const t = fieldStore.get().target;
     const [pos, look] = this.shot(t.shot, t.focus);
-    if (this.opts.reducedMotion || this.opts.poster) {
+    if (this.still) {
       this.camPos.copy(pos);
       this.camLook.copy(look);
     }
@@ -424,6 +426,19 @@ export class StockField {
     this.wake();
   }
 
+  /** Calm mode: still frames that still follow each chapter's state, switchable without a reboot. */
+  setStill(still: boolean) {
+    if (still === this.stillPref) return;
+    this.stillPref = still;
+    if (still) this.uniforms.uIntro.value = 1;
+    this.settling = true;
+    this.wake();
+  }
+
+  private get still() {
+    return this.opts.reducedMotion || !!this.opts.poster || this.stillPref;
+  }
+
   wake() {
     this.needsFrame = true;
     // Inside tick, the tick itself schedules the next frame. Scheduling here too (a queued pulse
@@ -439,7 +454,7 @@ export class StockField {
     if (this.disposed) return;
     const s = fieldStore.get();
     if (!s.visible && !this.opts.poster) return;
-    const still = this.opts.reducedMotion || !!this.opts.poster;
+    const still = this.still;
     if (!still) {
       this.govern(now);
       // Paced: with nothing easing and no input, the idle field (breathing, waves) draws at ~30 fps.
@@ -553,7 +568,7 @@ export class StockField {
       p.x += (m.pos[this.hoverCell * 2] - p.x) * ease(10);
       p.y += (m.pos[this.hoverCell * 2 + 1] - p.y) * ease(10);
     }
-    (u.uPointer.value as THREE.Vector3).z = this.opts.reducedMotion ? 0 : this.hoverStrength;
+    (u.uPointer.value as THREE.Vector3).z = still ? 0 : this.hoverStrength;
 
     // Projected anchors for HTML labels.
     if (this.opts.anchors?.length) {

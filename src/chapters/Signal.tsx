@@ -4,6 +4,7 @@ import { useFieldScene } from "../field/useFieldScene";
 import { fieldStore } from "../field/store";
 import { RevealHeading } from "../components/Words";
 import { prefersReducedMotion, useReveal } from "../lib/motion";
+import { useMotion } from "../lib/prefs";
 
 /** Where each named signal enters the field (normalised u, v). */
 const ENTRY: [number, number][] = [
@@ -21,12 +22,16 @@ export function Signal() {
   const section = useReveal<HTMLElement>(0.25);
   const [active, setActive] = useState(-1);
   const inView = useRef(false);
+  const calm = useMotion() === "calm";
   useFieldScene(section, { shot: "signal", signal: 1, forecast: 0, level: 0, focus: -1 });
 
   // While the chapter is on screen, the named signals take turns reaching the field.
   useEffect(() => {
     const el = section.current;
-    if (!el || prefersReducedMotion()) return;
+    if (!el || prefersReducedMotion() || calm) {
+      setActive(-1);
+      return;
+    }
     let timer = 0;
     let n = 0;
     const step = () => {
@@ -51,7 +56,7 @@ export function Signal() {
       io.disconnect();
       clearTimeout(timer);
     };
-  }, [c.signal.signals.length, section]);
+  }, [c.signal.signals.length, section, calm]);
 
   return (
     <section ref={section} id="signal" className="chapter signal" data-field="show" aria-labelledby="signal-title">

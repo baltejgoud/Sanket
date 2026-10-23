@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "../lib/motion";
+import { useMotion } from "../lib/prefs";
 
 /**
  * A contextual cursor for fine pointers. Elements opt in with
@@ -9,8 +10,9 @@ import { prefersReducedMotion } from "../lib/motion";
 export function Cursor({ fieldLabel }: { fieldLabel: string }) {
   const ring = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
+  const calm = useMotion() === "calm";
   useEffect(() => {
-    if (prefersReducedMotion() || !window.matchMedia("(pointer: fine)").matches) return;
+    if (calm || prefersReducedMotion() || !window.matchMedia("(pointer: fine)").matches) return;
     const el = ring.current!;
     const text = label.current!;
     document.documentElement.classList.add("has-cursor");
@@ -58,13 +60,14 @@ export function Cursor({ fieldLabel }: { fieldLabel: string }) {
     document.documentElement.addEventListener("pointerleave", leave);
     return () => {
       cancelAnimationFrame(raf);
+      el.classList.remove("is-on");
       document.documentElement.classList.remove("has-cursor");
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerdown", down);
       window.removeEventListener("pointerup", up);
       document.documentElement.removeEventListener("pointerleave", leave);
     };
-  }, [fieldLabel]);
+  }, [fieldLabel, calm]);
   return (
     <div ref={ring} className="cursor" aria-hidden="true">
       <span className="cursor-ring" />

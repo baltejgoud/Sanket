@@ -131,6 +131,16 @@ async function open(options = {}) {
   await page.getByText("అమ్ముడయ్యేదే నిల్వ చేయండి.").first().waitFor();
   await page.getByRole("button", { name: "English" }).first().click();
   ok("Hindi / Telugu switch and persist");
+
+  // Motion control (WCAG 2.2.2): reduced motion starts calm; the toggle persists.
+  const pause = page.getByRole("button", { name: /Play motion|Pause motion/ }).first();
+  if ((await pause.getAttribute("aria-pressed")) !== "true") fail("Reduced motion should start calm");
+  await pause.click();
+  if (await page.evaluate(() => document.documentElement.classList.contains("is-calm"))) fail("Play motion did not leave calm mode");
+  await page.reload({ waitUntil: "networkidle" });
+  if ((await page.getByRole("button", { name: /Play motion|Pause motion/ }).first().getAttribute("aria-pressed")) !== "false") fail("Motion choice did not persist");
+  await page.getByRole("button", { name: /Pause motion/ }).first().click();
+  ok("motion pause control, persisted");
   await context.close();
 }
 

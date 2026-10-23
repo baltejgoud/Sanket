@@ -327,6 +327,38 @@
   color: var(--ink);
   background: var(--bone);
 }
+.motion-toggle {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-dark-2);
+  color: var(--concrete);
+  transition:
+    color var(--t-ui),
+    border-color var(--t-ui),
+    background-color var(--t-ui);
+}
+.motion-toggle:hover {
+  color: var(--bone);
+  border-color: var(--concrete);
+}
+.motion-toggle[aria-pressed="true"] {
+  color: var(--signal);
+  border-color: rgb(255 90 31 / 0.5);
+}
+/* Calm: loops hold still (the field and the signal cycle stop in script). */
+.is-calm .readout-title i::before,
+.is-calm .hero-scroll i::after {
+  animation-play-state: paused;
+}
+.index-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 .talk {
   display: inline-flex;
   align-items: center;

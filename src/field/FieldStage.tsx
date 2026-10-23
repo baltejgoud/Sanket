@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useIdle, useReducedMotion } from "../lib/motion";
+import { isCalm, prefs } from "../lib/prefs";
 import { fieldStore, type Readout } from "./store";
 import type { StockField } from "./StockField";
 import type { FieldModel } from "./model";
@@ -85,6 +86,7 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
           return;
         }
         fieldRef.current = field;
+        field.setStill(isCalm());
         const booted = field;
         return booted.warm().then(() => {
           if (cancelled) return;
@@ -100,6 +102,9 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
       setReady(false);
     };
   }, [mode, idle, reduced, poster]);
+
+  // The visitor's pause control.
+  useEffect(() => prefs.subscribe(() => fieldRef.current?.setStill(isCalm())), []);
 
   // Resize with the canvas.
   useEffect(() => {
