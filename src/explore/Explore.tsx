@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent, type PointerEvent } from "react";
-import { Radio, Smartphone, Target, X } from "lucide-react";
+import { Box, Glasses, Radio, Smartphone, Target, X } from "lucide-react";
 import { useCopy } from "../copy";
 import type { Lang } from "../i18n";
 import { getLenis } from "../lib/motion";
@@ -9,6 +9,7 @@ import { useField } from "../field/bridge";
 import { startTilt, tiltSupported } from "../field/tilt";
 import { TIMELINE_STOPS } from "../field/timeline";
 import { exploreCopy } from "./exploreCopy";
+import { startXR, xrSupport } from "./xr";
 import "../styles/explore.css";
 
 /**
@@ -33,6 +34,9 @@ export default function Explore({ lang, onClose }: { lang: Lang; onClose: () => 
   const [v, setV] = useState(0);
   const [said, setSaid] = useState("");
   const [stopTilt, setStopTilt] = useState<(() => void) | null>(null);
+  const [xr, setXr] = useState<{ ar: boolean; vr: boolean; quickLook: boolean } | null>(null);
+  const [session, setSession] = useState<XRSession | null>(null);
+  const overlay = useRef<HTMLDivElement>(null);
   const readout = useSyncExternalStore(fieldStore.subscribeReadout, () => fieldStore.get().readout);
 
   // Open: hide the page, hold the scroll, focus the viewport. Close: undo all of it, before focus
@@ -57,6 +61,23 @@ export default function Explore({ lang, onClose }: { lang: Lang; onClose: () => 
   }, [field]);
 
   useEffect(() => field?.exploreTimeline(v), [field, v]);
+  useEffect(() => {
+    xrSupport().then(setXr, () => setXr(null));
+  }, []);
+  // Leaving explore ends any immersive session.
+  useEffect(() => () => void session?.end().catch(() => {}), [session]);
+
+  const enterXR = async (mode: "ar" | "vr") => {
+    if (!field) return;
+    try {
+      const s = await startXR(field, mode, overlay.current);
+      if (!s) return;
+      setSession(s);
+      s.addEventListener("end", () => setSession(null));
+    } catch {
+      setSaid(copy.xrFail);
+    }
+  };
   useEffect(() => () => stopTilt?.(), [stopTilt]);
 
   const describe = (r: Readout | null) =>
@@ -187,6 +208,26 @@ export default function Explore({ lang, onClose }: { lang: Lang; onClose: () => 
               <Radio size={16} aria-hidden="true" />
               {copy.signal}
             </button>
+            {xr?.ar && (
+              <button className="explore-btn is-primary" onClick={() => enterXR("ar")}>
+                <Box size={16} aria-hidden="true" />
+                {copy.ar}
+              </button>
+            )}
+            {xr?.vr && (
+              <button className="explore-btn is-primary" onClick={() => enterXR("vr")}>
+                <Glasses size={16} aria-hidden="true" />
+                {copy.vr}
+              </button>
+            )}
+            {xr?.quickLook && (
+              // Apple's AR viewer opens a link with rel="ar" that wraps an image.
+              <a className="explore-btn is-primary" rel="ar" href="/assets/stock-field.usdz">
+                <img src="/assets/stock-field.jpg" alt="" width={1} height={1} className="ql-thumb" />
+                <Box size={16} aria-hidden="true" />
+                {copy.quickLook}
+              </a>
+            )}
             {tiltSupported() && !calm && (
               <button className="explore-btn" aria-pressed={!!stopTilt} onClick={toggleTilt}>
                 <Smartphone size={16} aria-hidden="true" />
@@ -201,6 +242,26 @@ export default function Explore({ lang, onClose }: { lang: Lang; onClose: () => 
         <p className="sr-only" role="status">
           {said}
         </p>
+      </div>
+      {/* Shown over the camera view during AR (WebXR DOM overlay): the timeline and a way out. */}
+      <div ref={overlay} className="xr-overlay">
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={v}
+          aria-label={copy.timeline}
+          aria-valuetext={rail[stopAt]}
+          onChange={e => setV(+e.target.value)}
+          style={{ ["--progress" as string]: `${v * 100}%` }}
+        />
+        <p className="mono">{rail[stopAt]}</p>
+        <p className="xr-note">{copy.xrNote}</p>
+        <button className="explore-btn" onClick={() => session?.end()}>
+          <X size={16} aria-hidden="true" />
+          {copy.exit}
+        </button>
       </div>
     </dialog>
   );

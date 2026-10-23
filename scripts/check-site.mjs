@@ -294,6 +294,10 @@ async function open(options = {}) {
   await page.keyboard.press("n");
   await page.waitForTimeout(300);
   if (!/No stockouts left/.test(await dlg.getByRole("status").innerText())) fail("Explore: at In stock there should be no stockouts");
+  // No WebXR or Quick Look in headless Chromium: the placement controls must not appear.
+  await page.waitForTimeout(300);
+  if (await dlg.getByRole("button", { name: /Place on your desk|View in space/ }).count()) fail("XR buttons shown without WebXR support");
+  if (await dlg.locator('a[rel="ar"]').count()) fail("Quick Look link shown outside Safari");
   await page.screenshot({ path: "qa/spatial/explore.png" });
   await page.keyboard.press("Escape");
   await page.waitForTimeout(400);
@@ -406,6 +410,47 @@ for (const [width, height] of [
   await context.close();
 }
 ok("no overflow at 320 / 390 / 768 / 1024 / landscape; phone index dialog");
+
+// Placement controls with (mocked) support: an ARCore phone gets "Place on your desk"; a refused
+// session is reported and explore keeps working. An iPhone gets a Quick Look link to the model.
+for (const device of ["webxr-ar", "quicklook"]) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+  await context.addInitScript(d => {
+    if (d === "webxr-ar") {
+      Object.defineProperty(navigator, "xr", {
+        value: { isSessionSupported: async m => m === "immersive-ar", requestSession: async () => Promise.reject(new DOMException("No device", "NotSupportedError")) },
+      });
+    } else {
+      const supports = DOMTokenList.prototype.supports;
+      DOMTokenList.prototype.supports = function (t) {
+        return t === "ar" || supports.call(this, t);
+      };
+    }
+  }, device);
+  const page = await context.newPage();
+  page.on("pageerror", e => errors.push(e.message));
+  await page.goto(baseUrl, { waitUntil: "networkidle" });
+  await page.locator(".hero .btn-text").click();
+  const dlg = page.locator(".explore[open]");
+  await dlg.waitFor();
+  if (device === "webxr-ar") {
+    await dlg.getByRole("button", { name: "Place on your desk" }).click();
+    await dlg.getByRole("status").filter({ hasText: /Couldn’t start AR or VR/ }).waitFor();
+  } else {
+    const link = dlg.locator('a[rel="ar"][href="/assets/stock-field.usdz"]');
+    if ((await link.count()) !== 1 || (await link.locator("img").count()) !== 1) fail("Quick Look needs one rel=ar link wrapping an img");
+  }
+  await context.close();
+}
+ok("placement: WebXR AR button (refusal reported), Quick Look link to the USDZ");
+
+// The Quick Look model (iPhone/iPad "View in AR") is a real USDZ package: a zip whose first file is the scene.
+{
+  const usdz = fs.readFileSync("public/assets/stock-field.usdz");
+  if (usdz.subarray(0, 2).toString() !== "PK" || !usdz.includes(Buffer.from("model.usda"))) fail("public/assets/stock-field.usdz is not a USDZ package");
+  if (!usdz.includes(Buffer.from("metersPerUnit = 1"))) fail("USDZ should be authored in metres");
+  ok(`Quick Look model stock-field.usdz (${(usdz.length / 1024).toFixed(0)} kB)`);
+}
 
 await browser.close();
 if (errors.length) fail("Runtime errors: " + errors.join("; "));

@@ -321,7 +321,8 @@ varying vec2 vXZ;
 varying float vDepth;
 void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
-  vXZ = world.xz;
+  // Object space: the grid and the projector stay with the field when AR/VR scales it.
+  vXZ = position.xz;
   vec4 mv = viewMatrix * world;
   vDepth = -mv.z;
   gl_Position = projectionMatrix * mv;

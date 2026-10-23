@@ -114,6 +114,20 @@ export class StockField {
   // Explore mode (setExplore): orbit controls own the camera; the timeline replaces the story's targets.
   private controls: OrbitControls | null = null;
   private explore: { v: number; selected: number } | null = null;
+  /** every mesh of the field; scaled and placed as one object in AR/VR */
+  private root = new THREE.Group();
+  private floorMesh: THREE.Object3D | null = null;
+  // An immersive session (xrBegin): the XR loop replaces the page's rAF loop until it ends.
+  private xr: {
+    mode: "ar" | "vr";
+    session: XRSession;
+    hitSource: XRHitTestSource | null;
+    reticle: THREE.Mesh | null;
+    placed: boolean;
+    autoplay: boolean;
+    last: number;
+    t: number;
+  } | null = null;
   // The projector (see projection.ts): the slide on the texture, the one wanted, and its light.
   private proj = {
     canvas: document.createElement("canvas"),
@@ -139,6 +153,7 @@ export class StockField {
     this.renderer.setPixelRatio(opts.dpr);
     this.renderer.setClearColor(0x0b0c0a, 1);
     this.scene.fog = null;
+    this.scene.add(this.root);
 
     const col = (hex: string) => new THREE.Color(hex);
     this.uniforms = {
@@ -221,7 +236,7 @@ export class StockField {
 
   private add(mesh: THREE.Object3D & { material: THREE.Material }) {
     mesh.frustumCulled = false;
-    this.scene.add(mesh);
+    this.root.add(mesh);
     this.disposables.push(mesh.material);
   }
 
@@ -324,7 +339,9 @@ export class StockField {
       transparent: true,
       depthWrite: false,
     });
-    this.add(new THREE.Mesh(g, mat));
+    const floor = new THREE.Mesh(g, mat);
+    this.floorMesh = floor;
+    this.add(floor);
   }
 
   /* ---------- projector ---------- */
@@ -610,6 +627,114 @@ export class StockField {
     return true;
   }
 
+  /* ---------- immersive (WebXR) ---------- */
+
+  /**
+   * Take over a WebXR session. AR (phone): a reticle follows real surfaces and a tap places the
+   * field, 40 cm wide, on the desk; later taps send signals. VR (headset): the field floats at
+   * table height, about a metre wide, and a select sends a signal. Without a DOM overlay to hold
+   * the timeline, the timeline plays itself (still frames when calm). Explore mode must be on.
+   */
+  async xrBegin(mode: "ar" | "vr", session: XRSession) {
+    if (this.xr || this.disposed) return;
+    cancelAnimationFrame(this.frame);
+    this.frame = 0;
+    const r = this.renderer;
+    r.xr.enabled = true;
+    r.xr.setReferenceSpaceType(mode === "ar" ? "local" : "local-floor");
+    await r.xr.setSession(session);
+    const m = this.model;
+    this.root.scale.setScalar((mode === "ar" ? 0.4 : 1) / m.width);
+    this.root.position.set(0, mode === "ar" ? 0 : 0.8, mode === "ar" ? 0 : -0.9);
+    this.root.visible = mode === "vr";
+    if (this.floorMesh) this.floorMesh.visible = mode === "vr";
+    let reticle: THREE.Mesh | null = null;
+    let hitSource: XRHitTestSource | null = null;
+    if (mode === "ar") {
+      reticle = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.065, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff5a1f }));
+      reticle.matrixAutoUpdate = false;
+      reticle.visible = false;
+      this.scene.add(reticle);
+      try {
+        const viewer = await session.requestReferenceSpace("viewer");
+        hitSource = (await session.requestHitTestSource?.({ space: viewer })) ?? null;
+      } catch {
+        hitSource = null;
+      }
+    }
+    const overlay = (session as XRSession & { domOverlayState?: { type: string } }).domOverlayState;
+    this.xr = { mode, session, hitSource, reticle, placed: mode === "vr", autoplay: mode === "vr" || !overlay, last: performance.now(), t: 0 };
+    session.addEventListener("select", this.onXrSelect);
+    session.addEventListener("end", this.onXrEnd);
+    r.setAnimationLoop(this.xrFrame);
+  }
+
+  private xrFrame = (time: number, frame?: XRFrame) => {
+    const x = this.xr;
+    if (!x) return;
+    const dt = Math.min((time - x.last) / 1000, 1 / 20);
+    x.last = time;
+    if (x.mode === "ar" && !x.placed && frame && x.hitSource && x.reticle) {
+      const space = this.renderer.xr.getReferenceSpace();
+      const hit = space ? frame.getHitTestResults(x.hitSource)[0]?.getPose(space) : undefined;
+      x.reticle.visible = !!hit;
+      if (hit) x.reticle.matrix.fromArray(hit.transform.matrix);
+    }
+    // No overlay to hold the timeline: play the story through, pausing on each state.
+    if (x.autoplay && this.explore && !this.still) {
+      x.t = (x.t + dt / 16) % 1;
+      this.explore.v = Math.min(1, x.t * 1.15);
+    }
+    this.update(this.still ? 0 : dt, this.still);
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  private onXrSelect = () => {
+    const x = this.xr;
+    if (!x) return;
+    if (x.mode === "ar" && !x.placed) {
+      if (!x.reticle?.visible) return;
+      x.reticle.matrix.decompose(this.root.position, new THREE.Quaternion(), new THREE.Vector3());
+      this.root.visible = true;
+      x.reticle.visible = false;
+      x.placed = true;
+      return;
+    }
+    this.signalAtSelection();
+  };
+
+  private onXrEnd = () => {
+    const x = this.xr;
+    if (!x) return;
+    x.session.removeEventListener("select", this.onXrSelect);
+    x.session.removeEventListener("end", this.onXrEnd);
+    x.hitSource?.cancel();
+    if (x.reticle) {
+      this.scene.remove(x.reticle);
+      x.reticle.geometry.dispose();
+      (x.reticle.material as THREE.Material).dispose();
+    }
+    this.xr = null;
+    this.renderer.setAnimationLoop(null);
+    this.renderer.xr.enabled = false;
+    this.root.scale.setScalar(1);
+    this.root.position.set(0, 0, 0);
+    this.root.visible = true;
+    if (this.floorMesh) this.floorMesh.visible = true;
+    this.resize();
+    this.settling = true;
+    this.wake();
+  };
+
+  /** End the immersive session, if one is running. */
+  xrEnd() {
+    return this.xr?.session.end();
+  }
+
+  get immersive() {
+    return this.xr?.mode ?? null;
+  }
+
   /* ---------- lifecycle ---------- */
 
   resize() {
@@ -663,7 +788,7 @@ export class StockField {
     // Inside tick, the tick itself schedules the next frame. Scheduling here too (a queued pulse
     // becoming a wave mid-update did) started a second loop, then a third: the field rendered
     // once more per frame for every signal the page sent.
-    if (this.disposed || !this.running || this.frame || this.inTick || document.hidden) return;
+    if (this.disposed || !this.running || this.frame || this.inTick || this.xr || document.hidden) return;
     this.last = performance.now();
     this.frame = requestAnimationFrame(this.tick);
   }
@@ -793,7 +918,9 @@ export class StockField {
     const cam = this.camera;
     let camMoving = false;
     this.hoverStrength += ((this.pointerOnField ? 1 : 0) - this.hoverStrength) * ease(6);
-    if (this.controls) {
+    if (this.xr) {
+      // Immersive: the headset or phone owns the camera.
+    } else if (this.controls) {
       // Explore: the visitor flies the camera.
       camMoving = this.controls.update();
     } else {
@@ -807,7 +934,7 @@ export class StockField {
       cam.lookAt(this.camLook);
       cam.clearViewOffset();
     }
-    if (!still && !this.controls) {
+    if (!still && !this.controls && !this.xr) {
       cam.translateX(this.pointerSmooth.x * 2.2);
       cam.translateY(this.pointerSmooth.y * 1.2);
       cam.updateMatrixWorld();
@@ -822,7 +949,7 @@ export class StockField {
     (u.uPointer.value as THREE.Vector3).z = still ? 0 : this.hoverStrength;
 
     // Projected anchors for HTML labels.
-    if (this.opts.anchors?.length) {
+    if (this.opts.anchors?.length && !this.xr) {
       const v = new THREE.Vector3();
       this.opts.anchors.forEach((a, n) => {
         v.set(...a.at(m));
@@ -865,6 +992,7 @@ export class StockField {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.xr?.session.end().catch(() => {});
     this.controls?.dispose();
     cancelAnimationFrame(this.frame);
     this.unsubscribe();

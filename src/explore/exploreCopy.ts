@@ -18,6 +18,7 @@ export interface ExploreCopy {
   vr: string;
   quickLook: string;
   xrNote: string;
+  xrFail: string;
   exit: string;
 }
 
@@ -39,6 +40,7 @@ export const exploreCopy: Record<Lang, ExploreCopy> = {
     vr: "View in space",
     quickLook: "View in AR",
     xrNote: "Uses your camera to find a surface. Nothing is recorded or sent.",
+    xrFail: "Couldn’t start AR or VR on this device. You can keep exploring here.",
     exit: "Exit",
   },
   hi: {
@@ -58,6 +60,7 @@ export const exploreCopy: Record<Lang, ExploreCopy> = {
     vr: "स्पेस में देखें",
     quickLook: "AR में देखें",
     xrNote: "सतह खोजने के लिए आपका कैमरा इस्तेमाल होता है। कुछ भी रिकॉर्ड या भेजा नहीं जाता।",
+    xrFail: "इस डिवाइस पर AR या VR शुरू नहीं हो सका। आप यहीं घूमना जारी रख सकते हैं।",
     exit: "बाहर निकलें",
   },
   te: {
@@ -77,6 +80,7 @@ export const exploreCopy: Record<Lang, ExploreCopy> = {
     vr: "స్పేస్‌లో చూడండి",
     quickLook: "ARలో చూడండి",
     xrNote: "ఉపరితలాన్ని కనుగొనడానికి మీ కెమెరా ఉపయోగపడుతుంది. ఏదీ రికార్డ్ చేయబడదు, పంపబడదు.",
+    xrFail: "ఈ పరికరంలో AR లేదా VR ప్రారంభం కాలేదు. మీరు ఇక్కడే చూడటం కొనసాగించవచ్చు.",
     exit: "నిష్క్రమించండి",
   },
 };
