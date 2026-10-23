@@ -56,6 +56,10 @@ async function open(options = {}) {
   }
   ok(`anchors resolve (${hrefs.length} links + legacy ids)`);
 
+  const pad = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop));
+  if (!(pad >= 64)) fail("scroll-padding-top should clear the sticky header, got " + pad);
+  ok("scroll padding clears the sticky header (WCAG 2.4.11)");
+
   // Problems: selecting a tab updates the panel.
   await page.getByRole("tab", { name: /Warehouse full of slow stock/ }).click();
   await page.getByText("The warehouse is full of what nobody wants.").waitFor();
@@ -204,6 +208,18 @@ async function open(options = {}) {
   if (seen.join("|") !== "Order.|Move.|Mark down.|Adapt.") fail("Decide sequence: " + seen.join("|"));
   await page.screenshot({ path: `${out}/decide.png` });
   ok("decide scrub: Order → Move → Mark down → Adapt");
+
+  // The current chapter's header link fills with reading progress.
+  const read = await page.evaluate(async () => {
+    const el = document.getElementById("decide");
+    const y = el.offsetTop + el.offsetHeight / 2 - innerHeight * 0.45;
+    window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+    await new Promise(r => setTimeout(r, 500));
+    const a = document.querySelector('.chapter-nav a[aria-current]');
+    return a ? [a.getAttribute("href"), parseFloat(a.style.getPropertyValue("--read"))] : null;
+  });
+  if (!read || read[0] !== "#decide" || !(read[1] > 0.3 && read[1] < 0.7)) fail("Header reading progress: " + JSON.stringify(read));
+  ok("header link fills with reading progress");
   await context.close();
 }
 
@@ -220,6 +236,18 @@ for (const [width, height] of [
   if (over > 0) fail(`${width}px horizontal overflow: ${over}px`);
   if (width === 390) {
     await page.screenshot({ path: `${out}/mobile.png` });
+    // Dock: hidden on the hero, shown mid-page, hidden again at Contact.
+    const dock = page.locator(".dock");
+    if (await dock.isVisible()) fail("Dock visible on the hero");
+    await page.evaluate(() => scrollTo(0, document.getElementById("forecast").offsetTop));
+    await page.waitForTimeout(500);
+    if (!(await dock.isVisible())) fail("Dock hidden mid-page");
+    if (!/wa\.me/.test(await dock.getByRole("link").first().getAttribute("href"))) fail("Dock should link to WhatsApp");
+    await page.evaluate(() => scrollTo(0, document.getElementById("contact").offsetTop));
+    await page.waitForTimeout(500);
+    if (await dock.isVisible()) fail("Dock should hide at Contact");
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.waitForTimeout(300);
     const menu = page.getByRole("button", { name: "Open menu" });
     await menu.click();
     await page.getByRole("dialog").waitFor();

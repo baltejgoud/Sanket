@@ -201,10 +201,33 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
     // Page height is measured on resize, not per scroll frame: reading scrollHeight right after
     // the Decide scrub's style writes forced an extra layout on every frame.
     let max = 0;
-    const measure = () => (max = document.documentElement.scrollHeight - window.innerHeight);
+    // Each header link fills with reading progress through its group of sections.
+    const links = CHAPTERS.map(ch => ({
+      el: document.querySelector<HTMLElement>(`.chapter-nav a[href="#${ch.id}"]`),
+      ids: Object.keys(GROUP).filter(id => GROUP[id] === ch.id),
+      from: 0,
+      to: 1,
+      last: -1,
+    }));
+    const measure = () => {
+      max = document.documentElement.scrollHeight - window.innerHeight;
+      for (const l of links) {
+        const boxes = l.ids.map(id => document.getElementById(id)?.getBoundingClientRect()).filter(Boolean) as DOMRect[];
+        if (!boxes.length) continue;
+        l.from = Math.min(...boxes.map(b => b.top)) + window.scrollY;
+        l.to = Math.max(...boxes.map(b => b.bottom)) + window.scrollY;
+      }
+    };
     const update = () => {
       raf = 0;
       el.style.setProperty("--progress", String(max > 0 ? window.scrollY / max : 0));
+      const y = window.scrollY + window.innerHeight * 0.45;
+      for (const l of links) {
+        const read = Math.min(1, Math.max(0, (y - l.from) / Math.max(1, l.to - l.from)));
+        if (!l.el || Math.abs(read - l.last) < 0.002) continue;
+        l.last = read;
+        l.el.style.setProperty("--read", read.toFixed(3));
+      }
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);

@@ -282,10 +282,15 @@
 .chapter-nav a[aria-current] {
   color: var(--bone);
 }
-.chapter-nav a:hover::after,
-.chapter-nav a[aria-current]::after {
+.chapter-nav a:hover::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+/* The current chapter's underline fills as it is read (--read, set on scroll). */
+.chapter-nav a[aria-current]::after {
+  transform: scaleX(max(0.06, var(--read, 1)));
+  transform-origin: left;
+  transition: none;
 }
 .chapter-nav a[aria-current] .mono {
   color: var(--signal);
@@ -855,5 +860,73 @@
   .palette[open],
   .toast {
     animation: none;
+  }
+}
+
+/* ---------- Phone dock ---------- */
+.dock {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--line-dark-2);
+  border-radius: 999px;
+  background: rgb(20 22 19 / 0.88);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+  transition:
+    transform 420ms var(--ease-settle),
+    opacity 420ms var(--ease-settle),
+    visibility 0s;
+}
+.dock.is-hidden {
+  transform: translateY(calc(100% + 24px));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 360ms var(--ease-move),
+    opacity 360ms var(--ease-move),
+    visibility 0s linear 360ms;
+}
+.dock-talk {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  border-radius: 999px;
+  background: var(--signal);
+  color: var(--ink);
+  font-weight: 650;
+}
+.dock-talk:active,
+.dock-jump:active {
+  transform: scale(0.97);
+}
+.dock-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line-dark-2);
+  color: var(--bone);
+}
+@media (max-width: 699px) {
+  /* Focus and anchors land above the dock, not under it (WCAG 2.4.11). */
+  html {
+    scroll-padding-bottom: 84px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock.is-hidden {
+    transition: none;
   }
 }

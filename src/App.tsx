@@ -7,6 +7,7 @@ import { Cursor } from "./components/Cursor";
 import { onIdle, ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
 import { palette } from "./lib/paletteBus";
 import { Toaster } from "./components/Toast";
+import { Dock } from "./components/Dock";
 import { useMotion } from "./lib/prefs";
 import { Hero } from "./chapters/Hero";
 import { Signal } from "./chapters/Signal";
@@ -129,6 +130,7 @@ export default function App() {
         <Proof />
         <Invitation />
       </main>
+      <Dock />
       <Suspense fallback={null}>{paletteOpen && <Palette lang={lang} setLang={switchLang} onClose={closePalette} />}</Suspense>
       <Toaster />
     </LangContext.Provider>
