@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { createField, decisionProgress, FLAG_NEW, FLAG_SHEET, type Decision, type FieldModel } from "./model";
+import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { fieldStore, type Readout, type Shot } from "./store";
+import { timelineState } from "./timeline";
 import { decideMask, drawSlide, loadFaces, projectionRect, SLIDE_COLOR, SLIDE_STRENGTH, slideFor, type ProjectionCopy, type Slide } from "./projection";
 import {
   arcFragment,
@@ -109,6 +111,9 @@ export class StockField {
   private inTick = false;
   /** the visitor paused motion: render still frames, as for reduced motion */
   private stillPref = false;
+  // Explore mode (setExplore): orbit controls own the camera; the timeline replaces the story's targets.
+  private controls: OrbitControls | null = null;
+  private explore: { v: number; selected: number } | null = null;
   // The projector (see projection.ts): the slide on the texture, the one wanted, and its light.
   private proj = {
     canvas: document.createElement("canvas"),
@@ -475,6 +480,136 @@ export class StockField {
     this.wake();
   }
 
+  /* ---------- explore mode ---------- */
+
+  get exploring() {
+    return !!this.controls;
+  }
+
+  /**
+   * Hand the camera to the visitor (orbit, zoom, pan on `el`), or give it back to the story,
+   * which eases home from wherever the visitor left it. OrbitControls loads only now.
+   */
+  async setExplore(on: boolean, el?: HTMLElement) {
+    if (on && !this.controls && el) {
+      const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
+      if (this.disposed || this.controls) return;
+      const c = new OrbitControls(this.camera, el);
+      const k = this.model.width / 47;
+      c.enableDamping = !this.still;
+      c.dampingFactor = 0.08;
+      c.screenSpacePanning = false;
+      c.minDistance = 6 * k;
+      c.maxDistance = 85 * k;
+      c.maxPolarAngle = 1.48;
+      this.camera.clearViewOffset();
+      this.camera.position.copy(this.camPos);
+      c.target.copy(this.camLook);
+      c.update();
+      c.addEventListener("change", this.onControls);
+      this.controls = c;
+      this.explore = { v: 0, selected: -1 };
+    } else if (!on && this.controls) {
+      this.controls.removeEventListener("change", this.onControls);
+      this.camLook.copy(this.controls.target);
+      this.camPos.copy(this.camera.position);
+      this.controls.dispose();
+      this.controls = null;
+      this.explore = null;
+      this.hoverCell = -1;
+      this.pointerOnField = false;
+      fieldStore.setReadout(null);
+    }
+    this.settling = true;
+    this.wake();
+  }
+
+  private onControls = () => this.wake();
+
+  /** Explore's timeline, 0..1: Unbalanced → Signal → Forecast → Decide → In stock. */
+  exploreTimeline(v: number) {
+    if (!this.explore) return;
+    this.explore.v = Math.min(1, Math.max(0, v));
+    if (this.explore.selected >= 0) fieldStore.setReadout(this.readSelected());
+    this.wake();
+  }
+
+  private readSelected() {
+    const timeline = timelineState(this.explore?.v ?? 0);
+    return readCell(this.model, this.explore?.selected ?? 0, timeline.decide, timeline.target.level);
+  }
+
+  /** Select a cell, glide the orbit target over it and publish its readout. */
+  private select(k: number) {
+    if (!this.explore || !this.controls) return null;
+    const m = this.model;
+    this.explore.selected = k;
+    this.hoverCell = k;
+    this.pointerOnField = true;
+    const d = new THREE.Vector3(m.pos[k * 2], this.controls.target.y, m.pos[k * 2 + 1]).sub(this.controls.target);
+    this.controls.target.add(d);
+    this.camera.position.add(d);
+    const r = this.readSelected();
+    fieldStore.setReadout(r);
+    this.wake();
+    return r;
+  }
+
+  /** The next stockout after the selected cell, at the timeline's current state; null when none is left. */
+  nextStockout() {
+    if (!this.explore) return null;
+    const m = this.model;
+    const timeline = timelineState(this.explore.v);
+    for (let n = 1; n <= m.count; n++) {
+      const k = (this.explore.selected + n + m.count) % m.count;
+      if (readCell(m, k, timeline.decide, timeline.target.level).status === "short") return this.select(k);
+    }
+    return null;
+  }
+
+  /** Select the cell under the pointer (a tap or click that did not drag). */
+  selectAtPointer() {
+    return this.hoverCell >= 0 ? this.select(this.hoverCell) : null;
+  }
+
+  /** Send a signal from the selected cell, or from the middle of the field. */
+  signalAtSelection() {
+    const m = this.model;
+    const k = this.explore && this.explore.selected >= 0 ? this.explore.selected : Math.floor(m.rows / 2) * m.cols + Math.floor(m.cols / 2);
+    this.addWave(m.pos[k * 2], m.pos[k * 2 + 1], 1);
+  }
+
+  /** Keyboard flight: arrows orbit, + / − zoom, W A S D move over the ground. Returns true if used. */
+  exploreKey(key: string) {
+    const c = this.controls;
+    if (!c) return false;
+    const cam = this.camera;
+    const k = this.model.width / 47;
+    const off = cam.position.clone().sub(c.target);
+    const sph = new THREE.Spherical().setFromVector3(off);
+    const fwd = new THREE.Vector3(-off.x, 0, -off.z).normalize();
+    const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+    const walk: Record<string, THREE.Vector3> = { w: fwd, s: fwd.clone().negate(), a: right.clone().negate(), d: right };
+    const step = walk[key.toLowerCase()];
+    if (step) {
+      step.multiplyScalar(1.5 * k);
+      c.target.add(step);
+      cam.position.add(step);
+    } else {
+      if (key === "ArrowLeft") sph.theta -= 0.12;
+      else if (key === "ArrowRight") sph.theta += 0.12;
+      else if (key === "ArrowUp") sph.phi = Math.max(0.15, sph.phi - 0.08);
+      else if (key === "ArrowDown") sph.phi = Math.min(c.maxPolarAngle, sph.phi + 0.08);
+      else if (key === "+" || key === "=") sph.radius = Math.max(c.minDistance, sph.radius * 0.88);
+      else if (key === "-" || key === "_") sph.radius = Math.min(c.maxDistance, sph.radius * 1.12);
+      else return false;
+      cam.position.copy(c.target).add(new THREE.Vector3().setFromSpherical(sph));
+    }
+    c.update();
+    this.wake();
+    return true;
+  }
+
   /* ---------- lifecycle ---------- */
 
   resize() {
@@ -537,7 +672,7 @@ export class StockField {
     this.frame = 0;
     if (this.disposed) return;
     const s = fieldStore.get();
-    if (!s.visible && !this.opts.poster) return;
+    if (!s.visible && !this.opts.poster && !this.controls) return;
     const still = this.still;
     if (!still) {
       this.govern(now);
@@ -599,7 +734,9 @@ export class StockField {
   /** returns true while anything is still moving */
   private update(dt: number, still: boolean) {
     const s = fieldStore.get();
-    const t = s.target;
+    const timeline = this.explore ? timelineState(this.explore.v) : null;
+    const t = timeline ? timeline.target : s.target;
+    const decide = timeline ? timeline.decide : s.decide;
     const u = this.uniforms;
     const m = this.model;
     if (!still) this.clock += dt;
@@ -611,7 +748,7 @@ export class StockField {
     e.forecast += (t.forecast - e.forecast) * ease(2.6);
     e.level += (t.level - e.level) * ease(2);
     e.focus += ((t.focus >= 0 ? 1 : 0) - e.focus) * ease(3);
-    e.decide += (s.decide - e.decide) * ease(5.5);
+    e.decide += (decide - e.decide) * ease(5.5);
     u.uSignal.value = e.signal;
     u.uForecast.value = e.forecast;
     u.uLevel.value = e.level;
@@ -653,17 +790,24 @@ export class StockField {
     // Camera glide plus a window-like parallax: the eye moves with the pointer (or the phone's
     // tilt) without turning, and the frustum shifts so the look point stays pinned on screen.
     // Near, tall stock swings against the floor, as through a pane of glass.
-    const [pos, look] = this.shot(t.shot, t.focus);
-    this.camPos.lerp(pos, ease(1.9));
-    this.camLook.lerp(look, ease(2.2));
-    this.look.set(this.pointerNdc.x + this.tilt.x, this.pointerNdc.y + this.tilt.y).clampScalar(-1.2, 1.2);
-    this.pointerSmooth.lerp(this.look, ease(3));
-    this.hoverStrength += ((this.pointerOnField ? 1 : 0) - this.hoverStrength) * ease(6);
     const cam = this.camera;
-    cam.position.copy(this.camPos);
-    cam.lookAt(this.camLook);
-    cam.clearViewOffset();
-    if (!still) {
+    let camMoving = false;
+    this.hoverStrength += ((this.pointerOnField ? 1 : 0) - this.hoverStrength) * ease(6);
+    if (this.controls) {
+      // Explore: the visitor flies the camera.
+      camMoving = this.controls.update();
+    } else {
+      const [pos, look] = this.shot(t.shot, t.focus);
+      this.camPos.lerp(pos, ease(1.9));
+      this.camLook.lerp(look, ease(2.2));
+      camMoving = this.camPos.distanceTo(pos) > 0.01;
+      this.look.set(this.pointerNdc.x + this.tilt.x, this.pointerNdc.y + this.tilt.y).clampScalar(-1.2, 1.2);
+      this.pointerSmooth.lerp(this.look, ease(3));
+      cam.position.copy(this.camPos);
+      cam.lookAt(this.camLook);
+      cam.clearViewOffset();
+    }
+    if (!still && !this.controls) {
       cam.translateX(this.pointerSmooth.x * 2.2);
       cam.translateY(this.pointerSmooth.y * 1.2);
       cam.updateMatrixWorld();
@@ -699,9 +843,9 @@ export class StockField {
       Math.abs(t.signal - e.signal) > 0.002 ||
       Math.abs(t.forecast - e.forecast) > 0.002 ||
       Math.abs(t.level - e.level) > 0.002 ||
-      Math.abs(s.decide - e.decide) > 0.001 ||
+      Math.abs(decide - e.decide) > 0.001 ||
       Math.abs(lit - pj.amt) > 0.002 ||
-      this.camPos.distanceTo(pos) > 0.01;
+      camMoving;
     return moving;
   }
 
@@ -721,6 +865,7 @@ export class StockField {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.controls?.dispose();
     cancelAnimationFrame(this.frame);
     this.unsubscribe();
     document.removeEventListener("visibilitychange", this.onVisibility);

@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import type { StockField } from "./StockField";
 
 /**
@@ -18,3 +19,6 @@ export const fieldBridge = {
     return () => void listeners.delete(l);
   },
 };
+
+/** The running field (null while booting or on the poster), for components. */
+export const useField = () => useSyncExternalStore(fieldBridge.subscribe, fieldBridge.get, () => null);

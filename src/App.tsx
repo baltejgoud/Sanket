@@ -5,7 +5,8 @@ import { FieldStage } from "./field/FieldStage";
 import { Header } from "./components/Header";
 import { Cursor } from "./components/Cursor";
 import { onIdle, ScrollTrigger, useReducedMotion, useSmoothScroll } from "./lib/motion";
-import { palette } from "./lib/paletteBus";
+import { explore, palette } from "./lib/paletteBus";
+import { useField } from "./field/bridge";
 import { Toaster } from "./components/Toast";
 import { Dock } from "./components/Dock";
 import { useMotion } from "./lib/prefs";
@@ -20,6 +21,7 @@ import { Invitation } from "./chapters/Invitation";
 
 const loadPalette = () => import("./components/Palette");
 const Palette = lazy(loadPalette);
+const Explore = lazy(() => import("./explore/Explore"));
 
 const TRACKED = ["top", "signal", "problems", "forecast", "command", "decide", "industries", "integrations", "roi", "stories", "security", "contact"];
 
@@ -86,6 +88,23 @@ export default function App() {
     if (!ran) opener.current?.focus({ preventScroll: true });
   }, []);
 
+  // Explore mode: only while the field is running (not on the poster).
+  const field = useField();
+  const [exploring, setExploring] = useState(false);
+  const exploreOpener = useRef<HTMLElement | null>(null);
+  useEffect(
+    () =>
+      explore.onOpen(() => {
+        exploreOpener.current = document.activeElement as HTMLElement | null;
+        setExploring(true);
+      }),
+    [],
+  );
+  const closeExplore = useCallback(() => {
+    setExploring(false);
+    exploreOpener.current?.focus({ preventScroll: true });
+  }, []);
+
   useEffect(() => {
     document.documentElement.lang = lang;
     // Line lengths change with the language; re-measure every trigger.
@@ -132,7 +151,10 @@ export default function App() {
         <Invitation />
       </main>
       <Dock />
-      <Suspense fallback={null}>{paletteOpen && <Palette lang={lang} setLang={switchLang} onClose={closePalette} />}</Suspense>
+      <Suspense fallback={null}>
+        {paletteOpen && <Palette lang={lang} setLang={switchLang} explore={field ? explore.open : undefined} onClose={closePalette} />}
+        {exploring && field && <Explore lang={lang} onClose={closeExplore} />}
+      </Suspense>
       <Toaster />
     </LangContext.Provider>
   );

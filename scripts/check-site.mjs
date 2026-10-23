@@ -233,6 +233,9 @@ async function open(options = {}) {
     const el = document.getElementById("decide");
     const y = el.offsetTop + el.offsetHeight / 2 - innerHeight * 0.45;
     window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+    await new Promise(r => setTimeout(r, 200));
+    // Lenis can drop an immediate scroll that lands right after another; make sure we arrived.
+    if (Math.abs(scrollY - y) > 2) scrollTo(0, y);
     await new Promise(r => setTimeout(r, 500));
     const a = document.querySelector('.chapter-nav a[aria-current]');
     return a ? [a.getAttribute("href"), parseFloat(a.style.getPropertyValue("--read"))] : null;
@@ -272,6 +275,32 @@ async function open(options = {}) {
   await page.screenshot({ path: "qa/spatial/projection-level.png" });
   if (slides.join("|") !== "instock-faint|signals|decide|instock") fail("Projector slides: " + slides.join("|"));
   ok("projector slides follow the story");
+
+  // Explore mode: open from the hero, inspect by keyboard, scrub the timeline, Escape returns focus.
+  await page.evaluate(() => (window.__lenis ? window.__lenis.scrollTo(0, { immediate: true }) : scrollTo(0, 0)));
+  await page.waitForTimeout(400);
+  const exploreBtn = page.getByRole("button", { name: /Explore the warehouse/ });
+  await exploreBtn.click();
+  const dlg = page.getByRole("dialog", { name: /Explore the warehouse/ });
+  await dlg.waitFor();
+  const view = dlg.getByRole("application");
+  if (!(await view.evaluate(el => el === document.activeElement))) fail("Explore: the viewport should take focus");
+  await page.waitForTimeout(800);
+  await page.keyboard.press("n");
+  await dlg.locator(".explore-readout", { hasText: /SKU-\d+/ }).waitFor();
+  if (!/SKU-\d+/.test(await dlg.getByRole("status").innerText())) fail("Explore: the selection was not announced");
+  await page.keyboard.press("ArrowLeft");
+  await dlg.getByRole("slider", { name: /Timeline/ }).fill("1");
+  await page.keyboard.press("n");
+  await page.waitForTimeout(300);
+  if (!/No stockouts left/.test(await dlg.getByRole("status").innerText())) fail("Explore: at In stock there should be no stockouts");
+  await page.screenshot({ path: "qa/spatial/explore.png" });
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(400);
+  if (await dlg.isVisible()) fail("Escape did not close explore mode");
+  if (!(await exploreBtn.evaluate(el => el === document.activeElement))) fail("Focus did not return from explore mode");
+  if (await page.evaluate(() => document.documentElement.classList.contains("is-exploring"))) fail("Explore left the page hidden");
+  ok("explore mode: hero entry, keyboard inspect and announce, timeline, Escape and focus return");
 
   // The contact title's letters start uneven and level as the chapter arrives.
   await page.evaluate(() => {
@@ -317,6 +346,12 @@ async function open(options = {}) {
     await page.locator(".palette [role=combobox]").waitFor();
     await scan(" palette", ".palette");
     await page.keyboard.press("Escape");
+    if (lang === "en" && width === 1440 && (await page.locator(".hero .btn-text").count())) {
+      await page.locator(".hero .btn-text").click();
+      await page.locator(".explore[open]").waitFor();
+      await scan(" explore", ".explore");
+      await page.keyboard.press("Escape");
+    }
     if (width < 700) {
       await page.locator(".menu-button").click();
       await page.locator(".site-index").waitFor();

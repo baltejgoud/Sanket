@@ -1,0 +1,143 @@
+/* ⌘K palette: loaded with its lazy chunk (Palette.tsx). */
+/* ---------- Command palette ---------- */
+.palette {
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(560px, calc(100dvh - 18vh));
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 1px solid var(--line-dark-2);
+  border-radius: 18px;
+  background: var(--ink-2);
+  color: var(--bone);
+  box-shadow:
+    0 30px 80px rgb(0 0 0 / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
+  overflow: hidden;
+}
+.palette[open] {
+  display: flex;
+  flex-direction: column;
+  animation: palette-in 220ms var(--ease-settle);
+}
+.palette::backdrop {
+  background: rgb(11 12 10 / 0.62);
+  backdrop-filter: blur(6px);
+}
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+.palette-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-dark);
+  color: var(--concrete);
+}
+.palette-field input {
+  flex: 1;
+  min-width: 0;
+  height: 58px;
+  border: 0;
+  background: none;
+  color: var(--bone);
+  font: inherit;
+  font-size: 1.05rem;
+}
+.palette-field input:focus {
+  outline: none;
+}
+.palette-field:focus-within {
+  box-shadow: inset 0 -2px 0 var(--signal);
+}
+.palette-list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 8px 10px;
+}
+.palette-group {
+  padding: 14px 10px 6px;
+  color: var(--concrete);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.palette-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: #cfcbc2;
+  cursor: pointer;
+}
+.palette-option > svg:first-child {
+  flex: none;
+  color: var(--concrete);
+}
+.palette-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.palette-hint {
+  color: var(--concrete);
+  font-size: 0.75rem;
+}
+.palette-arrow {
+  opacity: 0;
+}
+.palette-option.is-active {
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--signal);
+}
+.palette-option.is-active svg,
+.palette-option.is-active .palette-hint {
+  color: var(--graphite-2);
+}
+.palette-empty {
+  padding: 28px 12px;
+  color: var(--concrete);
+  text-align: center;
+}
+.palette-keys {
+  padding: 10px 16px;
+  border-top: 1px solid var(--line-dark);
+  color: var(--concrete);
+  font-size: var(--fs-mono);
+}
+:lang(hi) .palette-group,
+:lang(te) .palette-group {
+  font-family: var(--font-text);
+  letter-spacing: 0;
+}
+
+.palette kbd {
+  padding: 2px 6px;
+  border: 1px solid var(--line-dark-2);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--concrete);
+}
+@media (max-width: 700px) {
+  .palette {
+    margin-top: 10px;
+  }
+  .palette-keys {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .palette[open] {
+    animation: none;
+  }
+}

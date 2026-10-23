@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useRef } from "react";
-import { ArrowDownRight } from "lucide-react";
+import { ArrowDownRight, Box } from "lucide-react";
 import { useT } from "../i18n";
 import { useCopy } from "../copy";
 import { useFieldScene } from "../field/useFieldScene";
 import { prefersReducedMotion, useMagnetic } from "../lib/motion";
 import { useContactLinks } from "../lib/contact";
+import { explore } from "../lib/paletteBus";
+import { useField } from "../field/bridge";
 import { WhatsAppIcon } from "../components/Icons";
 import { Words } from "../components/Words";
 
@@ -93,6 +95,7 @@ export function Hero({ lang }: { lang: string }) {
   const title = useRef<HTMLHeadingElement>(null);
   const cta = useMagnetic<HTMLAnchorElement>(0.2);
   const links = useContactLinks();
+  const field = useField();
   const latin = lang === "en";
   useFieldScene(section, { shot: "hero", signal: 0, forecast: 0, level: 0, focus: -1 });
   useRise(title, latin);
@@ -142,6 +145,12 @@ export function Hero({ lang }: { lang: string }) {
               <WhatsAppIcon size={18} />
               {c.hero.talk}
             </a>
+            {field && (
+              <button className="btn btn-text" onClick={() => explore.open()}>
+                <Box size={17} aria-hidden="true" />
+                {c.hero.explore}
+              </button>
+            )}
           </div>
           <p className="hero-meta mono fade" style={{ ["--d" as string]: "1000ms" }}>
             <span>{t.hero.pill}</span>

@@ -6,7 +6,7 @@ import type { StageCopy } from "./field/FieldStage";
 export interface Copy {
   nav: { signal: string; forecast: string; decide: string; world: string; proof: string; talk: string; menu: string; close: string; index: string; pause: string; play: string; jump: string; dock: string };
   rail: string[];
-  hero: { pos: string; gloss: string; see: string; talk: string; scroll: string; cursor: string };
+  hero: { pos: string; gloss: string; see: string; talk: string; scroll: string; cursor: string; explore: string };
   stage: Omit<StageCopy, "inStock" | "lang">;
   signal: { plate: string; a: string; b: string; body: string; listLabel: string; signals: string[]; caption: string };
   problems: { plate: string; fieldLabel: string; captions: string[] };
@@ -78,6 +78,7 @@ const en: Copy = {
     talk: "Talk to the builders",
     scroll: "Scroll to rebalance the field",
     cursor: "Send a signal",
+    explore: "Explore the warehouse",
   },
   stage: {
     readout: "Field readout",
@@ -191,6 +192,7 @@ const hi: Copy = {
     talk: "बनाने वालों से बात करें",
     scroll: "स्क्रॉल करें, स्टॉक को संतुलित होते देखें",
     cursor: "संकेत भेजें",
+    explore: "गोदाम में घूमें",
   },
   stage: {
     readout: "फ़ील्ड रीडआउट",
@@ -304,6 +306,7 @@ const te: Copy = {
     talk: "తయారు చేసినవారితో మాట్లాడండి",
     scroll: "స్క్రోల్ చేయండి, స్టాక్ సమతుల్యం కావడం చూడండి",
     cursor: "సంకేతం పంపండి",
+    explore: "గోదాములో తిరగండి",
   },
   stage: {
     readout: "ఫీల్డ్ రీడౌట్",

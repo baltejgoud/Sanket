@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Menu, Pause, Play, Search, X } from "lucide-react";
 import { dict, languages, type Lang } from "../i18n";
 import { copy } from "../copy";
-import { scrollToId, useMagnetic } from "../lib/motion";
+import { ScrollTrigger, scrollToId, useMagnetic } from "../lib/motion";
 import { prefs, useMotion } from "../lib/prefs";
 import { palette } from "../lib/paletteBus";
 import { usePuck } from "../lib/detents";
@@ -239,12 +239,19 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
       onScroll();
     });
     ro.observe(document.body);
+    // Pins re-space the page on refresh (fonts, language) without always resizing the body.
+    const onRefresh = () => {
+      measure();
+      onScroll();
+    };
+    ScrollTrigger.addEventListener("refresh", onRefresh);
     measure();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", measure);
     return () => {
       ro.disconnect();
+      ScrollTrigger.removeEventListener("refresh", onRefresh);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
       cancelAnimationFrame(raf);

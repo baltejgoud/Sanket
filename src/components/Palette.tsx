@@ -4,6 +4,7 @@ import { paletteCopy } from "./paletteCopy";
 import { useContactLinks } from "../lib/contact";
 import { buildCommands, rankCommands, type Command, type Group } from "../lib/commands";
 import type { Lang } from "../i18n";
+import "../styles/palette.css";
 
 const GROUPS: Group[] = ["chapters", "tools", "actions"];
 const ICONS = { chapters: LayoutList, tools: Wrench, actions: Zap };

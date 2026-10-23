@@ -135,20 +135,23 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
   // Pointer: parallax everywhere, readout and signals over field zones.
   useEffect(() => {
     if (mode !== "webgl") return;
+    // Explore mode handles its own pointer.
     const move = (e: PointerEvent) => {
       const f = fieldRef.current;
-      if (!f) return;
+      if (!f || f.exploring) return;
       const zone = (e.target as Element | null)?.closest?.("[data-field-zone]");
       f.setPointer((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1, !!zone && e.pointerType === "mouse");
     };
     const down = (e: PointerEvent) => {
       const f = fieldRef.current;
-      if (!f || !(e.target as Element | null)?.closest?.("[data-field-zone]")) return;
+      if (!f || f.exploring || !(e.target as Element | null)?.closest?.("[data-field-zone]")) return;
       f.setPointer((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1, true);
       f.signalAtPointer();
       if (e.pointerType !== "mouse") window.setTimeout(() => f.setPointer(0, 0, false), 600);
     };
-    const leave = () => fieldRef.current?.setPointer(0, 0, false);
+    const leave = () => {
+      if (!fieldRef.current?.exploring) fieldRef.current?.setPointer(0, 0, false);
+    };
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", down, { passive: true });
     document.documentElement.addEventListener("pointerleave", leave);
