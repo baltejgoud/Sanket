@@ -223,6 +223,45 @@ async function open(options = {}) {
   await context.close();
 }
 
+// ---------- WCAG 2.2 A/AA audit (axe): serious and critical issues fail ----------
+{
+  const { default: AxeBuilder } = await import("@axe-core/playwright");
+  const report = [];
+  for (const [lang, width] of [
+    ["en", 1440],
+    ["hi", 1440],
+    ["te", 1440],
+    ["en", 390],
+  ]) {
+    const { context, page } = await open({ viewport: { width, height: 900 }, isMobile: width < 700, hasTouch: width < 700 });
+    await page.evaluate(l => localStorage.setItem("sanket-lang", l), lang);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(600);
+    const scan = async (state, include) => {
+      const builder = new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]);
+      const { violations } = await (include ? builder.include(include) : builder).analyze();
+      for (const v of violations) report.push(`${lang}@${width}${state} ${v.impact} ${v.id} ×${v.nodes.length}: ${v.nodes.slice(0, 3).map(n => n.target.join(" ")).join(" | ")}`);
+    };
+    await scan("");
+    // Dialogs too: the palette everywhere, the index on phones.
+    await page.keyboard.press("Control+k");
+    await page.locator(".palette [role=combobox]").waitFor();
+    await scan(" palette", ".palette");
+    await page.keyboard.press("Escape");
+    if (width < 700) {
+      await page.locator(".menu-button").click();
+      await page.locator(".site-index").waitFor();
+      await scan(" index", ".site-index");
+      await page.keyboard.press("Escape");
+    }
+    await context.close();
+  }
+  const bad = report.filter(r => / (serious|critical) /.test(r));
+  report.filter(r => !bad.includes(r)).forEach(r => console.log("axe (moderate/minor): " + r));
+  if (bad.length) fail("axe:\n  " + bad.join("\n  "));
+  ok("axe: no serious or critical WCAG 2.2 A/AA issues (en, hi, te at 1440; en at 390)");
+}
+
 // ---------- Phone: overflow, index dialog, focus return ----------
 for (const [width, height] of [
   [320, 640],

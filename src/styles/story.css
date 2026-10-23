@@ -421,6 +421,10 @@
   background: var(--graphite);
   color: var(--bone);
 }
+/* The card is a dark surface inside a light chapter: its muted text uses the dark-surface grey. */
+.industry-card .muted {
+  color: var(--concrete);
+}
 .industry-card strong {
   font-size: 1.15rem;
   font-weight: 600;
@@ -989,7 +993,7 @@
 }
 .footer-legal {
   margin-top: 26px;
-  color: #6f726b;
+  color: var(--concrete-dim);
 }
 
 @media (max-width: 1100px) {

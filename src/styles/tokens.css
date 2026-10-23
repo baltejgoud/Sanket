@@ -8,6 +8,8 @@
   --line-dark: #2a2d28;
   --line-dark-2: #3a3e37;
   --concrete: #8d9088;
+  /* a quieter tier than concrete that still reads at 11px: 5.2:1 on ink */
+  --concrete-dim: #81847c;
   --bone: #ece8df;
   --bone-2: #e2ddd1;
   --bone-3: #d6d0c2;
@@ -18,7 +20,7 @@
   --signal-soft: #ff7a45;
   --signal-ink: #a83a0d;
   --forecast: #9fd8c9;
-  --forecast-ink: #2f6f61;
+  --forecast-ink: #2a6457;
 
   --font-display: "Archivo", "Arial Narrow", Arial, sans-serif;
   --font-text: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;

@@ -576,7 +576,7 @@ input[type="range"]:active::-webkit-slider-thumb {
 .range-limits {
   display: flex;
   justify-content: space-between;
-  color: #6f726b;
+  color: var(--concrete-dim);
   text-transform: none;
   letter-spacing: 0.04em;
 }

@@ -11,6 +11,7 @@
     "hero:render": "node scripts/render-hero.mjs",
     "film:render": "node scripts/render-order-film.mjs",
     "check": "node scripts/check-site.mjs",
+    "a11y": "node scripts/a11y.mjs",
     "perf": "node scripts/perf.mjs",
     "poster:render": "node scripts/render-field-poster.mjs"
   },
@@ -23,6 +24,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/three": "^0.186.0",

@@ -185,7 +185,7 @@
   letter-spacing: 0.08em;
 }
 .readout-note {
-  color: #6f726b;
+  color: var(--concrete-dim);
   font-size: 0.625rem;
   letter-spacing: 0.1em;
 }

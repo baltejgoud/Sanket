@@ -467,7 +467,7 @@
 }
 .footnote {
   grid-column: 1 / -1;
-  color: #6f726b;
+  color: var(--concrete-dim);
   max-width: 90ch;
   text-transform: none;
   letter-spacing: 0.04em;
