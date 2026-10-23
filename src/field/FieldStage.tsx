@@ -8,6 +8,10 @@ import type { FieldModel } from "./model";
 type Mode = "pending" | "webgl" | "poster";
 
 export interface StageCopy {
+  /** what the projector writes on the level field ("In stock") */
+  inStock: string;
+  /** the page language, for the projector's display face */
+  lang: string;
   readout: string;
   onHand: string;
   need: string;
@@ -52,6 +56,12 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
   const fieldRef = useRef<StockField | null>(null);
   const anchorRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const coarse = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+  // The renderer boots once; later language changes reach it through setProjectionCopy.
+  const copyRef = useRef(copy);
+  copyRef.current = copy;
+  useEffect(() => {
+    fieldRef.current?.setProjectionCopy(projectionCopy(copy));
+  }, [copy]);
 
   useEffect(() => {
     setMode(capable() ? "webgl" : "poster");
@@ -80,6 +90,10 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
             anchors,
             onFail: () => setMode("poster"),
             onSlow: () => setMode("poster"),
+            projection: projectionCopy(copyRef.current),
+            onSlide: slide => {
+              if (rootRef.current) rootRef.current.dataset.slide = slide;
+            },
           });
         } catch {
           setMode("poster");
@@ -194,6 +208,8 @@ export function FieldStage({ copy }: { copy: StageCopy }) {
     </div>
   );
 }
+
+const projectionCopy = (copy: StageCopy) => ({ inStock: copy.inStock, signals: copy.signals, lang: copy.lang });
 
 function anchorAt(n: number) {
   return (m: FieldModel): [number, number, number] => {

@@ -47,6 +47,24 @@ float focusMask(vec2 p) {
 }
 `;
 
+/* The projector: a top-down parallel light casting a canvas onto the ground plane. `face` is how
+   squarely the surface takes the light (tops 1, sides a streak, floor a spill). */
+const projection = /* glsl */ `
+uniform sampler2D uProjTex;
+uniform vec4 uProjRect; // minX, minZ, sizeX, sizeZ
+uniform vec3 uProjMask;
+uniform vec3 uProjColor;
+uniform float uProjAmt;
+vec3 projected(vec2 xz, float face) {
+  if (uProjAmt <= 0.001) return vec3(0.0);
+  vec2 uv = (xz - uProjRect.xy) / uProjRect.zw;
+  uv.y = 1.0 - uv.y;
+  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return vec3(0.0);
+  float light = clamp(dot(texture2D(uProjTex, uv).rgb, uProjMask), 0.0, 1.0);
+  return uProjColor * light * face * uProjAmt;
+}
+`;
+
 export const columnVertex = /* glsl */ `
 ${common}
 attribute vec4 aA; // x, z, stock0, stock1
@@ -64,6 +82,7 @@ varying float vDepth;
 varying float vHover;
 varying float vNew;
 varying float vHeight;
+varying vec3 vObj;
 
 void main() {
   vec2 p = aA.xy;
@@ -82,6 +101,7 @@ void main() {
   pos.xz *= uColSize;
   pos.y *= h;
   pos.xz += p;
+  vObj = pos;
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
 
@@ -102,6 +122,7 @@ void main() {
 `;
 
 export const columnFragment = /* glsl */ `
+${projection}
 uniform vec3 uBone;
 uniform vec3 uShadow;
 uniform vec3 uSignalColor;
@@ -123,6 +144,7 @@ varying float vDepth;
 varying float vHover;
 varying float vNew;
 varying float vHeight;
+varying vec3 vObj;
 
 void main() {
   vec3 n = normalize(vNormal);
@@ -152,6 +174,9 @@ void main() {
   // Focus: dim everything outside the problem being discussed.
   col *= mix(1.0, mix(0.22, 1.12, vFocus), uFocusAmt);
   col = mix(col, uBone * diffuse * mix(0.9, 1.04, top), uLevel * 0.25);
+
+  // Projected light: full on the tops, a streak down the sides.
+  col += projected(vObj.xz, mix(0.28, 1.0, top));
 
   // Distance fades into a faint haze, so the field has a horizon.
   float fog = smoothstep(uFogNear, uFogFar, vDepth);
@@ -304,6 +329,7 @@ void main() {
 `;
 
 export const floorFragment = /* glsl */ `
+${projection}
 uniform vec3 uLine;
 uniform vec3 uInk;
 uniform vec2 uHalf;
@@ -321,7 +347,10 @@ void main() {
   vec2 major = abs(fract((vXZ - 0.5) / 6.0) - 0.5) * 6.0;
   float majorLine = 1.0 - min(smoothstep(0.0, fw.x, major.x), smoothstep(0.0, fw.y, major.y));
   float a = (line * 0.38 + majorLine * 0.3) * fade * uIntro;
+  // The projector's spill on the ground between the columns.
+  vec3 spill = projected(vXZ, 0.5);
+  float s = max(spill.r, max(spill.g, spill.b));
   float fog = smoothstep(uFogNear, uFogFar, vDepth);
-  gl_FragColor = vec4(uLine, a * (1.0 - fog));
+  gl_FragColor = vec4(mix(uLine, spill / max(s, 0.001), s / max(a + s, 0.001)), max(a, s) * (1.0 - fog));
 }
 `;

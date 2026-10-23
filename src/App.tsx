@@ -1,4 +1,4 @@
-import { lazy, startTransition, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LangContext, dict, type Lang } from "./i18n";
 import { copy } from "./copy";
 import { FieldStage } from "./field/FieldStage";
@@ -42,6 +42,7 @@ export default function App() {
   const calm = useMotion() === "calm";
   const t = dict[lang];
   const c = copy[lang];
+  const stageCopy = useMemo(() => ({ ...c.stage, inStock: c.rail[4], lang }), [c, lang]);
   useSmoothScroll(!reduced && !calm && !posterMode);
   // A language switch re-renders the whole story; as a transition React renders it in slices,
   // so the press paints at once instead of after the full re-render. The choice is stored right
@@ -117,7 +118,7 @@ export default function App() {
       <a href="#main" className="skip-link">
         {t.skip}
       </a>
-      <FieldStage copy={c.stage} />
+      <FieldStage copy={stageCopy} />
       <Header lang={lang} setLang={switchLang} active={active} />
       <Cursor fieldLabel={c.hero.cursor} />
       <main id="main" className={`lang-${lang}`}>

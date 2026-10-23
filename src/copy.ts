@@ -7,7 +7,7 @@ export interface Copy {
   nav: { signal: string; forecast: string; decide: string; world: string; proof: string; talk: string; menu: string; close: string; index: string; pause: string; play: string; jump: string; dock: string };
   rail: string[];
   hero: { pos: string; gloss: string; see: string; talk: string; scroll: string; cursor: string };
-  stage: StageCopy;
+  stage: Omit<StageCopy, "inStock" | "lang">;
   signal: { plate: string; a: string; b: string; body: string; listLabel: string; signals: string[]; caption: string };
   problems: { plate: string; fieldLabel: string; captions: string[] };
   forecast: {

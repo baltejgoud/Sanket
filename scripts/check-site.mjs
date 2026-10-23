@@ -240,6 +240,27 @@ async function open(options = {}) {
   if (!read || read[0] !== "#decide" || !(read[1] > 0.3 && read[1] < 0.7)) fail("Header reading progress: " + JSON.stringify(read));
   ok("header link fills with reading progress");
 
+  // The projector follows the story: signal names, decide floor markings, "in stock" on the level field.
+  // (Software WebGL renders a few frames a second, so wait for each slide rather than sleeping.)
+  const slideAt = async (id, want) => {
+    await page.evaluate(i => {
+      const y = document.getElementById(i).offsetTop + 40;
+      window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+    }, id);
+    await page.waitForFunction(w => document.querySelector(".stage")?.dataset.slide === w, want, { timeout: 8000 }).catch(() => {});
+    return page.locator(".stage").getAttribute("data-slide");
+  };
+  const slides = [
+    await slideAt("top", "instock-faint"),
+    await slideAt("signal", "signals"),
+    await slideAt("decide", "decide"),
+    await slideAt("contact", "instock"),
+  ];
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "qa/spatial/projection-level.png" });
+  if (slides.join("|") !== "instock-faint|signals|decide|instock") fail("Projector slides: " + slides.join("|"));
+  ok("projector slides follow the story");
+
   // The contact title's letters start uneven and level as the chapter arrives.
   await page.evaluate(() => {
     const y = document.getElementById("contact").offsetTop - innerHeight * 0.9;

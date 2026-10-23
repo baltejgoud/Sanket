@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { createField, decisionProgress, FLAG_NEW, FLAG_SHEET, type Decision, type FieldModel } from "./model";
 import { fieldStore, type Readout, type Shot } from "./store";
+import { decideMask, drawSlide, loadFaces, projectionRect, SLIDE_COLOR, SLIDE_STRENGTH, slideFor, type ProjectionCopy, type Slide } from "./projection";
 import {
   arcFragment,
   arcVertex,
@@ -32,6 +33,10 @@ export interface StockFieldOptions {
   onFail?: () => void;
   /** the device cannot hold the frame rate even at reduced quality */
   onSlow?: () => void;
+  /** words the projector casts, in the page language */
+  projection?: ProjectionCopy;
+  /** the projector changed slide (mirrored to the stage for labels and tests) */
+  onSlide?: (slide: Slide) => void;
 }
 
 const UNITS_PER_HEIGHT = 40;
@@ -100,6 +105,15 @@ export class StockField {
   private inTick = false;
   /** the visitor paused motion: render still frames, as for reduced motion */
   private stillPref = false;
+  // The projector (see projection.ts): the slide on the texture, the one wanted, and its light.
+  private proj = {
+    canvas: document.createElement("canvas"),
+    texture: null as THREE.CanvasTexture | null,
+    drawn: "" as string,
+    slide: "off" as Slide,
+    amt: 0,
+    copy: { inStock: "In stock", signals: [], lang: "en" } as ProjectionCopy,
+  };
 
   constructor(opts: StockFieldOptions) {
     this.opts = opts;
@@ -142,7 +156,13 @@ export class StockField {
       uHalf: { value: new THREE.Vector2(m.width / 2 + 0.5, m.depth / 2 + 0.5) },
       uFogNear: { value: 26 },
       uFogFar: { value: 78 },
+      uProjTex: { value: null },
+      uProjRect: { value: new THREE.Vector4() },
+      uProjMask: { value: new THREE.Vector3(1, 0, 0) },
+      uProjColor: { value: new THREE.Color(0, 0, 0) },
+      uProjAmt: { value: 0 },
     };
+    this.buildProjector();
 
     this.buildColumns();
     this.buildBands();
@@ -296,6 +316,60 @@ export class StockField {
       depthWrite: false,
     });
     this.add(new THREE.Mesh(g, mat));
+  }
+
+  /* ---------- projector ---------- */
+
+  private buildProjector() {
+    const m = this.model;
+    const r = projectionRect(m);
+    const c = this.proj.canvas;
+    // Phones (small grids) get a 1024-wide slide; ground cells stay ~30px either way.
+    c.width = m.cols < 30 ? 1024 : 1536;
+    c.height = Math.round((c.width * r.sizeZ) / r.sizeX);
+    const tex = new THREE.CanvasTexture(c);
+    tex.generateMipmaps = false;
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    this.proj.texture = tex;
+    this.disposables.push(tex);
+    this.uniforms.uProjTex.value = tex;
+    (this.uniforms.uProjRect.value as THREE.Vector4).set(r.minX, r.minZ, r.sizeX, r.sizeZ);
+    if (this.opts.projection) this.proj.copy = this.opts.projection;
+    loadFaces(this.proj.copy).then(() => this.redrawSlide());
+  }
+
+  /** Slide key: the slide plus whatever changes its drawing (the focused problem). */
+  private slideKey(slide: Slide, focus: number) {
+    return slide === "reticle" ? `reticle:${focus}` : slide;
+  }
+
+  private drawProjection(slide: Slide, focus: number) {
+    const ctx = this.proj.canvas.getContext("2d");
+    if (!ctx || !this.proj.texture) return;
+    if (slide !== "off") drawSlide(ctx, slide, this.model, this.proj.copy, focus);
+    this.proj.texture.needsUpdate = true;
+    this.proj.drawn = this.slideKey(slide, focus);
+    if (this.proj.slide !== slide) {
+      this.proj.slide = slide;
+      this.opts.onSlide?.(slide);
+    }
+    const [r, g, b] = SLIDE_COLOR[slide];
+    (this.uniforms.uProjColor.value as THREE.Color).setRGB(r, g, b);
+  }
+
+  /** Redraw the current slide (fonts arrived, or the language changed). */
+  private redrawSlide() {
+    if (this.disposed) return;
+    const t = fieldStore.get().target;
+    this.drawProjection(this.proj.slide, t.focus);
+    this.wake();
+  }
+
+  /** The words the projector casts, in the page language. */
+  setProjectionCopy(copy: ProjectionCopy) {
+    this.proj.copy = copy;
+    loadFaces(copy).then(() => this.redrawSlide());
   }
 
   /* ---------- camera choreography ---------- */
@@ -544,6 +618,23 @@ export class StockField {
       fv.z += (f.r - fv.z) * ease(4);
     }
 
+    // Projector: fade out, change the slide while dark, fade in at the slide's strength.
+    const want = slideFor(t.shot);
+    const wantKey = this.slideKey(want, t.focus);
+    const pj = this.proj;
+    let lit = wantKey === pj.drawn ? SLIDE_STRENGTH[want] : 0;
+    // Out quickly (~0.4s), in at the same rate.
+    pj.amt += (lit - pj.amt) * ease(9);
+    if (wantKey !== pj.drawn && pj.amt < 0.02) {
+      pj.amt = 0;
+      this.drawProjection(want, t.focus);
+      lit = SLIDE_STRENGTH[want]; // keeps the loop going to fade the new slide in
+    }
+    u.uProjAmt.value = pj.amt;
+    const mask = u.uProjMask.value as THREE.Vector3;
+    if (pj.slide === "decide") mask.set(...decideMask(e.decide));
+    else mask.set(1, 0, 0);
+
     // Pulses queued by the page: named signals, problem 4, the finale.
     for (const p of fieldStore.takePulses()) {
       if (!still) this.addWave(p.u * m.width - m.width / 2, p.v * m.depth - m.depth / 2, p.strength);
@@ -590,6 +681,7 @@ export class StockField {
       Math.abs(t.forecast - e.forecast) > 0.002 ||
       Math.abs(t.level - e.level) > 0.002 ||
       Math.abs(s.decide - e.decide) > 0.001 ||
+      Math.abs(lit - pj.amt) > 0.002 ||
       this.camPos.distanceTo(pos) > 0.01;
     return moving;
   }
