@@ -1,4 +1,76 @@
-# SANKET / PRISMA · The Stock Field
+# SANKET · The warehouse story
+
+The current page is a centered, scroll-led warehouse story. It opens with what SANKET does, reveals the warehouse, exposes the stock mismatch, introduces demand targets, follows a transfer, and ends with contact details. The earlier Stock Field documentation below describes the retained tools and archived implementation.
+
+## Review fixes and upgrades — 25 October 2026 (evening)
+
+Two live reviews (Chrome on a real GPU, headless axe, production build) found one broken path, seven high-impact issues and a polish list. All are addressed; evidence is in `qa/review/before` and `qa/review/after`.
+
+**Checks.** `npm run build`, `npm run check` (timeline; with `SANKET_TEST_URL` it also loads the page in a hidden tab), `npm run check:budgets`, `npm run check:boot` (production long tasks on the real GPU, plus the hidden-tab load), `npm run a11y` (axe on the page and on each tool dialog, `--lang=en,hi,te`), `npm run check:features`, `npm run check:guide`, `npm run check:revision`. `.github/workflows/ci.yml` runs them on every push; CI has no GPU, so there the long-task budget covers the page with WebGL off and the hidden-tab load runs on SwiftShader.
+
+- **Stage after a background-tab load (P0).** `onReady` fired only from the first `requestAnimationFrame` callback, which the visibility handler replaced, so a page opened in a background tab stayed on “Preparing the warehouse…”. Ready now fires after the first frame actually draws, by whichever path scheduled it. A watchdog falls back to the HTML story if frames run but none draws for 3 s; it is armed by a frame callback, so a hidden or occluded tab is never failed for not drawing.
+- **Boot without a freeze.** The engine chunk loads after `load` plus an idle moment. The scene is built in slices with yields, shaders compile in parallel (`compileAsync`, including stand-ins for the shadow-depth, SSAO-normal and post-pass variants three.js creates internally), and each program's first-use uniform read happens in the warm-up, so the first frame compiles nothing (32 programs warm, 0 compiled while drawing). Cold shader cache, production build, 1× CPU: longest task 1,155 → 79 ms, TBT 1,136 → 47 ms (median of 3).
+- **Tool dialogs on dark.** Instrument tokens are scoped to the dialog (`src/styles/tools.css`): the horizon select, figure labels, legend, axes and the business-case summaries all reach WCAG AA (muted text 7.6:1, mint 10.5:1; was 1.1–2.7:1). The business case's headline figure stays on one line at any size.
+- **Layout.** Chapter eyebrows clear the fixed header at short heights. Rack tags never overlap: each takes the first free spot above its rack, stacked higher or below, with a leader back to the rack, and phones use short names. The hero headline is capped by viewport height, the hero model is framed in the room under the copy (1440×900 unchanged), the x-ray pop card stays clear of the copy and on screen, and the calls to action sit on a soft scrim. The scrolled header is opaque.
+- **Accessibility.** The stage is a labelled group; scene steppers are groups named with their chapter (two landmarks remain: the header and menu navigation); in-page links, the menu and the palette move focus to the target heading; small targets are 44px. axe: 0 issues on the page and every dialog at 1440 and 390, in English, Hindi and Telugu.
+- **Palette.** Its chunk is prefetched on idle and on hover/focus of its button, and keys typed while it loads are kept. Chapters are the six on the page, 01–06 in order, with unique names in every language; the combobox has a label.
+- **Share and search.** New 1200×630 share image (`public/og-image.jpg`), absolute `og:image`, `og:url`, `og:type`, `og:site_name`, Twitter card, canonical, Organization + WebSite JSON-LD. The language is in the URL (`?lang=hi`, `?lang=te`) with hreflang alternates; title, description and canonical follow it.
+- **Weight.** Legacy Stock Field, explore/AR, chapter and dock code is deleted; its assets (3.7 MB) and scripts moved to `archive/stock-field-20261025/`. GSAP and Lenis are gone. Tool-only strings and styles load with the tools. Main CSS 23.3 → 13.8 kB gzip (budget 14), entry JS 54.5 → 35.6 kB gzip (initial JS 81 kB with React; budget 150). A pixel diff of 43 states before and after the CSS split shows no change.
+- **Upgrades.** Device tier (touch devices with ≤4 GB or ≤4 cores, or a low unplugged battery: no SSAO/bloom, 1× pixels, 1024² shadows, 15 fps ambient); data saver skips the 3D download until asked. Scene deep links (`#problems/2`) open that scene, and the address follows the reader. Fonts are self-hosted (no Google requests; the Archivo preload is kept). A three-line enquiry form and “Send me this scenario” in the forecast and business case compose a message in the visitor's own email or WhatsApp; nothing is posted from the page. The forecast has an “illustrative data” tag, a full reset, a bottom sheet on phones and a chart that stays above the fold at 674px. Privacy-friendly events (`src/lib/analytics.ts`: chapter reached, scene stepped, tool opened, scenario changed, contact click) carry no identifiers or cookies, honour Do Not Track, and go nowhere until `VITE_VERCEL_ANALYTICS=1` or `VITE_ANALYTICS_ENDPOINT` is set at build time.
+- **Not verified here.** Real phones (including the device tier and the bottom sheet on iOS Safari), screen readers, AR/VR, and Vercel Web Analytics (it needs enabling in the Vercel project).
+
+## Current experience — 24 October 2026
+
+- One full-width 3D stage with short centered captions; no persistent left copy column.
+- Six chapters: opening, warehouse, problem, what we do, how it works, contact. The four middle chapters contain 15 explanation cards with scene controls and settled reading holds.
+- Scroll lifts the warehouse roof, moves into a rack close-up, empties a popular-product row, pans to excess stock, draws mint demand targets, then follows a pallet through picking, loading and dispatch. The stockout shot is over twice the opening scale. Camera moves ease into a stationary reading hold; backward scrolling restores the same state.
+- English, Hindi and Telugu copy is in `src/campus/storyCopy.ts` and `src/campus/StoryCards.tsx`. Timeline and renderer are in `src/campus/`; page composition is in `src/App.tsx`; layout is in `src/styles/campus.css`.
+- Forecast, business-case and connection tools remain available from the final section and search. WhatsApp and email remain direct links.
+- Reduced motion uses fixed views for each individual card, preserving all close-ups without camera travel. If WebGL fails, the HTML story uses shorter reading sections. Development fallback: `?no-webgl`.
+- Verified: TypeScript/Vite production build; 501 forward/reverse timeline samples, freight ordering, shortage-before-solution sequencing, 5,000 camera continuity probes, camera holds, close-up scale, fractional anchor rounding; browser review at 1440×900 and 390×844, phone navigation, Hindi copy, forecast scenario response, contact destinations, and no-WebGL fallback.
+
+Run `npm run dev` for the local preview, `npm run build` for production output, and `npm run check` for timeline regressions.
+
+## Guided explanation pass — 25 October 2026
+
+- Every scene includes a short “In the model” cue. Rack IDs A2, A3 and A4 connect the shortage, transfer and slow-stock examples to the rendered geometry. Mint wireframes are stock targets; solid mint boxes are proposed replenishment; physical movement follows team approval.
+- The A2 planning example explicitly returns to an earlier moment before the stockout. Its 800-unit order includes the full calculation and confirmed inbound stock. A3’s 360-unit transfer and A4’s markdown are separate examples.
+- Previous/next controls and numbered scene buttons allow revisiting the explanation. Focus follows the selected control when the visible card changes. Short landscape screens use document flow; the no-WebGL version shows all 15 cards.
+- The opening includes a direct route to the decisions. Contextual links open the forecast, business-case and connections tools. Contact includes tool descriptions, data/approval/demo FAQs, and removable context from tools the visitor actually changes.
+- Additional copy is in `src/campus/guideCopy.ts`, with English, Hindi and Telugu variants. `node scripts/check-story-guide.mjs` checks all scenes at desktop, tablet and phone widths, tool entry points, focus, contact accessibility, message context, fallback and landscape. `node scripts/check-story-revision.mjs` covers normal/reduced motion and reverse scrolling.
+
+## Motion and craft pass — 25 October 2026
+
+Spec: `docs/superpowers/specs/2026-10-25-sanket-motion-upgrade-design.md`. Same layout, copy and story; motion added on top.
+
+- **Hero.** The warehouse is in frame from the start, low under the headline, with its lamps off. Once the engine is ready the site switches on circuit by circuit (street, office, warehouse, docks) with a fluorescent ignition flicker. The eyebrow types itself out. Headline words drop in like cartons while Archivo settles from condensed and light to its set width and weight. English letters gain weight near the pointer; Hindi and Telugu move by whole words. On scroll the layers drift apart, and the camera rises only as the copy fades. The scroll hint has a small conveyor cue.
+- **3D.** The camera rig leans up to 2° toward the pointer on a damped spring. Ambient life (a perimeter truck, breathing signal lamps) runs only in the opening and closing wide shots, at 30 fps when nothing else changes; reading holds stay still. Overlays fade over time instead of popping, and the transfer path draws itself. Labels draw their leader line, then wipe open. Bloom on lamps and signal orange is limited to the desktop high-quality tier; the existing quality governor drops it with SSAO. Story cards enter from the direction of travel.
+- **Contact.** The closing wide shot is visible while the section rises, then sits behind the heading as a dark still. Rendering stops once the section reaches the top. The heading uses the same kinetic drop. WhatsApp and Email are tactile keys (lift, pointer sheen, press). Copying the email rolls the label and draws a check. A live India-time line has rolling digits. Tool cards arrive in sequence. FAQ markers turn into close marks. A SANKET wordmark widens as it scrolls in, using a CSS scroll-driven animation with a static fallback.
+- **Everywhere.** The contextual cursor (fine pointers) is back with localized labels. `src/lib/kinetic.ts` holds the GSAP-free helpers (reduced motion, reveal, spring magnetic, sheen, native scroll), so GSAP and Lenis no longer load up front: initial JS fell from 140.3 kB to 97.6 kB gzip. Calm mode and `prefers-reduced-motion` render final states, with no flicker, parallax, drift or ambient motion.
+- New files: `src/campus/Kinetic.tsx`, `src/campus/Contact.tsx`, `src/campus/motionCopy.ts`, `src/lib/kinetic.ts`, `src/styles/kinetic.css`. Lamps use four material circuits in `src/campus/models.ts`. The timeline adds `hero`, `finale` and `ambient` (all scroll-derived and reversible).
+- Verified: `check-campus` (now also checks that reading holds stay still and the closing shot is ambient), `check-story-guide` at six sizes and three languages with axe on contact, `check-story-revision`, and production build. Browser review covered 1440×900, 1024×768 and 390×844, English and Hindi, reduced motion, pointer weight, key hover, copy roll and directional cards. Both revision and guide checks accept `SANKET_TEST_URL`.
+- Known: main CSS is 23.2 kB gzip against the 14 kB budget (20.6 kB before this pass; the legacy Stock Field styles are still shipped). The engine chunk grew 3.4 kB gzip for bloom.
+
+## X-ray hero and self-explaining scene — 25 October 2026
+
+Spec: `docs/superpowers/specs/2026-10-25-sanket-xray-and-scene-panels-design.md`.
+
+- **Hero.** An x-ray lens cuts through the warehouse roof and facade under the mouse, with a glowing rim. A chip names the rack beneath it (A1 steady, A2 selling fast, A3 spare stock, A4 selling slowly). After the lights come on, the lens tours A2, A3 and A4 by itself: once on desktop, looping on touch. Orange comets of light (demand signals) flow from the streets into the roof. The audience line now lives in the typed eyebrow, and the hint reads "Scroll to explore", plus a lens cue on mouse devices.
+- **Explanation.** Rack status tags appear when the roof lifts. Each problem and solution beat has a data panel anchored to its rack with a leader line, scrubbed by scroll:
+  - stock lasts ~9 days against a day-14 delivery, so the 5-day gap opens in red;
+  - out-of-stock gauge, demand counter and stamp;
+  - A4 at ~120 days of stock;
+  - the 4-week forecast draws itself;
+  - the 800-unit order sum builds line by line;
+  - the 360-unit transfer travels, while a ghost pallet rides the arc in 3D;
+  - a −12% swing tag flips.
+  
+  The connect beat shows three mint data streams with source chips. On wide screens in WebGL mode, the card's figures column is visually hidden (still read by screen readers) because the panels carry the figures.
+- **Files.** `src/campus/streams.ts`, `annotate.ts`, `ScenePanels.tsx`, `sceneCopy.ts` (EN/HI/TE) and `scene.css`. The CSS is loaded with the lazy engine chunk, so the first paint and the no-WebGL page do not pay for it. The engine clones shell materials with a screen-space lens discard, keeping lamp clones on their circuits.
+
+---
+
+# The Stock Field (archived)
 
 Demand-intelligence website for retailers, brands and distributors. One continuous WebGL scene, **the Stock Field**, sits behind the whole story. Every column is a product at a location, and its height is units on hand. Scrolling moves the field from unbalanced (empty pits beside overstock towers) through incoming signals, forecast bands and physical decisions (orders drop in, transfers arc across, markdowns shrink dead stock) to level: *in stock*.
 

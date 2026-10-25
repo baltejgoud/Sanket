@@ -1,0 +1,39 @@
+name: CI
+
+# Gates every push and pull request on the production build:
+# timeline regressions, bundle budgets, a long-task budget, the hidden-tab load, and axe on the page
+# and each tool dialog at 1440 and 390 px. The engine's own long-task budget needs a real GPU, which
+# runners lack: run `npm run check:boot` locally for it (see README). Here the page is budgeted with
+# WebGL off, and the hidden-tab load is checked on SwiftShader.
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Type check and production build
+        run: npm run build
+      - name: Timeline regressions
+        run: npm run check
+      - name: Bundle budgets (initial JS ≤ 150 kB, main CSS ≤ 14 kB, engine ≤ 175 kB gzip)
+        run: npm run check:budgets
+      - name: Long-task budget, page without WebGL (longest < 200 ms, TBT < 300 ms)
+        run: node scripts/check-boot.mjs --webgl=off --hidden=skip --runs=3
+      - name: Hidden-tab load reaches the ready stage (SwiftShader)
+        run: node scripts/check-boot.mjs --gpu=swiftshader --runs=1 --budget=100000 --tbt=100000
+      - name: Accessibility (axe, page and each dialog, 1440 and 390 px) and feature checks
+        run: |
+          npx vite preview --port 4173 --strictPort &
+          for i in $(seq 1 30); do curl -sf http://localhost:4173 > /dev/null && break; sleep 1; done
+          SANKET_TEST_URL=http://localhost:4173 npm run a11y
+          SANKET_TEST_URL=http://localhost:4173 npm run check:features

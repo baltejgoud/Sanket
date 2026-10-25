@@ -1,5 +1,5 @@
 import { Fragment, type ElementType, type ReactNode } from "react";
-import { useReveal } from "../lib/motion";
+import { useReveal } from "../lib/kinetic";
 
 /**
  * Splits text into masked words for the reveal system. Words, not letters,

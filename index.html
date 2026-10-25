@@ -9,32 +9,76 @@
       name="description"
       content="SANKET reads the signals in your sales, forecasts every product every week, and tells you what to order, move or mark down. Demand intelligence for retailers, brands and distributors."
     />
+    <title>SANKET — Stock what sells. Skip what doesn't.</title>
+    <!-- One production origin for canonical, share and structured-data URLs. App.tsx keeps canonical,
+         og:url and the description in step with the chosen language (?lang=hi, ?lang=te). -->
+    <link rel="canonical" href="https://sanket-swart.vercel.app/" />
+    <link rel="alternate" hreflang="en" href="https://sanket-swart.vercel.app/" />
+    <link rel="alternate" hreflang="hi" href="https://sanket-swart.vercel.app/?lang=hi" />
+    <link rel="alternate" hreflang="te" href="https://sanket-swart.vercel.app/?lang=te" />
+    <link rel="alternate" hreflang="x-default" href="https://sanket-swart.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SANKET" />
+    <meta property="og:url" content="https://sanket-swart.vercel.app/" />
     <meta property="og:title" content="SANKET — Stock what sells. Skip what doesn't." />
     <meta
       property="og:description"
       content="Demand signals in. Decisions out. Know what to order, move or mark down."
     />
-    <meta property="og:image" content="/assets/stock-field.jpg" />
-    <title>SANKET — Stock what sells. Skip what doesn't.</title>
+    <meta property="og:image" content="https://sanket-swart.vercel.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SANKET: We help you stock what sells next. An illustrative 3D warehouse at night." />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta property="og:locale:alternate" content="te_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SANKET — Stock what sells. Skip what doesn't." />
+    <meta name="twitter:description" content="Demand signals in. Decisions out. Know what to order, move or mark down." />
+    <meta name="twitter:image" content="https://sanket-swart.vercel.app/og-image.jpg" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://sanket-swart.vercel.app/#organization",
+            "name": "SANKET",
+            "url": "https://sanket-swart.vercel.app/",
+            "logo": "https://sanket-swart.vercel.app/favicon.svg",
+            "description": "Demand intelligence for retailers, brands and distributors: forecasts for every product and location, and what to order, transfer or mark down.",
+            "areaServed": "IN",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "sales",
+              "email": "baltej.panagatla@gmail.com",
+              "telephone": "+91-79939-69656",
+              "availableLanguage": ["English", "Hindi", "Telugu"]
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://sanket-swart.vercel.app/#website",
+            "url": "https://sanket-swart.vercel.app/",
+            "name": "SANKET",
+            "inLanguage": ["en", "hi", "te"],
+            "publisher": { "@id": "https://sanket-swart.vercel.app/#organization" }
+          }
+        ]
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Archivo (latin), the hero face, fetched alongside the CSS rather than after first layout:
-         on desktop the hero then never paints in the fallback and swaps (that swap moved the
-         headline, CLS ~0.03). Phones skip it, where it would compete with the app's JS on a slow
-         link and the font lands before first render anyway. This is the file Google's CSS serves
-         for Archivo v25; scripts/check-site.mjs fails if that changes. -->
+    <!-- Archivo (Latin), the hero face, is fetched alongside the CSS rather than after first layout, so
+         the desktop hero never paints in the fallback and then swaps (that swap moved the headline,
+         CLS ~0.03). Phones skip it: there it would compete with the app's JS on a slow link. The fonts
+         are self-hosted (src/styles/fonts.css); Vite fingerprints this file to the same URL the CSS uses. -->
     <link
       rel="preload"
-      href="https://fonts.gstatic.com/s/archivo/v25/k3kQo8UDI-1M0wlSfdnoLg.woff2"
+      href="./node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
       media="(min-width: 700px)"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Noto+Sans+Devanagari:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;600&family=Tiro+Devanagari+Hindi&family=Tiro+Telugu&display=swap"
-      rel="stylesheet"
     />
   </head>
   <body>

@@ -3,8 +3,7 @@ import { ArrowRight, CornerDownLeft, LayoutList, Search, Wrench, Zap } from "luc
 import { paletteCopy } from "./paletteCopy";
 import { useContactLinks } from "../lib/contact";
 import { buildCommands, rankCommands, type Command, type Group } from "../lib/commands";
-import { explore as exploreBus } from "../lib/paletteBus";
-import { useField } from "../field/bridge";
+import { paletteInput } from "../lib/paletteBus";
 import type { Lang } from "../i18n";
 import "../styles/palette.css";
 
@@ -21,13 +20,11 @@ export default function Palette({ lang, setLang, onClose }: { lang: Lang; setLan
   const links = useContactLinks();
   const dialog = useRef<HTMLDialogElement>(null);
   const uid = useId().replace(/:/g, "");
-  const [query, setQuery] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState(paletteInput.take);
   const [active, setActive] = useState(0);
   const ran = useRef<Command | null>(null);
-  // Explore is on offer only while the field runs (not on the poster).
-  const explore = useField() ? exploreBus.open : undefined;
-
-  const all = useMemo(() => buildCommands({ copy, lang, setLang, links, explore }), [copy, lang, setLang, links, explore]);
+  const all = useMemo(() => buildCommands({ copy, lang, setLang, links }), [copy, lang, setLang, links]);
   const results = useMemo(() => rankCommands(all, query), [all, query]);
   // While searching, show the best match first regardless of group; otherwise group the list.
   const grouped = useMemo(
@@ -41,6 +38,9 @@ export default function Palette({ lang, setLang, onClose }: { lang: Lang; setLan
   useEffect(() => {
     const d = dialog.current;
     if (d && !d.open) d.showModal();
+    // Anything typed while the palette loaded is already in the field; keep typing after it.
+    const field = input.current, end = field?.value.length ?? 0;
+    field?.setSelectionRange(end, end);
   }, []);
   useEffect(() => setActive(0), [query]);
   useEffect(() => {
@@ -85,8 +85,10 @@ export default function Palette({ lang, setLang, onClose }: { lang: Lang; setLan
           {copy.label}
         </label>
         <input
+          ref={input}
           id={`${uid}-input`}
           role="combobox"
+          aria-label={copy.label}
           aria-expanded="true"
           aria-controls={`${uid}-list`}
           aria-autocomplete="list"
@@ -100,7 +102,7 @@ export default function Palette({ lang, setLang, onClose }: { lang: Lang; setLan
         />
         <kbd aria-hidden="true">Esc</kbd>
       </div>
-      <div id={`${uid}-list`} role="listbox" aria-label={copy.label} className="palette-list" data-lenis-prevent>
+      <div id={`${uid}-list`} role="listbox" aria-label={copy.label} className="palette-list">
         {grouped.map(({ group, items }) =>
           items.length ? (
             <div key={group ?? "results"} role="group" aria-labelledby={group ? `${uid}-g-${group}` : undefined} aria-label={group ? undefined : copy.label}>

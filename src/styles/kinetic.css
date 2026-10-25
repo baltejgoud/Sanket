@@ -1,0 +1,166 @@
+/* SANKET warehouse story — motion and craft layer (25 Oct 2026).
+   Transforms, opacity and custom properties only; calm mode and reduced motion get final states. */
+
+@property --ks { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --p { syntax: '<number>'; inherits: false; initial-value: 0; }
+
+/* ---------- Stage: the warehouse is present from the first frame ---------- */
+.campus-ready canvas { opacity: 1; transition: opacity 1.4s var(--ease-settle) }
+.campus-shade { opacity: calc(1 - max(var(--hero, 0), var(--finale, 0))) }
+.hero-shade,.finale-shade { position: absolute; inset: 0; pointer-events: none }
+/* Darkness sits behind the words; the site stays lit below them. */
+.hero-shade { opacity: var(--hero, 0); background: radial-gradient(ellipse 60% 50% at 50% 38%, #090b09f2 0%, #090b09d6 56%, transparent 100%), linear-gradient(180deg, #090b09 0%, #090b09 10%, #090b0900 42%, transparent 82%, #090b0999 100%) }
+.finale-shade { opacity: var(--finale, 0); background: linear-gradient(180deg, #090b09 0%, #090b0966 12%, transparent 26%, transparent 50%, #090b09cc 68%, #090b09 84%) }
+.campus-fallback .hero-shade,.campus-fallback .finale-shade { display: none }
+
+/* ---------- Hero ---------- */
+/* Copy sits high; the warehouse is the ground it stands on. */
+.campus-story .opening .story-sticky { align-items: flex-start; padding-top: clamp(104px, 14svh, 150px); padding-bottom: 0 }
+.campus-story .hero-copy .story-lead { margin-top: 24px }
+.story-controls-hint { margin-top: 12px }
+
+/* The eyebrow types itself out, then a block caret blinks and leaves. */
+.story-eyebrow > .k-type { width: auto; height: auto; background: none; border-radius: 0 }
+.k-type { display: inline-block; animation: k-type 1.1s steps(var(--n, 28), end) 120ms both }
+.hint-lens { color: #ffb17c }
+.is-calm .hint-lens,.campus-fallback ~ .campus-story .hint-lens { display: none }
+@media (prefers-reduced-motion: reduce) { .hint-lens { display: none } }
+.story-eyebrow .k-type::after { content: ''; display: inline-block; width: .62em; height: 1.05em; margin-left: 4px; vertical-align: -.22em; background: #ff6b25; animation: k-caret .42s steps(1) 1.07s 6 both }
+@keyframes k-type { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0 -1em 0 0) } }
+@keyframes k-caret { 0%,49% { opacity: 1 } 50%,100% { opacity: 0 } }
+
+/* Words drop like cartons while the face settles from condensed and light to its set width. */
+.k-title { --kw1: 650; --kw2: 380 }
+.hero-copy .k-title { --kw1: 600 }
+.contact-section .k-title { --kw1: 750 }
+.k-title .k-line { display: block }
+.k-title .k-line:first-child { --kw: var(--kw1) }
+.k-title .k-line:nth-child(2) { --kw: var(--kw2) }
+.campus-story .story-copy .k-title > .k-line:first-child { color: #f1eee5; margin: 0 }
+.k-title .word > span { --ks: 1; font-variation-settings: 'wght' calc(var(--kw) - var(--ks) * 260), 'wdth' calc(100 - var(--ks) * 24) }
+.k-title.is-in .word > span { animation: carton 780ms both, k-settle 1150ms var(--ease-settle) both; animation-delay: calc(var(--i, 0) * 55ms), calc(var(--i, 0) * 55ms + 140ms) }
+.k-title .k-ch { font-variation-settings: 'wght' calc(var(--kw) - var(--ks) * 260 + var(--p) * 220), 'wdth' calc(100 - var(--ks) * 24 + var(--p) * 7) }
+@keyframes k-settle { from { --ks: 1 } to { --ks: 0 } }
+
+/* Supporting lines rise in after the headline. */
+.k-rise { animation: k-rise 1s var(--ease-settle) var(--d, 0ms) both }
+@keyframes k-rise { from { opacity: 0; transform: translateY(16px) } }
+
+/* On scroll-out the layers drift apart at different rates. */
+.hero-copy .story-eyebrow { translate: 0 calc(var(--hero-scroll, 0) * -84px) }
+.hero-copy .k-title .k-line:first-child { translate: 0 calc(var(--hero-scroll, 0) * -62px) }
+.hero-copy .k-title .k-line:nth-child(2) { translate: 0 calc(var(--hero-scroll, 0) * -34px) }
+.hero-copy .story-lead { translate: 0 calc(var(--hero-scroll, 0) * -18px) }
+.hero-copy .hero-paths { translate: 0 calc(var(--hero-scroll, 0) * -8px) }
+
+/* A carton rides the belt down and drops off the end, beside the scroll hint. */
+.conveyor { position: relative; display: inline-block; width: 12px; height: 30px; margin-right: 12px; vertical-align: -10px }
+.conveyor::before { content: ''; position: absolute; left: 50%; top: 5px; bottom: 5px; width: 1px; background: linear-gradient(#6c725f, #2c3128) }
+.conveyor-roller { position: absolute; left: 50%; width: 7px; height: 7px; margin-left: -3.5px; border: 1px solid #6c725f; border-radius: 50% }
+.conveyor-roller:first-child { top: 0 }
+.conveyor-roller:last-child { bottom: 0 }
+.conveyor-carton { position: absolute; left: 50%; top: 3px; width: 7px; height: 6px; margin-left: -3.5px; border-radius: 1px; background: #ff6b25; box-shadow: 0 0 10px #ff6b2566; animation: k-convey 2.4s cubic-bezier(.45, 0, .55, 1) 1.4s infinite both }
+@keyframes k-convey { 0% { transform: none; opacity: 0 } 12% { opacity: 1 } 70% { transform: translateY(17px); opacity: 1 } 84%,100% { transform: translateY(23px) scale(.6); opacity: 0 } }
+.campus-fallback ~ .campus-story .conveyor { display: none }
+
+/* ---------- Micro-interactions ---------- */
+.story-begin { position: relative }
+.story-begin::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: #ffb17c; transform: scaleX(0); transform-origin: right; transition: transform .55s var(--ease-settle) }
+.story-begin:hover::after,.story-begin:focus-visible::after { transform: scaleX(1); transform-origin: left }
+.story-begin:hover svg { animation: k-nudge-down .7s var(--ease-settle) }
+:is(.hero-shortcut,.talk,.contact-key,.story-resources button):hover svg:last-child { animation: k-nudge-diag .7s var(--ease-settle) }
+@keyframes k-nudge-down { 0% { transform: none; opacity: 1 } 38% { transform: translateY(12px); opacity: 0 } 39% { transform: translateY(-12px); opacity: 0 } 100% { transform: none; opacity: 1 } }
+@keyframes k-nudge-diag { 0% { transform: none; opacity: 1 } 38% { transform: translate(9px, -9px); opacity: 0 } 39% { transform: translate(-9px, 9px); opacity: 0 } 100% { transform: none; opacity: 1 } }
+
+/* ---------- 3D labels draw their leader line, then wipe open ---------- */
+.campus-label { opacity: 0; clip-path: inset(0 100% -40px 0); transition: opacity .2s, clip-path 0s .2s }
+.campus-label::before { transform: scaleY(0); transform-origin: 50% 100%; transition: transform .2s }
+.campus-label[data-shown=true] { opacity: 1; clip-path: inset(-40px -40px -40px -40px); transition: opacity .2s, clip-path .6s var(--ease-settle) .12s }
+.campus-label[data-shown=true]::before { transform: scaleY(1); transition: transform .32s var(--ease-settle) }
+
+/* ---------- Story cards enter from the direction of travel ---------- */
+.story-card-deck[data-dir=next] .story-detail-card:not([hidden]) { animation: k-card-next .6s var(--ease-settle) both }
+.story-card-deck[data-dir=back] .story-detail-card:not([hidden]) { animation: k-card-back .6s var(--ease-settle) both }
+.story-card-deck[data-dir] .story-detail-card:not([hidden]) > * { animation: k-card-part .65s var(--ease-settle) both }
+.story-card-deck[data-dir] .story-detail-card > :nth-child(2) { animation-delay: 60ms }
+.story-card-deck[data-dir] .story-detail-card > :nth-child(3) { animation-delay: 120ms }
+.story-card-deck[data-dir] .story-detail-card > :nth-child(4) { animation-delay: 180ms }
+@keyframes k-card-next { from { opacity: 0; transform: translateY(28px) scale(.985) } }
+@keyframes k-card-back { from { opacity: 0; transform: translateY(-28px) scale(.985) } }
+@keyframes k-card-part { from { opacity: 0; transform: translateY(8px) } }
+
+/* ---------- Contact: the closing shot ---------- */
+/* The closing shot is seen whole while the section rises, then darkens to a ghost behind the heading. */
+.campus-story .contact-section { background: linear-gradient(180deg, transparent 0, #090b09b8 16svh, #090b09eb 44svh, #090b09 75svh) top / 100% 75svh no-repeat, radial-gradient(ellipse at 50% 100%, #192015, #090b09 70%) 0 75svh / 100% calc(100% - 75svh) no-repeat }
+.campus-story .contact-section .story-sticky { flex-direction: column }
+/* Contact is ordinary document flow: its words rise into view with the section instead of waiting for a hold. */
+.campus-story .contact-section .story-copy { opacity: 1 }
+.contact-section .story-lead,.contact-section .contact-prepare { text-shadow: 0 1px 14px #090b09, 0 0 2px #090b09 }
+
+/* Channels are physical keys: they lift and catch light, and press in. */
+.campus-contact { gap: 16px }
+.campus-contact a.contact-key { position: relative; gap: 18px; padding: 20px 22px; border: 1px solid #3c4535; border-top-color: #58634c; border-radius: 14px; background: linear-gradient(180deg, #1b2218, #10150e); box-shadow: inset 0 1px 0 #ffffff14, 0 4px 0 #050705, 0 18px 30px -18px #000; transition: translate .4s var(--ease-spring), rotate .52s var(--ease-settle), box-shadow .3s, border-color .25s }
+.campus-contact a.contact-key:hover { translate: 0 -3px; border-color: #6d7b5c; box-shadow: inset 0 1px 0 #ffffff1c, 0 7px 0 #050705, 0 28px 44px -20px #000 }
+.campus-contact a.contact-key:active { translate: 0 3px; box-shadow: inset 0 2px 8px #000a, 0 1px 0 #050705; transition-duration: .08s }
+.campus-contact a.contact-key:focus-visible { outline: 2px solid #ffb17c; outline-offset: 4px }
+.key-icon { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: #0b0f0a; color: #ff7b3a; box-shadow: inset 0 1px 3px #000c, 0 1px 0 #ffffff12; transition: color .25s }
+.contact-key:hover .key-icon { color: #ffb17c }
+
+.contact-meta { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 36px; margin-top: 22px }
+.contact-meta .text-action { margin-top: 0 }
+.copy-action .copy-icon { display: grid; width: 16px; height: 16px }
+.copy-action .copy-icon > * { grid-area: 1 / 1; width: 16px; height: 16px; transition: opacity .25s, transform .45s var(--ease-spring) }
+.copy-check path { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .45s var(--ease-settle) .12s }
+.copy-action[data-copied=true] { color: #a8e6ce; border-color: #a8e6ce }
+.copy-action[data-copied=true] .copy-icon > :first-child { opacity: 0; transform: scale(.5) rotate(-25deg) }
+.copy-action[data-copied=true] .copy-check path { stroke-dashoffset: 0 }
+.roll { display: inline-grid; overflow: clip; line-height: 1.5 }
+.roll > span { grid-area: 1 / 1; transition: transform .55s var(--ease-spring), opacity .3s }
+.roll > span:last-child { transform: translateY(100%); opacity: 0 }
+.copy-action[data-copied=true] .roll > span:first-child { transform: translateY(-100%); opacity: 0 }
+.copy-action[data-copied=true] .roll > span:last-child { transform: none; opacity: 1 }
+
+.contact-clock { display: inline-flex; align-items: center; gap: 10px; font: 11px/1.5 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #aeb9a2 }
+.clock-dot { width: 7px; height: 7px; border-radius: 50%; background: #a8e6ce; animation: k-pulse 2.4s ease-out infinite }
+.clock-time { display: inline-flex; align-items: baseline; gap: 6px; color: #e6ebdd }
+@keyframes k-pulse { 0% { box-shadow: 0 0 0 0 #a8e6ce66 } 70%,100% { box-shadow: 0 0 0 8px #a8e6ce00 } }
+
+/* Tool cards arrive one after another and catch light under the pointer. */
+.story-resources button { transition: opacity .8s var(--ease-settle) var(--d, 0ms), transform .9s var(--ease-settle) var(--d, 0ms), rotate .52s var(--ease-settle), translate .4s var(--ease-spring), border-color .2s, background .2s }
+.story-resources button:hover { translate: 0 -2px }
+
+/* Questions open on their height (base.css) with a plus that turns into a close mark. */
+.story-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 20px }
+.story-faq summary::after { content: ''; flex: none; width: 12px; height: 12px; color: #ffb17c; background: linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat, linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat; transition: rotate .5s var(--ease-spring) }
+.story-faq details[open] summary::after { rotate: 135deg }
+
+/* A floor-stencil wordmark that widens as it comes into view. */
+.contact-wordmark { width: 100%; margin: 72px 0 0; overflow: clip; text-align: center; font-family: "Archivo", "Arial Narrow", Arial, sans-serif; font-size: clamp(60px, 16vw, 250px); line-height: .82; letter-spacing: -.035em; font-variation-settings: 'wght' 800, 'wdth' 112; color: transparent; background: linear-gradient(180deg, #3d4934 0%, #1a2116 88%); -webkit-background-clip: text; background-clip: text; user-select: none; pointer-events: none }
+@supports (animation-timeline: view()) {
+  .contact-wordmark { animation: k-wordmark linear both; animation-timeline: view(); animation-range: entry 10% contain 15% }
+  @keyframes k-wordmark { from { font-variation-settings: 'wght' 260, 'wdth' 62; letter-spacing: .1em; opacity: .25 } to { font-variation-settings: 'wght' 800, 'wdth' 112; letter-spacing: -.035em; opacity: 1 } }
+}
+
+@media (max-width: 759px) {
+  .campus-story .opening .story-sticky { padding-bottom: 50px }
+  .campus-contact { gap: 10px }
+  .campus-contact a.contact-key,.campus-contact a.contact-key:first-child { padding: 16px; border: 1px solid #3c4535; border-top-color: #58634c }
+  .key-icon { width: 40px; height: 40px; border-radius: 10px }
+  .contact-meta { flex-direction: column; gap: 6px }
+  .contact-wordmark { margin-top: 48px }
+}
+
+/* ---------- Calm mode and reduced motion: final states, nothing moving on its own ---------- */
+.is-calm :is(.k-type, .k-type::after, .k-rise, .k-title .word > span, .conveyor-carton, .clock-dot, .story-card-deck .story-detail-card, .story-detail-card > *, .contact-wordmark) { animation: none !important }
+.is-calm .k-title .word > span { --ks: 0; transform: none }
+.is-calm .k-type::after { display: none }
+.is-calm .conveyor-carton { transform: translateY(9px) }
+@media (prefers-reduced-motion: reduce) {
+  .k-title .word > span { --ks: 0 }
+  .k-type { animation: none; clip-path: none }
+  .k-type::after { display: none }
+  .conveyor-carton { animation: none; transform: translateY(9px) }
+  .clock-dot { animation: none }
+  .campus-label,.campus-label::before { transition: none }
+  .contact-wordmark { animation: none }
+}

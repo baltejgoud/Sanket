@@ -1,13 +1,18 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Plus, RefreshCw } from "lucide-react";
-import { LangContext, useT } from "../i18n";
+import { LangContext } from "../i18n";
 import { useCopy } from "../copy";
+import { useToolCopy, useToolT } from "./toolCopy";
+import { ScenarioShare } from "./ScenarioShare";
+import { track } from "../lib/analytics";
 import { storyMeta } from "../data";
-import { useReveal, useSheen } from "../lib/motion";
+import { useReveal, useSheen } from "../lib/kinetic";
 import { visit } from "../lib/visit";
 import { snapToDetent, tick, usePuck } from "../lib/detents";
 import { RevealHeading } from "../components/Words";
 import { Odometer } from "../components/Odometer";
+import "../styles/instruments.css";
+import "../styles/tools.css";
 
 type Currency = "INR" | "USD";
 const presets = {
@@ -57,7 +62,7 @@ function EditableNumber({ value, commit, min, max, label, id }: { value: number;
 }
 
 /** The business case. Arithmetic is unchanged from the original calculator; results are exact and immediate. */
-function ROI() {
+export function ROI() {
   const lang = useContext(LangContext);
   const c = roiCopy[lang];
   const contact = useCopy().contact;
@@ -87,6 +92,7 @@ function ROI() {
   const short = (n: number) => (currency === "INR" ? `₹${+(n / (n >= 1e7 ? 1e7 : 1e5)).toFixed(2)} ${n >= 1e7 ? "cr" : "lakh"}` : `$${+(n / 1e6).toFixed(2)}M`);
   const load = (curr: Currency, index: number) => {
     const p = presets[curr][index];
+    track("scenario_changed", { tool: "business_case", currency: curr, size: ["small", "growing", "enterprise"][index] });
     setCurrency(curr);
     setSize(index);
     setRevenue(p.revenue);
@@ -223,7 +229,7 @@ function ROI() {
       </div>
       <div ref={result} className="roi-result">
         <span className="mono accent">{c.impact}</span>
-        <p className="roi-total display" data-testid="roi-total">
+        <p className="roi-total display" data-testid="roi-total" style={{ ["--chars" as string]: format(total).length }}>
           <Odometer value={format(total)} />
         </p>
         <span className="muted">{c.sub}</span>
@@ -239,6 +245,7 @@ function ROI() {
           ))}
         </ul>
         <p className="mono muted fine">{c.note}</p>
+        <ScenarioShare tool="business_case" line={contact.roi(format(total), c.sizes[size])} />
         <details className="disclosure">
           <summary>
             {c.formula}
@@ -264,9 +271,9 @@ function ROI() {
   );
 }
 
-function Stories() {
-  const t = useT();
-  const c = useCopy().proof;
+export function Stories() {
+  const t = useToolT();
+  const c = useToolCopy().proof;
   const [region, setRegion] = useState<"all" | "india" | "global">("all");
   const regionSeg = usePuck<HTMLDivElement>();
   const rows = storyMeta.map((meta, i) => ({ meta, text: t.stories.items[i] })).filter(({ meta }) => region === "all" || meta.region === region);
@@ -346,7 +353,7 @@ function Stories() {
 }
 
 function Trust() {
-  const t = useT();
+  const t = useToolT();
   return (
     <section id="security" className="chapter trust" aria-labelledby="trust-title">
       <div className="wrap trust-grid">
@@ -374,8 +381,8 @@ function Trust() {
 }
 
 export function Proof() {
-  const t = useT();
-  const c = useCopy();
+  const t = useToolT();
+  const c = useToolCopy();
   const section = useReveal<HTMLElement>(0.08);
   return (
     <>

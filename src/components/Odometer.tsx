@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { prefersReducedMotion } from "../lib/motion";
+import { prefersReducedMotion } from "../lib/kinetic";
 import { isCalm } from "../lib/prefs";
 
 /**

@@ -2,34 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Menu, Pause, Play, Search, X } from "lucide-react";
 import { dict, languages, type Lang } from "../i18n";
 import { copy } from "../copy";
-import { ScrollTrigger, scrollToId, useMagnetic } from "../lib/motion";
+import { storyCopy } from "../campus/storyCopy";
+import { focusSection, scrollToId, useMagnetic } from "../lib/kinetic";
 import { prefs, useMotion } from "../lib/prefs";
-import { palette } from "../lib/paletteBus";
+import { palette, preloadPalette } from "../lib/paletteBus";
 import { usePuck } from "../lib/detents";
-import { fieldStore } from "../field/store";
 import { Mark } from "./Icons";
 
 export const CHAPTERS = [
-  { id: "signal", key: "signal", n: "01" },
-  { id: "forecast", key: "forecast", n: "02" },
-  { id: "decide", key: "decide", n: "03" },
-  { id: "industries", key: "world", n: "04" },
-  { id: "roi", key: "proof", n: "05" },
+  { id: "warehouse", n: "02", index: 1 },
+  { id: "problems", n: "03", index: 2 },
+  { id: "forecast", n: "04", index: 3 },
+  { id: "decide", n: "05", index: 4 },
 ] as const;
-
-/** Which header link a section belongs to. */
-const GROUP: Record<string, string> = {
-  signal: "signal",
-  problems: "signal",
-  forecast: "forecast",
-  command: "forecast",
-  decide: "decide",
-  industries: "industries",
-  integrations: "industries",
-  roi: "roi",
-  stories: "roi",
-  security: "roi",
-};
+const GROUP: Record<string, string> = { warehouse: 'warehouse', problems: 'problems', forecast: 'forecast', decide: 'decide' };
 
 export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lang) => void; active: string }) {
   const c = copy[lang];
@@ -52,13 +38,11 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
     if (!d) return;
     if (open && !d.open) d.showModal();
     if (!open && d.open) d.close();
-    // The index covers the whole screen: the field need not draw behind it.
-    fieldStore.setCovered(open);
   }, [open]);
 
   const closeMenu = (thenScrollTo?: string) => {
     setOpen(false);
-    if (thenScrollTo) requestAnimationFrame(() => scrollToId(thenScrollTo));
+    if (thenScrollTo) requestAnimationFrame(() => { scrollToId(thenScrollTo); focusSection(thenScrollTo); });
     else opener.current?.focus();
   };
 
@@ -78,7 +62,7 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
           {CHAPTERS.map(ch => (
             <a key={ch.id} href={`#${ch.id}`} aria-current={group === ch.id ? "location" : undefined}>
               <span className="mono">{ch.n}</span>
-              {c.nav[ch.key]}
+              {storyCopy[lang].chapters[ch.index]}
             </a>
           ))}
         </nav>
@@ -112,7 +96,7 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
           </button>
         </div>
         <nav aria-label={c.nav.index}>
-          {[...CHAPTERS.map(ch => ({ id: ch.id, n: ch.n, label: c.nav[ch.key] })), { id: "contact", n: "06", label: c.nav.talk }].map(item => (
+          {[...CHAPTERS.map(ch => ({ id: ch.id, n: ch.n, label: storyCopy[lang].chapters[ch.index] })), { id: "contact", n: "06", label: c.nav.talk }].map(item => (
             <a
               key={item.id}
               href={`#${item.id}`}
@@ -136,7 +120,7 @@ export function Header({ lang, setLang, active }: { lang: Lang; setLang: (l: Lan
         </div>
       </dialog>
 
-      <StateRail labels={c.rail} active={active} />
+      <ReadingProgress />
     </>
   );
 }
@@ -146,7 +130,7 @@ const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigat
 /** Opens the ⌘K palette; the shortcut is shown, and declared for assistive tech. */
 export function JumpButton({ label, className = "jump" }: { label: string; className?: string }) {
   return (
-    <button className={className} aria-keyshortcuts="Meta+K Control+K /" onClick={() => palette.open()}>
+    <button className={className} aria-keyshortcuts="Meta+K Control+K" onClick={() => palette.open()} onPointerEnter={preloadPalette} onFocus={preloadPalette}>
       <Search size={15} aria-hidden="true" />
       <span className="jump-label">{label}</span>
       <kbd aria-hidden="true">{isMac ? "⌘K" : "Ctrl K"}</kbd>
@@ -178,35 +162,10 @@ function LangSwitch({ lang, setLang, label }: { lang: Lang; setLang: (l: Lang) =
   );
 }
 
-/** Story position per section. Between "Decide" and "In stock" the visitor is checking the fit and the proof. */
-const RAIL_INDEX: Record<string, number> = {
-  top: 0,
-  signal: 1,
-  problems: 1,
-  forecast: 2,
-  command: 2,
-  decide: 3,
-  industries: 3.5,
-  integrations: 3.5,
-  roi: 3.5,
-  stories: 3.5,
-  security: 3.5,
-  contact: 4,
-};
-const RAIL_TARGET = ["top", "signal", "forecast", "decide", "contact"];
-
-/** Right-edge indicator: where the story (and the field) stands. Mouse convenience; the header nav is the accessible index. */
-function StateRail({ labels, active }: { labels: string[]; active: string }) {
-  const rail = useRef<HTMLDivElement>(null);
-  const index = RAIL_INDEX[active] ?? 0;
+/** Each header chapter link's underline fills with reading progress through its chapter (--read). */
+function ReadingProgress() {
   useEffect(() => {
-    const el = rail.current;
-    if (!el) return;
     let raf = 0;
-    // Page height is measured on resize, not per scroll frame: reading scrollHeight right after
-    // the Decide scrub's style writes forced an extra layout on every frame.
-    let max = 0;
-    // Each header link fills with reading progress through its group of sections.
     const links = CHAPTERS.map(ch => ({
       el: document.querySelector<HTMLElement>(`.chapter-nav a[href="#${ch.id}"]`),
       ids: Object.keys(GROUP).filter(id => GROUP[id] === ch.id),
@@ -215,7 +174,6 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
       last: -1,
     }));
     const measure = () => {
-      max = document.documentElement.scrollHeight - window.innerHeight;
       for (const l of links) {
         const boxes = l.ids.map(id => document.getElementById(id)?.getBoundingClientRect()).filter(Boolean) as DOMRect[];
         if (!boxes.length) continue;
@@ -225,7 +183,6 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
     };
     const update = () => {
       raf = 0;
-      el.style.setProperty("--progress", String(max > 0 ? window.scrollY / max : 0));
       const y = window.scrollY + window.innerHeight * 0.45;
       for (const l of links) {
         const read = Math.min(1, Math.max(0, (y - l.from) / Math.max(1, l.to - l.from)));
@@ -242,41 +199,16 @@ function StateRail({ labels, active }: { labels: string[]; active: string }) {
       onScroll();
     });
     ro.observe(document.body);
-    // Pins re-space the page on refresh (fonts, language) without always resizing the body.
-    // Measured on the next frame, once that layout has happened, rather than forcing it now.
-    let refreshRaf = 0;
-    const onRefresh = () => {
-      cancelAnimationFrame(refreshRaf);
-      refreshRaf = requestAnimationFrame(() => {
-        measure();
-        update();
-      });
-    };
-    ScrollTrigger.addEventListener("refresh", onRefresh);
     measure();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", measure);
     return () => {
       ro.disconnect();
-      ScrollTrigger.removeEventListener("refresh", onRefresh);
-      cancelAnimationFrame(refreshRaf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
       cancelAnimationFrame(raf);
     };
   }, []);
-  return (
-    <div ref={rail} className="state-rail" aria-hidden="true">
-      <span className="rail-line">
-        <i />
-      </span>
-      {labels.map((label, n) => (
-        <div key={n} className={`rail-item ${n === index ? "is-active" : ""} ${n < index ? "is-past" : ""}`} onClick={() => scrollToId(RAIL_TARGET[n])}>
-          <i />
-          <span className="mono">{label}</span>
-        </div>
-      ))}
-    </div>
-  );
+  return null;
 }

@@ -1,13 +1,10 @@
 import { languages, type Lang } from "../i18n";
 import type { PaletteCopy } from "../components/paletteCopy";
-import { scrollToId } from "./motion";
+import { focusSection, scrollToId } from "./kinetic";
 import { prefs } from "./prefs";
 import { EMAIL } from "./contact";
 import { toast } from "../components/Toast";
-import { fieldBridge } from "../field/bridge";
-import { startTilt, tiltSupported } from "../field/tilt";
-
-let stopTilt: (() => void) | null = null;
+import { storyCopy } from "../campus/storyCopy";
 
 export type Group = "chapters" | "tools" | "actions";
 
@@ -48,29 +45,23 @@ export function rankCommands(list: Command[], query: string) {
 
 /* ---------- the commands ---------- */
 
-/** Scroll to a section, then move focus there (to its heading, or to `focus` inside it) for keyboard users. */
-export function goTo(id: string, focus?: string) {
+/** Scroll to a section, then move focus to its heading for keyboard users. */
+export function goTo(id: string) {
   scrollToId(id);
-  const section = document.getElementById(id);
-  const target = (focus ? section?.querySelector<HTMLElement>(focus) : section?.querySelector<HTMLElement>("h1, h2, h3")) ?? section;
-  if (!target) return;
-  if (!focus && !target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
-  target.focus({ preventScroll: true });
+  focusSection(id);
 }
 
-const CHAPTERS: [string, string, string][] = [
-  ["top", "00", "start home hero top stock what sells"],
-  ["signal", "01", "signal signals weather trends demand"],
-  ["problems", "01·2", "problems cost guessing stockout overstock pain"],
-  ["forecast", "02", "forecast how it works steps"],
-  ["command", "02·2", "try forecast sandbox demo chart monday"],
-  ["decide", "03", "decide decisions order move transfer mark down markdown"],
-  ["industries", "04", "industries industry apparel electronics pharma grocery fmcg workspace"],
-  ["integrations", "04·2", "integrations connectors tally sap shopify zoho erp"],
-  ["roi", "05", "roi proof business case savings return"],
-  ["stories", "05·2", "stories failures public examples evidence"],
-  ["security", "05·3", "security privacy data trust"],
-  ["contact", "06", "contact talk whatsapp email"],
+/** Opens a tool dialog: 0 forecast, 1 business case, 2 connections. */
+const openTool = (tool: number) => window.dispatchEvent(new CustomEvent("sanket:tool", { detail: tool }));
+
+/** The story's six chapters in page order, numbered as their eyebrows are. */
+const CHAPTERS: [id: string, keywords: string][] = [
+  ["signal", "start home hero top idea stock what sells"],
+  ["warehouse", "warehouse shelves stock inventory racks"],
+  ["problems", "problems cost guessing stockout overstock pain"],
+  ["forecast", "forecast what we do solution plan order transfer markdown"],
+  ["decide", "how it works decide decisions approve move dispatch"],
+  ["contact", "contact talk whatsapp email faq"],
 ];
 
 export interface CommandContext {
@@ -78,26 +69,17 @@ export interface CommandContext {
   lang: Lang;
   setLang: (l: Lang) => void;
   links: { wa: string; mail: string };
-  /** present when the stage can be explored (WebGL) */
-  explore?: () => void;
 }
 
-export function buildCommands({ copy, lang, setLang, links, explore }: CommandContext): Command[] {
+export function buildCommands({ copy, lang, setLang, links }: CommandContext): Command[] {
   const calm = prefs.get() === "calm";
-  const chapters: Command[] = CHAPTERS.map(([id, n, keywords]) => ({
-    id: `chapter-${id}`,
-    group: "chapters",
-    label: copy.chapters[id],
-    hint: n,
-    keywords,
-    run: () => goTo(id),
-  }));
+  const story = storyCopy[lang];
+  const chapters: Command[] = CHAPTERS.map(([id, keywords], i) => ({ id: `chapter-${id}`, group: "chapters", label: story.chapters[i], hint: `0${i + 1}`, keywords, run: () => goTo(id) }));
   const tools: Command[] = [
-    { id: "tool-roi", group: "tools", label: copy.tools.roi, keywords: "roi calculator savings money estimate return", run: () => goTo("roi", ".roi-controls button") },
-    { id: "tool-sandbox", group: "tools", label: copy.tools.sandbox, keywords: "sandbox forecast try demo scenario chart", run: () => goTo("command", ".sandbox .seg button") },
-    { id: "tool-connectors", group: "tools", label: copy.tools.connectors, keywords: "search integrations connectors tally sap shopify", run: () => goTo("integrations", "input") },
-    { id: "tool-stories", group: "tools", label: copy.tools.stories, keywords: "stories failures examples evidence", run: () => goTo("stories") },
-    { id: "tool-film", group: "tools", label: copy.tools.film, keywords: "film video watch play", run: () => goTo("command", ".film-play, .film video") },
+    { id: "tool-sandbox", group: "tools", label: story.tools[0], keywords: "sandbox forecast try demo scenario chart", run: () => openTool(0) },
+    { id: "tool-roi", group: "tools", label: story.tools[1], keywords: "roi calculator savings money estimate return business case", run: () => openTool(1) },
+    { id: "tool-connectors", group: "tools", label: story.tools[2], keywords: "search integrations connectors tally sap shopify industries", run: () => openTool(2) },
+    { id: "tool-stories", group: "tools", label: copy.tools.stories, keywords: "stories failures examples evidence", run: () => openTool(1) },
   ];
   const actions: Command[] = [
     ...languages.map(l => ({
@@ -115,26 +97,6 @@ export function buildCommands({ copy, lang, setLang, links, explore }: CommandCo
       keywords: "motion animation pause play stop calm reduce accessibility",
       run: () => prefs.setMotion(calm ? "full" : "calm"),
     },
-    ...(explore ? [{ id: "explore", group: "actions" as const, label: copy.actions.explore, keywords: "explore 3d warehouse field ar vr place desk spatial", run: explore }] : []),
-    ...(tiltSupported() && fieldBridge.get()
-      ? [
-          {
-            id: "tilt",
-            group: "actions" as const,
-            label: stopTilt ? copy.actions.tiltOff : copy.actions.tilt,
-            keywords: "tilt gyroscope phone look around 3d spatial parallax",
-            run: async () => {
-              if (stopTilt) {
-                stopTilt();
-                stopTilt = null;
-                return;
-              }
-              const field = fieldBridge.get();
-              stopTilt = field ? await startTilt((x, y) => field.setTilt(x, y)) : null;
-            },
-          },
-        ]
-      : []),
     {
       id: "whatsapp",
       group: "actions",

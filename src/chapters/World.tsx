@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, Lock, Plus, Search, X } from "lucide-react";
-import { useT } from "../i18n";
 import { useCopy } from "../copy";
+import { useToolCopy, useToolT } from "./toolCopy";
 import { connectors, industries } from "../data";
-import { useReveal } from "../lib/motion";
+import { useReveal } from "../lib/kinetic";
 import { visit } from "../lib/visit";
 import { RevealHeading } from "../components/Words";
 import { series, smooth } from "./Sandbox";
+import "../styles/instruments.css";
+import "../styles/tools.css";
 
 function Spark({ phase, scenario }: { phase: number; scenario: number }) {
   const data = useMemo(() => series(scenario, 13, 0, phase), [phase, scenario]);
@@ -27,8 +29,8 @@ function Spark({ phase, scenario }: { phase: number; scenario: number }) {
   );
 }
 
-function Industries() {
-  const { world: c, contact } = useCopy();
+export function Industries() {
+  const c = useToolCopy().world, { contact } = useCopy();
   const [open, setOpen] = useState(0);
   // Apparel opens by default; only an industry the visitor picks goes into their message.
   const picked = useRef(false);
@@ -103,9 +105,9 @@ function Industries() {
   );
 }
 
-function Integrations() {
-  const t = useT();
-  const c = useCopy().world;
+export function Integrations() {
+  const t = useToolT();
+  const c = useToolCopy().world;
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<{ name: string; cat: string } | null>(null);
   const q = query.trim().toLowerCase();
@@ -171,8 +173,8 @@ function Integrations() {
 }
 
 export function World() {
-  const t = useT();
-  const c = useCopy();
+  const t = useToolT();
+  const c = useToolCopy();
   const section = useReveal<HTMLElement>(0.08);
   return (
     <section ref={section} id="industries" className="chapter light world" aria-labelledby="world-title">

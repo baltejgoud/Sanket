@@ -1,194 +1,8 @@
 /* ---------- Stage: the fixed field behind the story ---------- */
-.stage {
-  position: fixed;
-  inset: 0;
-  height: 100lvh;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(120% 80% at 70% 70%, #171915 0%, var(--ink) 60%),
-    var(--ink);
-}
-.stage-canvas,
-.stage-poster {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1.4s var(--ease-settle);
-}
-.stage-poster {
-  object-fit: cover;
-  object-position: 62% 50%;
-  opacity: 0.85;
-}
-.stage.is-ready .stage-canvas {
-  opacity: 1;
-}
-.stage[data-visible="false"] .stage-canvas {
-  opacity: 0;
-  transition-duration: 0.2s;
-}
-.stage.is-poster .stage-canvas {
-  opacity: 1 !important;
-  transition: none;
-}
-.stage-anchors {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.anchor {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  transition: opacity 0.6s var(--ease-settle);
-  will-change: transform;
-}
-.anchor i {
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  border-radius: 50%;
-  border: 1.5px solid var(--signal);
-  background: var(--ink);
-}
-.anchor b {
-  padding: 5px 9px;
-  background: rgb(11 12 10 / 0.78);
-  border: 1px solid var(--line-dark-2);
-  border-radius: 3px;
-  color: var(--bone);
-  white-space: nowrap;
-  font-weight: 500;
-  backdrop-filter: blur(6px);
-}
-.stage.is-ready[data-shot="decide"] .anchor-decide,
-.stage.is-ready[data-shot="signal"] .anchor-signal {
-  opacity: 1;
-}
-.anchor[data-behind="true"] {
-  opacity: 0 !important;
-}
 
 /* Readout HUD: the field, read cell by cell. */
-.readout {
-  position: absolute;
-  right: calc(var(--gutter) + 52px);
-  bottom: 32px;
-  width: 268px;
-  padding: 14px 16px 12px;
-  border: 1px solid var(--line-dark-2);
-  border-radius: 4px;
-  background: rgb(11 12 10 / 0.72);
-  backdrop-filter: blur(10px);
-  color: var(--bone);
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.6s var(--ease-settle),
-    transform 0.6s var(--ease-settle);
-}
-.stage.is-ready[data-shot="hero"] .readout {
-  opacity: 1;
-  transform: none;
-}
-.readout-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--concrete);
-}
-.readout-title i {
-  position: relative;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--signal);
-}
 /* The ping: a disc that grows from the dot (radius 3 → 12 px) and fades. Transform and opacity
    run on the compositor; the box-shadow version repainted the page on every frame. */
-.readout-title i::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: rgb(255 90 31);
-  opacity: 0;
-  animation: ping 2.4s var(--ease-settle) infinite;
-}
-@keyframes ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  70%,
-  100% {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-.readout dl {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 14px;
-  margin: 12px 0 10px;
-}
-.readout dl div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.readout dt {
-  color: var(--concrete);
-  font-weight: 400;
-}
-.readout dd {
-  margin: 0;
-  color: var(--bone);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-}
-.readout .status {
-  grid-column: 1 / -1;
-}
-.readout .status dd {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.readout .status dd::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 1px;
-  background: var(--bone);
-}
-.readout .status-short dd::before,
-.readout .status-new dd::before {
-  background: var(--signal);
-}
-.readout .status-over dd::before {
-  background: #5a5c55;
-}
-.readout .status-sheet dd::before {
-  background: var(--forecast);
-}
-.readout-hint {
-  margin: 12px 0 10px;
-  color: var(--bone);
-  letter-spacing: 0.08em;
-}
-.readout-note {
-  color: var(--concrete-dim);
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-}
 
 /* ---------- Header ---------- */
 .site-header {
@@ -398,10 +212,6 @@
   border-color: rgb(255 90 31 / 0.5);
 }
 /* Calm: loops hold still (the field and the signal cycle stop in script). */
-.is-calm .readout-title i::before,
-.is-calm .hero-scroll i::after {
-  animation-play-state: paused;
-}
 .index-controls {
   display: flex;
   align-items: center;
@@ -520,74 +330,6 @@
   color: var(--concrete);
 }
 
-/* ---------- State rail ---------- */
-.state-rail {
-  position: fixed;
-  right: max(14px, calc(var(--gutter) - 30px));
-  top: 50%;
-  z-index: 30;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 6px 0;
-  mix-blend-mode: difference;
-  color: #e8e6e1;
-}
-.rail-line {
-  position: absolute;
-  right: 3.5px;
-  top: 10px;
-  bottom: 10px;
-  width: 1px;
-  background: rgb(232 230 225 / 0.25);
-}
-.rail-line i {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 100%;
-  background: currentColor;
-  transform-origin: top;
-  transform: scaleY(var(--progress, 0));
-}
-.rail-item {
-  position: relative;
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-}
-.rail-item i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  background: #000;
-  transition:
-    background-color var(--t-ui),
-    transform var(--t-ui) var(--ease-settle);
-}
-.rail-item span {
-  font-size: 0.625rem;
-  opacity: 0;
-  transform: translateX(6px);
-  transition:
-    opacity var(--t-ui),
-    transform var(--t-ui) var(--ease-settle);
-}
-.rail-item.is-past i {
-  background: currentColor;
-}
-.rail-item.is-active i {
-  background: currentColor;
-  transform: scale(1.35);
-}
-.rail-item.is-active span,
-.state-rail:hover .rail-item span {
-  opacity: 1;
-  transform: none;
-}
 
 /* ---------- Cursor annotation ---------- */
 .cursor {
@@ -650,14 +392,6 @@
 }
 
 /* ---------- Poster mode (used to render the static fallback) ---------- */
-.poster-mode .site-header,
-.poster-mode .state-rail,
-.poster-mode main,
-.poster-mode .cursor,
-.poster-mode .skip-link,
-.poster-mode .readout {
-  display: none !important;
-}
 
 /* The chapter links need ~1200px beside the actions; below that they live in the index dialog. */
 @media (max-width: 1200px) {
@@ -671,12 +405,6 @@
     grid-template-columns: 1fr auto;
   }
 }
-@media (max-width: 1100px) {
-  .state-rail,
-  .readout {
-    display: none;
-  }
-}
 @media (max-width: 700px) {
   :root {
     --header-h: 64px;
@@ -686,10 +414,6 @@
     display: none;
   }
   .brand-deva {
-    display: none;
-  }
-  .readout,
-  .stage-anchors {
     display: none;
   }
 }
@@ -742,115 +466,16 @@
 }
 
 /* ---------- Phone dock ---------- */
-.dock {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 40;
-  display: flex;
-  gap: 8px;
-  padding: 6px;
-  border: 1px solid var(--line-dark-2);
-  border-radius: 999px;
-  background: rgb(20 22 19 / 0.88);
-  backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
-  transition:
-    transform 420ms var(--ease-settle),
-    opacity 420ms var(--ease-settle),
-    visibility 0s;
-}
-.dock.is-hidden {
-  transform: translateY(calc(100% + 24px));
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    transform 360ms var(--ease-move),
-    opacity 360ms var(--ease-move),
-    visibility 0s linear 360ms;
-}
-.dock-talk {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 46px;
-  border-radius: 999px;
-  background: var(--signal);
-  color: var(--ink);
-  font-weight: 650;
-}
-.dock-talk:active,
-.dock-jump:active {
-  transform: scale(0.97);
-}
-.dock-jump {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid var(--line-dark-2);
-  color: var(--bone);
-}
 @media (max-width: 699px) {
   /* Focus and anchors land above the dock, not under it (WCAG 2.4.11). */
   html {
     scroll-padding-bottom: 84px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .dock,
-  .dock.is-hidden {
-    transition: none;
-  }
-}
 
 /* Hero "Explore the warehouse": invisible (and out of the tab order) until the field runs;
    phones reach explore from the dock. */
-.hero-explore:not([data-ready="true"]) {
-  visibility: hidden;
-}
-@media (max-width: 699px) {
-  .hero-ctas .hero-explore {
-    display: none;
-  }
-}
-.dock-icon {
-  padding: 0;
-  width: 46px;
-  justify-content: center;
-}
 @media (max-width: 359px) {
   /* The narrowest phones: "Jump to" becomes an icon too (its label stays for assistive tech). */
-  .dock-jump span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  .dock-jump {
-    padding: 0 14px;
-  }
 }
 /* A quiet text button (hero: Explore the warehouse). */
-.btn-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 6px;
-  color: var(--bone);
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgb(236 232 223 / 0.35);
-  text-underline-offset: 6px;
-  transition: text-decoration-color var(--t-ui);
-}
-.btn-text:hover {
-  text-decoration-color: var(--signal);
-}

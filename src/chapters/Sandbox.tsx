@@ -1,10 +1,15 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { PackageCheck, RefreshCw, TrendingDown, TrendingUp, Zap } from "lucide-react";
 import { useCopy } from "../copy";
-import { prefersReducedMotion } from "../lib/motion";
+import { useToolCopy } from "./toolCopy";
+import { ScenarioShare } from "./ScenarioShare";
+import { track } from "../lib/analytics";
+import { prefersReducedMotion } from "../lib/kinetic";
 import { visit } from "../lib/visit";
 import { Odometer } from "../components/Odometer";
 import { snapToDetent, tick, usePuck } from "../lib/detents";
+import "../styles/instruments.css";
+import "../styles/tools.css";
 
 export interface Point {
   week: number;
@@ -80,13 +85,15 @@ function useTween(data: Point[], instant: boolean) {
 }
 
 export function Sandbox() {
-  const { forecast: c, contact } = useCopy();
+  const tc = useToolCopy(), c = tc.forecast, { contact } = useCopy();
   const [scenario, setScenario] = useState(0);
   const [horizon, setHorizon] = useState(13);
   const [offset, setOffset] = useState(0);
   const [drag, setDrag] = useState<number | null>(null);
   const [hover, setHover] = useState<number | null>(null);
   const [width, setWidth] = useState(720);
+  // The chart gives up height on short screens so it stays above the fold (674px laptops included).
+  const [viewport, setViewport] = useState(() => window.innerHeight);
   const box = useRef<HTMLDivElement>(null);
   const scenarioSeg = usePuck<HTMLDivElement>();
   const gid = useId().replace(/:/g, "");
@@ -111,10 +118,16 @@ export function Sandbox() {
     if (!el) return;
     const ro = new ResizeObserver(([e]) => setWidth(Math.max(280, e.contentRect.width)));
     ro.observe(el);
-    return () => ro.disconnect();
+    const tall = () => setViewport(window.innerHeight);
+    window.addEventListener("resize", tall);
+    return () => { ro.disconnect(); window.removeEventListener("resize", tall); };
   }, []);
 
-  const height = width < 560 ? 250 : 320;
+  const height = Math.min(width < 560 ? 250 : 320, Math.max(170, viewport - 470));
+  const choose = (next: number) => {
+    setScenario(next);
+    track("scenario_changed", { tool: "forecast", scenario: ["baseline", "price_cut", "viral_spike"][next] });
+  };
   const m = { l: 46, r: 14, t: 26, b: 30 };
   const yMax = Math.max(2400, Math.ceil(Math.max(...data.map(d => d.hi)) / 400) * 400);
   const x = (i: number) => m.l + (i / (horizon - 1)) * (width - m.l - m.r);
@@ -150,14 +163,14 @@ export function Sandbox() {
       <div className="sandbox-toolbar">
         <div ref={scenarioSeg} className="seg" role="group" aria-label="Forecast scenario">
           {c.scenarios.map((s, i) => (
-            <button key={s} aria-pressed={scenario === i} onClick={() => setScenario(i)}>
+            <button key={s} aria-pressed={scenario === i} onClick={() => choose(i)}>
               {i === 2 && <Zap size={13} aria-hidden="true" />} {s}
             </button>
           ))}
         </div>
         <label className="select">
           <span className="sr-only">Forecast horizon</span>
-          <select aria-label="Forecast horizon" value={horizon} onChange={e => setHorizon(+e.target.value)}>
+          <select aria-label="Forecast horizon" value={horizon} onChange={e => { setHorizon(+e.target.value); track("scenario_changed", { tool: "forecast", horizon: +e.target.value }); }}>
             {[13, 26, 52].map(v => (
               <option key={v} value={v}>
                 {c.horizon(v)}
@@ -197,6 +210,7 @@ export function Sandbox() {
         onPointerCancel={() => setDrag(null)}
         onPointerLeave={() => setHover(null)}
       >
+        <span className="chart-ribbon mono">{tc.share.illustrative}</span>
         <svg width={width} height={height} role="img" aria-label={`${c.chartLabel}: ${c.expected} ${last.median} ${c.perWeek}, ${c.range} ${last.lo}–${last.hi}.`}>
           <defs>
             <linearGradient id={`band-${gid}`} x1="0" y1="0" x2="0" y2="1">
@@ -287,15 +301,15 @@ export function Sandbox() {
           {offset}
         </output>
         <button
-          className="icon-button"
+          className="sandbox-reset"
           onClick={() => {
             setOffset(0);
             setScenario(0);
+            setHorizon(13);
           }}
-          aria-label="Reset forecast"
-          title={c.reset}
         >
-          <RefreshCw size={15} />
+          <RefreshCw size={15} aria-hidden="true" />
+          {c.reset}
         </button>
       </div>
       <p className="sandbox-hint mono">{c.drag}</p>
@@ -318,6 +332,7 @@ export function Sandbox() {
         <span className="mono muted">{c.leadTime}</span>
         <span className="mono muted">{c.check}</span>
       </div>
+      <ScenarioShare tool="forecast" line={contact.sandbox(c.scenarios[scenario], quantity.toLocaleString("en-US"))} />
     </div>
   );
 }

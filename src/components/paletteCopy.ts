@@ -8,9 +8,8 @@ export interface PaletteCopy {
   results: (n: number) => string;
   empty: string;
   keys: string;
-  chapters: Record<string, string>;
-  tools: { roi: string; sandbox: string; connectors: string; stories: string; film: string };
-  actions: { pause: string; play: string; explore: string; tilt: string; tiltOff: string; whatsapp: string; email: string; copy: string; copied: string; copyFail: string };
+  tools: { stories: string };
+  actions: { pause: string; play: string; whatsapp: string; email: string; copy: string; copied: string; copyFail: string };
 }
 
 export const paletteCopy: Record<Lang, PaletteCopy> = {
@@ -21,27 +20,10 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
     results: n => (n === 1 ? "1 result" : `${n} results`),
     empty: "Nothing matches. Try “ROI”, “sandbox” or “Hindi”.",
     keys: "↑↓ move · Enter open · Esc close",
-    chapters: {
-      top: "Start: Stock what sells",
-      signal: "Signal: the world moves",
-      problems: "The cost of guessing",
-      forecast: "Forecast: three steps",
-      command: "Try the forecast",
-      decide: "Decide: order, move, mark down",
-      industries: "Your industry",
-      integrations: "Integrations",
-      roi: "Proof: the business case",
-      stories: "When the forecast is wrong",
-      security: "Security",
-      contact: "Talk to us",
-    },
-    tools: { roi: "ROI calculator", sandbox: "Forecast sandbox", connectors: "Search integrations", stories: "Public inventory failures", film: "Watch the 20-second film" },
+    tools: { stories: "Public inventory failures" },
     actions: {
       pause: "Pause motion",
       play: "Play motion",
-      explore: "Explore the warehouse",
-      tilt: "Tilt your phone to look around",
-      tiltOff: "Stop tilt to look",
       whatsapp: "Chat on WhatsApp",
       email: "Send an email",
       copy: "Copy email address",
@@ -56,27 +38,10 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
     results: n => `${n} परिणाम`,
     empty: "कुछ नहीं मिला। “ROI”, “सैंडबॉक्स” या “हिन्दी” आज़माएँ।",
     keys: "↑↓ चुनें · Enter खोलें · Esc बंद करें",
-    chapters: {
-      top: "शुरुआत: जो बिकता है, वही रखें",
-      signal: "संकेत: दुनिया बदलती है",
-      problems: "अंदाज़े की कीमत",
-      forecast: "पूर्वानुमान: तीन कदम",
-      command: "पूर्वानुमान आज़माएँ",
-      decide: "निर्णय: ऑर्डर, ट्रांसफ़र, मार्कडाउन",
-      industries: "आपका उद्योग",
-      integrations: "इंटीग्रेशन",
-      roi: "प्रमाण: कारोबारी फ़ायदा",
-      stories: "जब पूर्वानुमान गलत होता है",
-      security: "सुरक्षा",
-      contact: "बात करें",
-    },
-    tools: { roi: "ROI कैलकुलेटर", sandbox: "पूर्वानुमान सैंडबॉक्स", connectors: "इंटीग्रेशन खोजें", stories: "स्टॉक की सार्वजनिक विफलताएँ", film: "20 सेकंड की फ़िल्म देखें" },
+    tools: { stories: "स्टॉक की सार्वजनिक विफलताएँ" },
     actions: {
       pause: "गति रोकें",
       play: "गति चालू करें",
-      explore: "गोदाम में घूमें",
-      tilt: "फ़ोन झुकाकर चारों ओर देखें",
-      tiltOff: "झुकाकर देखना बंद करें",
       whatsapp: "WhatsApp पर बात करें",
       email: "ईमेल भेजें",
       copy: "ईमेल पता कॉपी करें",
@@ -91,27 +56,10 @@ export const paletteCopy: Record<Lang, PaletteCopy> = {
     results: n => `${n} ఫలితాలు`,
     empty: "ఏమీ దొరకలేదు. “ROI”, “శాండ్‌బాక్స్” లేదా “తెలుగు” ప్రయత్నించండి.",
     keys: "↑↓ ఎంచుకోండి · Enter తెరవండి · Esc మూసివేయండి",
-    chapters: {
-      top: "ప్రారంభం: అమ్ముడయ్యేదే నిల్వ చేయండి",
-      signal: "సంకేతం: ప్రపంచం మారుతుంది",
-      problems: "ఊహించడం వల్ల నష్టం",
-      forecast: "అంచనా: మూడు దశలు",
-      command: "అంచనాను ప్రయత్నించండి",
-      decide: "నిర్ణయం: ఆర్డర్, బదిలీ, మార్క్‌డౌన్",
-      industries: "మీ పరిశ్రమ",
-      integrations: "ఇంటిగ్రేషన్‌లు",
-      roi: "రుజువు: వ్యాపార లాభం",
-      stories: "అంచనా తప్పినప్పుడు",
-      security: "భద్రత",
-      contact: "మాట్లాడండి",
-    },
-    tools: { roi: "ROI కాలిక్యులేటర్", sandbox: "అంచనా శాండ్‌బాక్స్", connectors: "ఇంటిగ్రేషన్‌లను వెతకండి", stories: "బహిరంగ స్టాక్ వైఫల్యాలు", film: "20 సెకన్ల ఫిల్మ్ చూడండి" },
+    tools: { stories: "బహిరంగ స్టాక్ వైఫల్యాలు" },
     actions: {
       pause: "కదలిక ఆపండి",
       play: "కదలిక ప్రారంభించండి",
-      explore: "గోదాములో తిరగండి",
-      tilt: "ఫోన్ వంచి చుట్టూ చూడండి",
-      tiltOff: "వంచి చూడటం ఆపండి",
       whatsapp: "WhatsAppలో మాట్లాడండి",
       email: "ఈమెయిల్ పంపండి",
       copy: "ఈమెయిల్ చిరునామా కాపీ చేయండి",

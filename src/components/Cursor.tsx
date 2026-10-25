@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { prefersReducedMotion } from "../lib/motion";
+import { prefersReducedMotion } from "../lib/kinetic";
 import { useMotion } from "../lib/prefs";
 
 /**

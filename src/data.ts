@@ -121,54 +121,6 @@ export const connectors = {
     "Parquet / CSV / Excel",
   ],
 };
-export const optimizers = [
-  {
-    name: "Order the right amount",
-    label: "Newsvendor + EOQ",
-    desc: "Balance carrying cost against lost sales at the optimal order quantity.",
-    file: "optimization/eoq.py",
-    result: "Order 1,240 units",
-    detail: "Service target 95% · Lead time 14 days",
-    icon: "PackageCheck",
-  },
-  {
-    name: "Balance stock across locations",
-    label: "Network intelligence",
-    desc: "Put safety stock in the right place, across every node in your network.",
-    file: "optimization/multi_echelon.py",
-    result: "Transfer 360 units",
-    detail: "Central hub → West distribution center",
-    icon: "Network",
-  },
-  {
-    name: "Adapt as demand changes",
-    label: "Ray RLlib PPO + OR-Tools",
-    desc: "Continuously adapt replenishment policies to changing real-world conditions.",
-    file: "optimization/rl_replenishment.py",
-    result: "Reorder point 820",
-    detail: "PPO policy · simulation reward +12.8%",
-    icon: "Bot",
-  },
-  {
-    name: "Time your markdowns",
-    label: "Margin-aware pricing",
-    desc: "Find the right price and moment before inventory becomes dead stock.",
-    file: "optimization/markdown.py",
-    result: "Markdown 12% in W8",
-    detail: "Projected sell-through 92% · margin protected",
-    icon: "Tags",
-  },
-];
-// Problem and story text lives in i18n.ts; these carry the language-neutral parts.
-export const problemIcons = [
-  "PackageX",
-  "Warehouse",
-  "FileSpreadsheet",
-  "Sparkles",
-  "CloudSun",
-  "MapPin",
-];
-
 export const storyMeta: {
   region: "india" | "global";
   year: string;

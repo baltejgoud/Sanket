@@ -1,0 +1,597 @@
+{
+  "jump-nav-warehouse": {
+    "header": 94,
+    "kickers": [
+      {
+        "t": "02Your warehouse",
+        "top": 88
+      }
+    ],
+    "focus": "BODY"
+  },
+  "jump-nav-problems": {
+    "header": 94,
+    "kickers": [
+      {
+        "t": "03The problem",
+        "top": 88
+      }
+    ],
+    "focus": "BODY"
+  },
+  "jump-begin": {
+    "header": 94,
+    "kickers": [
+      {
+        "t": "02Your warehouse",
+        "top": 88
+      }
+    ],
+    "focus": "BODY"
+  },
+  "jump-skip-tools": {
+    "header": 94,
+    "kickers": [
+      {
+        "t": "04What we do",
+        "top": 88
+      }
+    ],
+    "focus": "BODY"
+  },
+  "racks-1440": [
+    [
+      "A1 · Steady sellerStock matches demand",
+      413,
+      277,
+      543,
+      312
+    ],
+    [
+      "A2 · Selling fastRuns out in about 9 days",
+      523,
+      287,
+      643,
+      321
+    ],
+    [
+      "A3 · Spare stockCould supply a transfer",
+      634,
+      368,
+      759,
+      402
+    ],
+    [
+      "A4 · Selling slowlyAbout 120 days of stock",
+      753,
+      385,
+      887,
+      420
+    ]
+  ],
+  "racks-375": [
+    [
+      "A1 · Steady sellerStock matches demand",
+      28,
+      203,
+      138,
+      230
+    ],
+    [
+      "A2 · Selling fastRuns out in about 9 days",
+      79,
+      188,
+      180,
+      216
+    ],
+    [
+      "A3 · Spare stockCould supply a transfer",
+      125,
+      242,
+      230,
+      270
+    ],
+    [
+      "A4 · Selling slowlyAbout 120 days of stock",
+      173,
+      230,
+      285,
+      257
+    ]
+  ],
+  "forecast-contrast": [
+    {
+      "text": "SKU-1042",
+      "tag": "span.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "Model calibrated",
+      "tag": "span.calibrated",
+      "color": "rgb(42, 100, 87)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.65
+    },
+    {
+      "text": "Baseline",
+      "tag": "button",
+      "color": "rgb(236, 232, 223)",
+      "bg": "rgb(226,221,209)",
+      "size": "14px",
+      "ratio": 1.11
+    },
+    {
+      "text": "13-week horizon",
+      "tag": "select",
+      "color": "rgb(236, 232, 223)",
+      "bg": "rgb(226,221,209)",
+      "size": "14.4px",
+      "ratio": 1.11
+    },
+    {
+      "text": "Expected demand",
+      "tag": "span.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "units / week",
+      "tag": "small",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "15.2px",
+      "ratio": 2.09
+    },
+    {
+      "text": "+12.4%",
+      "tag": "span.delta",
+      "color": "rgb(42, 100, 87)",
+      "bg": "rgb(20,33,24)",
+      "size": "14.4px",
+      "ratio": 2.41
+    },
+    {
+      "text": "vs. prior period",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(20,33,24)",
+      "size": "14.4px",
+      "ratio": 1.9
+    },
+    {
+      "text": "Actual demand",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "p50 forecast",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "p10–p90 range",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "Demand adjustment",
+      "tag": "label",
+      "color": "rgb(236, 232, 223)",
+      "bg": "rgb(226,221,209)",
+      "size": "14.4px",
+      "ratio": 1.11
+    },
+    {
+      "text": "0",
+      "tag": "output.mono",
+      "color": "rgb(236, 232, 223)",
+      "bg": "rgb(226,221,209)",
+      "size": "11px",
+      "ratio": 1.11
+    },
+    {
+      "text": "Drag the chart, or use the demand slider",
+      "tag": "p.sandbox-hint",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "11px",
+      "ratio": 2.09
+    },
+    {
+      "text": "Technical details",
+      "tag": "summary",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "14.4px",
+      "ratio": 2.09
+    },
+    {
+      "text": "Forecast range: p10–p90. The centre line",
+      "tag": "p",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(17,23,15)",
+      "size": "14.72px",
+      "ratio": 2.09
+    }
+  ],
+  "roi-figure-1440": {
+    "text": "₹5,60,00,000",
+    "lines": 2,
+    "h": 154.875,
+    "w": 411.640625
+  },
+  "roi-contrast": [
+    {
+      "text": "₹ INR",
+      "tag": "button",
+      "color": "rgb(11, 12, 10)",
+      "bg": "rgb(11,12,10)",
+      "size": "14px",
+      "ratio": 1
+    },
+    {
+      "text": "Enterprise",
+      "tag": "button",
+      "color": "rgb(11, 12, 10)",
+      "bg": "rgb(11,12,10)",
+      "size": "14px",
+      "ratio": 1
+    },
+    {
+      "text": "Edit savings assumptions",
+      "tag": "summary",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.4px",
+      "ratio": 2.25
+    },
+    {
+      "text": "See the calculation",
+      "tag": "summary",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.4px",
+      "ratio": 2.25
+    },
+    {
+      "text": "Inventory carrying savings = ₹1,00,00,00",
+      "tag": "p",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.72px",
+      "ratio": 2.25
+    },
+    {
+      "text": "Lost sales recovery = ₹5,00,00,00,000 × ",
+      "tag": "p",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.72px",
+      "ratio": 2.25
+    },
+    {
+      "text": "Expedited freight savings = ₹1,75,00,000",
+      "tag": "p",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.72px",
+      "ratio": 2.25
+    },
+    {
+      "text": "End-of-season markdowns = ₹6,00,00,000 ×",
+      "tag": "p",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(11,12,10)",
+      "size": "14.72px",
+      "ratio": 2.25
+    },
+    {
+      "text": "All",
+      "tag": "button",
+      "color": "rgb(236, 232, 223)",
+      "bg": "rgb(226,221,209)",
+      "size": "14px",
+      "ratio": 1.11
+    },
+    {
+      "text": "Car sales fell in August 2024, yet manuf",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Push-based planning ignores what buyers ",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Moneylife / FADA",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "In April 2021, families queued for Remde",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "A spike isn't the new normal. SANKET sep",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Udayavani / PTI",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "·",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Scrip",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "BS-IV vehicles could not be sold after 3",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "When a cut-off date is coming, every ord",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Autocar Professional",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "·",
+      "tag": "span",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "BW Businessworld",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "A new demand-planning system over-ordere",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "A forecast you can't question is a forec",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "CIO",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "As shoppers shifted online and to cheape",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Demand shifts show up in search trends a",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "NPR",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Target opened 133 Canadian stores before",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "THE LESSON",
+      "tag": "span.mono",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "Stock in the wrong place costs as much a",
+      "tag": "p",
+      "color": "rgb(27, 29, 26)",
+      "bg": "rgb(236,232,223)",
+      "size": "17px",
+      "ratio": 1
+    },
+    {
+      "text": "Source :",
+      "tag": "p.mono",
+      "color": "rgb(74, 76, 70)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    },
+    {
+      "text": "PBS NewsHour",
+      "tag": "a",
+      "color": "rgb(168, 58, 13)",
+      "bg": "rgb(236,232,223)",
+      "size": "11px",
+      "ratio": 1
+    }
+  ],
+  "roi-figure-390": {
+    "text": "₹5,60,00,000",
+    "lines": 2,
+    "h": 89.59375,
+    "w": 270
+  },
+  "targets": [
+    [
+      "Back to top",
+      76,
+      16
+    ]
+  ]
+}
