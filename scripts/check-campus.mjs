@@ -48,6 +48,34 @@ assert.deepEqual(sampleTimeline(2.12).position, sampleTimeline(2.24).position, '
 assert.notDeepEqual(sampleTimeline(1.1, true).position, sampleTimeline(1.7, true).position, 'Reduced motion must still show each distinct scene');
 console.log('PASS: 501 forward/backward snapshots, continuous cameras, sequence ordering, reduced-motion views, section mapping, and final settled state.');
 
+// The story forklift (life.ts): a pure function of the scrolled pick and loading. Transpiled next to
+// node_modules so its three.js import resolves.
+{
+  const lifeSource = await fs.readFile(new URL('../src/campus/life.ts', import.meta.url), 'utf8');
+  const cache = new URL('../node_modules/.cache/', import.meta.url);
+  await fs.mkdir(cache, { recursive: true });
+  const file = new URL('sanket-life-check.mjs', cache);
+  await fs.writeFile(file, ts.transpileModule(lifeSource, { compilerOptions: { module: ts.ModuleKind.ES2020, target: ts.ScriptTarget.ES2020 } }).outputText);
+  const { storyLift } = await import(file.href);
+  const pallet = ({ lift: s }) => [s.x + Math.sin(s.yaw) * 1.6, .735 + s.fork, s.z + Math.cos(s.yaw) * 1.6];
+  assert.deepEqual([storyLift(0, 0).lift.x, storyLift(0, 0).lift.z, storyLift(0, 0).attached], [4.5, -4.9, false], 'The forklift waits deep in the aisle');
+  const lift = storyLift(.361, 0);
+  assert(lift.attached && Math.hypot(...pallet(lift).map((v, i) => v - [6.6, 2.15, -2][i])) < .03, `Forks take the pallet from its A3 slot: ${pallet(lift)}`);
+  const docked = storyLift(1, 0).lift;
+  assert(Math.hypot(docked.x - 1.4, docked.z - 4.9) < .01 && storyLift(1, 0).attached, 'The pallet arrives at dock 02 on the forks');
+  assert(!storyLift(1, 1).attached, 'The pallet stays in the truck after loading');
+  let previous = storyLift(0, 0).lift;
+  for (let i = 1; i <= 2000; i++) {
+    const u = Math.min(1, i / 1000), l = Math.max(0, i / 1000 - 1), s = storyLift(u, l);
+    assert(Math.hypot(s.lift.x - previous.x, s.lift.z - previous.z) < .08, `Forklift jumps at u=${u} l=${l}`);
+    // Lowered with a pallet inside the rack block, the load must stay in the aisle (rack faces at x 3.13 and 5.87).
+    const [px, , pz] = pallet(s);
+    if (s.attached && s.lift.fork < 1 && pz < 2.3) assert(px > 3.13 + .55 && px < 5.87 - .55, `Lowered pallet clips a rack at u=${u}: ${px}`);
+    previous = s.lift;
+  }
+  console.log('PASS: story forklift takes the A3 pallet from its slot, keeps it in the aisle, docks and leaves it in the truck, without jumps.');
+}
+
 // Browser regression (needs a running site): a page loaded in a background tab must still reach the
 // ready stage once revealed. Runs when SANKET_TEST_URL is set, e.g. against `npm run dev` or preview.
 if (process.env.SANKET_TEST_URL) {

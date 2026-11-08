@@ -41,6 +41,13 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
     leaf2: new T.MeshStandardMaterial({ color: '#4b5139', roughness: 1, flatShading: true }),
     soil: new T.MeshStandardMaterial({ color: '#282d20', roughness: 1 }),
     mint: new T.MeshStandardMaterial({ color: '#9ee5c9', emissive: '#73cba6', emissiveIntensity: .2, roughness: .6, transparent: true, opacity: .62, depthWrite: false }),
+    // Product looks per rack: older, dustier cartons for the slow seller, stretch film over its pallets.
+    cartonOld: new T.MeshStandardMaterial({ color: '#a59b84', roughness: .97 }),
+    wrap: new T.MeshStandardMaterial({ color: '#e4ece9', roughness: .16, metalness: .05, transparent: true, opacity: .24, depthWrite: false }),
+    cabDark: new T.MeshStandardMaterial({ color: '#34504a', roughness: .45, metalness: .25 }),
+    rubber: new T.MeshStandardMaterial({ color: '#151815', roughness: .92 }),
+    // Status light on equipment SANKET's plan directs (robots, the supervisor's tablet).
+    mintLight: new T.MeshStandardMaterial({ color: '#a8e6ce', emissive: '#7fdcb6', emissiveIntensity: 1.25 }),
   };
   // Fine, deterministic surface grain keeps close shots from reading as plastic blocks.
   function grain(base: string, strength: number, repeat: number) {
@@ -61,9 +68,12 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
   materials.stone.map = grain('#e2e0d9', .08, 9);
   materials.road.map = grain('#c9cecc', .16, 12);
   materials.carton.map = grain('#f4ecdc', .07, 1);
+  materials.cartonOld.map = grain('#eee5d2', .12, 1);
   type Mat = keyof typeof materials;
   const boxGeo = new T.BoxGeometry(1, 1, 1);
   const bevelGeo = new RoundedBoxGeometry(1, 1, 1, 2, .045);
+  // A third of the triangles, for the many small cartons that are never seen up close.
+  const liteGeo = new RoundedBoxGeometry(1, 1, 1, 1, .04);
   const cylinderGeo = new T.CylinderGeometry(1, 1, 1, 12);
   const foliageGeo = new T.IcosahedronGeometry(1, 1);
   const groups = new Set<T.Group>([root, roof, frontWall, selectedStock]);
@@ -78,6 +88,7 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
     buckets.get(g)!.get(key)!.matrices.push(dummy.matrix.clone());
   }
   const box = (g: T.Group, m: Mat, x: number, y: number, z: number, w: number, h: number, d: number, bevel = false, ry = 0) => add(g, bevel ? bevelGeo : boxGeo, m, x, y, z, w, h, d, 0, ry);
+  const lite = (g: T.Group, m: Mat, x: number, y: number, z: number, w: number, h: number, d: number) => add(g, liteGeo, m, x, y, z, w, h, d);
   const cylinder = (g: T.Group, m: Mat, x: number, y: number, z: number, r: number, h: number, rz = 0) => add(g, cylinderGeo, m, x, y, z, r, h, r, rz);
   function beam(g: T.Group, m: Mat, a: T.Vector3, b: T.Vector3, thickness = .06) {
     dummy.position.copy(a).add(b).multiplyScalar(.5); dummy.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), b.clone().sub(a).normalize());
@@ -238,15 +249,47 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
     box(root, 'lampStreet', x + .5, 4.86, z, .3, .055, .14);
   }
   [[-16, -7], [-16, 7], [16.5, -7], [16.5, 7], [-5, 12], [5, 12], [-17, -13], [10, -13]].forEach(([x, z]) => streetLamp(x, z));
-  // Actual slatted pallets and individually strapped cartons.
-  function pallet(g: T.Group, x: number, y: number, z: number, accent = false, boxes = true) {
+  // Actual slatted pallets and individually strapped cartons. Each rack holds a different product,
+  // so the four racks read apart even without their tags: steady kraft cartons (A1), small fast-moving
+  // cartons with an orange band (A2), double-stacked spare stock (A3) and film-wrapped, dusty slow stock (A4).
+  type Kind = 'steady' | 'fast' | 'spare' | 'slow';
+  function pallet(g: T.Group, x: number, y: number, z: number, accent = false, boxes = true, kind: Kind = 'steady', variant = 0) {
     for (const dx of [-.48, 0, .48]) box(g, 'wood', x + dx, y + .08, z, .13, .15, 1.05);
     for (let dz = -.45; dz <= .45; dz += .18) box(g, 'wood', x, y + .19, z + dz, 1.2, .08, .13);
-    if (boxes) for (const dx of [-.29, .29]) for (const dz of [-.24, .24]) {
-      box(g, accent ? 'orange' : 'carton', x + dx, y + .62, z + dz, .55, .76, .45, true);
+    if (!boxes) return;
+    const skin: Mat = accent ? 'orange' : kind === 'slow' ? 'cartonOld' : 'carton';
+    if (kind === 'fast') {
+      for (const layer of [0, 1]) for (const dx of [-.39, 0, .39]) for (const dz of [-.24, .24]) {
+        // A fast seller is picked from the top: the front of the upper layer is often already gone.
+        if (layer === 1 && variant % 3 === 1 && dz > 0 && dx > 0) continue;
+        const h = .36, yy = y + .23 + h / 2 + layer * (h + .012);
+        lite(g, skin, x + dx, yy, z + dz, .37, h, .45);
+        box(g, 'orange', x + dx, yy + .04, z + dz + .229, .37, .05, .008);
+        if (layer === 1) box(g, 'tape', x + dx, yy + h / 2 + .004, z + dz, .045, .01, .46);
+      }
+      return;
+    }
+    if (kind === 'spare') {
+      for (const layer of [0, 1]) for (const dx of [-.29, .29]) for (const dz of [-.24, .24]) {
+        const h = .42, yy = y + .23 + h / 2 + layer * (h + .012);
+        lite(g, skin, x + dx, yy, z + dz, .55, h, .45);
+        box(g, 'tape', x + dx, yy + h / 2 + .004, z + dz, .055, .01, .46);
+        box(g, 'cream', x + dx + .12, yy, z + dz + .229, .16, .1, .008);
+      }
+      return;
+    }
+    for (const dx of [-.29, .29]) for (const dz of [-.24, .24]) {
+      // Steady stock is replenished regularly, so a few pallets are part-used.
+      if (kind === 'steady' && variant % 4 === 2 && dx > 0 && dz > 0) continue;
+      box(g, skin, x + dx, y + .62, z + dz, .55, .76, .45, true);
       box(g, 'tape', x + dx, y + 1.008, z + dz, .055, .01, .46);
       box(g, 'cream', x + dx, y + .65, z + dz + .233, .2, .12, .008);
       for (let line = 0; line < 5; line++) box(g, 'dark', x + dx - .065 + line * .026, y + .65, z + dz + .239, line % 2 ? .009 : .014, .075, .005);
+    }
+    // Slow stock has sat long enough to stay wrapped: a film skin and a corner board over the cartons.
+    if (kind === 'slow') {
+      lite(g, 'wrap', x, y + .62, z, 1.17, .8, .98);
+      for (const dx of [-.585, .585]) box(g, 'cream', x + dx, y + .62, z + .49, .03, .78, .05);
     }
   }
   await pause();
@@ -257,10 +300,12 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
       box(root, 'frame', x + dx, 2.6, z + dz, .075, 4.6, .075);
       box(root, 'orange', x + dx, .65, z + dz, .1, .6, .1);
     }
-    for (const y of [.6, 2.1, 3.6]) {
+    const kind: Kind = x === 2.4 ? 'fast' : x === 6.6 ? 'spare' : x === 10.8 ? 'slow' : 'steady';
+    for (const [level, y] of [.6, 2.1, 3.6].entries()) {
       for (const dx of [-.73, .73]) box(root, 'orange', x + dx, y, z, .07, .11, 1.7);
       box(root, 'silver', x, y, z, 1.4, .06, 1.62);
-      pallet(x === 2.4 ? demandStock : x === 6.6 && b === 2 && y === 2.1 ? selectedStock : root, x, y + .05, z, (b + Math.round(x)) % 7 === 0);
+      // The selected A3 pallet keeps the shared carton material so the decision beat can light it.
+      pallet(x === 2.4 ? demandStock : x === 6.6 && b === 2 && y === 2.1 ? selectedStock : root, x, y + .05, z, kind === 'steady' && (b + Math.round(x)) % 7 === 0, true, kind, b * 3 + level);
     }
     for (const dz of [-.83, .83]) for (const y of [.7, 2.2]) beam(root, 'silver', new T.Vector3(x - .7, y, z + dz), new T.Vector3(x + .7, y + 1.35, z + dz), .025);
   }
@@ -296,13 +341,16 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
   for (const x of [1, 4, 8]) box(root, 'frame', x, .7, -6.4, .08, .6, .6);
   await pause();
   // Trucks have chassis, cab glazing, mirrors, corrugated trailer and wheel hubs.
-  function truck(x: number, z: number, rotation = 0) {
+  function truck(x: number, z: number, rotation = 0, cab: Mat = 'orange') {
     const g = new T.Group(); root.add(g); g.position.set(x, .28, z); g.rotation.y = rotation;
     box(g, 'frame', 0, .55, 0, 1.8, .24, 6.8, true);
     box(g, 'cream', 0, 1.65, -1, 2.15, 2.1, 4.9, true);
-    box(g, 'orange', 0, 1.4, 2.55, 2.12, 1.9, 1.6, true);
+    box(g, cab, 0, 1.4, 2.55, 2.12, 1.9, 1.6, true);
     box(g, 'glass', 0, 1.85, 3.37, 1.85, .7, .04);
-    box(g, 'orange', 0, 2.45, 2.5, 2.15, .2, 1.7, true);
+    box(g, cab, 0, 2.45, 2.5, 2.15, .2, 1.7, true);
+    // Rear doors and a hinge line, so a parked trailer reads as open for loading from the dock.
+    box(g, 'frame', 0, 1.65, -3.46, 2.1, 2.05, .03);
+    for (const dx of [-.52, .52]) box(g, 'silver', dx, 1.65, -3.48, .03, 1.9, .02);
     for (const dx of [-1.075, 1.075]) {
       box(g, 'glass', dx, 1.85, 2.6, .035, .65, 1.1);
       box(g, 'frame', dx * 1.1, 1.75, 3.3, .15, .24, .1, true);
@@ -318,21 +366,87 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
     return g;
   }
   const deliveryTruck = truck(1.4, 10);
-  truck(8.6, 10); const ambientTruck = truck(-8, 16.2, Math.PI / 2);
+  const dockTruck = truck(8.6, 10, 0, 'cabDark');
+  const ambientTruck = truck(-8, 16.2, Math.PI / 2);
+  // Road traffic for the wide shots: a supplier truck, a delivery van and a car share the loop.
+  const supplierTruck = truck(0, 16.2, Math.PI / 2, 'cabDark');
+  function van(x: number, z: number) {
+    const g = new T.Group(); root.add(g); g.position.set(x, .28, z);
+    box(g, 'frame', 0, .42, 0, 1.6, .2, 4.4, true);
+    box(g, 'white', 0, 1.25, -.35, 1.85, 1.75, 3.6, true);
+    box(g, 'white', 0, 1.0, 1.65, 1.8, 1.25, 1.1, true);
+    box(g, 'glass', 0, 1.35, 2.18, 1.6, .5, .04);
+    for (const dx of [-.93, .93]) { box(g, 'glass', dx, 1.42, 1.5, .03, .45, .75); box(g, 'orange', dx, 1.1, -.4, .02, .18, 3.3); }
+    for (const dx of [-.62, .62]) { box(g, 'lampDock', dx, .95, 2.22, .26, .1, .04); box(g, 'signal', dx, .9, -2.17, .12, .14, .04); }
+    for (const dz of [-1.35, 1.4]) for (const dx of [-.86, .86]) cylinder(g, 'tyre', dx, .35, dz, .33, .2, Math.PI / 2);
+    return g;
+  }
+  function car(x: number, z: number) {
+    const g = new T.Group(); root.add(g); g.position.set(x, .28, z);
+    box(g, 'cabDark', 0, .5, 0, 1.45, .5, 3.4, true);
+    box(g, 'glass', 0, .95, -.15, 1.25, .5, 1.7, true);
+    box(g, 'cabDark', 0, 1.22, -.2, 1.28, .07, 1.25, true);
+    for (const dx of [-.5, .5]) { box(g, 'lampStreet', dx, .55, 1.71, .26, .08, .03); box(g, 'signal', dx, .55, -1.71, .22, .08, .03); }
+    for (const dx of [-.7, .7]) for (const dz of [-1.05, 1.05]) cylinder(g, 'tyre', dx, .28, dz, .26, .16, Math.PI / 2);
+    return g;
+  }
+  const deliveryVan = van(0, 16.2), passingCar = car(0, 16.2);
   function forklift(x: number, z: number) {
     const g = new T.Group(); root.add(g); g.position.set(x, .5, z);
     box(g, 'orange', 0, .55, 0, .95, .65, 1.45, true);
     box(g, 'dark', 0, 1, -.2, .48, .2, .5, true); box(g, 'dark', 0, 1.2, -.43, .48, .5, .12, true);
     for (const dx of [-.43, .43]) for (const dz of [-.5, .5]) box(g, 'frame', dx, 1.35, dz, .055, 1.5, .055);
     box(g, 'frame', 0, 2.1, 0, 1.05, .1, 1.25);
-    for (const dx of [-.3, .3]) { box(g, 'frame', dx, 1.05, .82, .08, 2, .11); box(g, 'silver', dx, .2, 1.25, .1, .07, .9); }
+    for (const dx of [-.3, .3]) box(g, 'frame', dx, 1.05, .82, .08, 2, .11);
+    box(g, 'signal', 0, 2.2, -.45, .1, .08, .1);
     for (const dx of [-.5, .5]) for (const dz of [-.5, .5]) cylinder(g, 'tyre', dx, .3, dz, .27, .16, Math.PI / 2);
     // Driver with hardhat and vest.
     box(g, 'orange', 0, 1.28, 0, .32, .42, .25, true); cylinder(g, 'cream', 0, 1.65, 0, .13, .21); cylinder(g, 'white', 0, 1.79, 0, .17, .08);
+    // The fork carriage and inner mast rise together (life.ts drives `carriage.position.y`).
+    const carriage = new T.Group(); g.add(carriage);
+    box(carriage, 'frame', 0, .52, .9, .74, .62, .05);
+    for (const dx of [-.22, .22]) box(carriage, 'frame', dx, 1.0, .87, .06, 1.85, .07);
+    for (const dx of [-.3, .3]) box(carriage, 'silver', dx, .2, 1.25, .1, .07, .9);
+    g.userData.carriage = carriage;
     return g;
   }
-  const lift = forklift(4.5, -.8); forklift(12.8, 3.8).rotation.y = -Math.PI / 2;
-  const movingPallet = new T.Group(); root.add(movingPallet); pallet(movingPallet, 0, 0, 0, true);
+  // The story forklift waits deep in the A2/A3 aisle; the second one loads the truck at dock 04.
+  const lift = forklift(4.5, -4.9), dockLift = forklift(10, 5.1); dockLift.rotation.y = Math.PI / 2;
+  const movingPallet = new T.Group(); root.add(movingPallet); pallet(movingPallet, 0, 0, 0, true, true, 'spare');
+  // Outbound pallets staged inside dock 05, and the one riding dock 04's forks.
+  const stagedPallet = new T.Group(); root.add(stagedPallet); stagedPallet.position.set(11.9, .5, 5.1); pallet(stagedPallet, 0, 0, 0, false, true, 'steady', 1);
+  pallet(root, 13.2, .5, 5.1, false, true, 'steady', 5);
+  lite(root, 'wrap', 13.2, 1.12, 5.1, 1.17, .8, .98);
+  const dockPallet = new T.Group(); root.add(dockPallet); pallet(dockPallet, 0, 0, 0, false, true, 'steady', 1);
+  // Autonomous carts carry totes between the racks and packing, guided by the plan (mint status light).
+  function robot() {
+    const g = new T.Group(); root.add(g);
+    box(g, 'dark', 0, .2, 0, .72, .26, 1.0, true);
+    box(g, 'dark', 0, .35, 0, .66, .04, .94);
+    box(g, 'mintLight', 0, .2, .505, .5, .05, .02);
+    for (const dx of [-.37, .37]) box(g, 'mintLight', dx, .2, 0, .02, .05, .6);
+    for (const [dz, h] of [[-.22, .26], [.22, .26], [-.22, .52], [.22, .52]]) lite(g, 'orange', 0, .37 + h - .13, dz, .6, .25, .4);
+    return g;
+  }
+  const robots = [robot(), robot()];
+  // Conveyor packing machine: cartons ride in from the left and disappear into it on the right.
+  box(root, 'frame', 9.55, 1.25, -6.35, 1.1, 1.5, 1.0, true);
+  box(root, 'dark', 9.0, 1.3, -6.35, .04, .5, .62);
+  box(root, 'lampDock', 9.55, 2.02, -5.84, .5, .05, .03);
+  box(root, 'cream', 9.55, 1.6, -5.84, .5, .25, .01);
+  // Picking trolley at the A1/A2 aisle mouth, where pickers drop what they collect.
+  box(root, 'frame', .3, .95, 3.35, .62, .05, .95);
+  box(root, 'frame', .3, .62, 3.35, .62, .04, .95);
+  for (const dx of [-.29, .29]) for (const dz of [-.45, .45]) box(root, 'frame', .3 + dx, .78, 3.35 + dz, .03, .55, .03);
+  for (const dz of [-.18, .2]) box(root, 'carton', .3, 1.12, 3.35 + dz, .4, .3, .34, true);
+  // Dock shelters and bumpers frame the two open doors from outside.
+  for (const x of [1.4, 8.6]) {
+    for (const dx of [-1.58, 1.58]) box(frontWall, 'rubber', x + dx, 2.35, 6.32, .22, 3.7, .2);
+    box(frontWall, 'rubber', x, 4.16, 6.32, 3.38, .26, .2);
+  }
+  // Floor zones: hatched staging squares inside the docks, the robots' lane east of A4.
+  for (const x of [1.4, 8.6, 12.4]) for (let k = -4; k <= 4; k++) box(root, 'cream', x + k * .17, .512, 5.25, .05, .006, 1.3, false, .7);
+  for (let z = -5.4; z < 3; z += .9) box(root, 'mintLight', 12.7, .508, z, .04, .004, .45);
   // Scene selection outlines are geometry, with no new render passes.
   const outlines = {} as Record<Facility, T.LineSegments>;
   const definitions: [Facility, number, number, number, number, number, number][] = [
@@ -373,5 +487,5 @@ export async function buildCampus(pause: () => Promise<void> = async () => {}) {
     mesh.instanceMatrix.copy(o.instanceMatrix); mesh.computeBoundingSphere(); proposedStock.add(mesh);
   });
   root.add(proposedStock);
-  return { root, demandStock, demandTarget, proposedStock, transferGuide, transferCurve, markdownZone, roof, frontWall, selectedStock, stockOutline, movingPallet, lift, deliveryTruck, ambientTruck, outlines, materials };
+  return { root, demandStock, demandTarget, proposedStock, transferGuide, transferCurve, markdownZone, roof, frontWall, selectedStock, stockOutline, movingPallet, lift, dockLift, stagedPallet, dockPallet, robots, deliveryTruck, dockTruck, ambientTruck, supplierTruck, deliveryVan, passingCar, outlines, materials };
 }

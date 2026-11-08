@@ -5,9 +5,10 @@ import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { buildCampus } from './models';
-import { sampleTimeline, facilityAnchors, type Facility, type TimelineState } from './timeline';
+import { sampleTimeline, heroFrame, facilityAnchors, type Facility, type TimelineState } from './timeline';
 import { createStreams } from './streams';
 import { createRackFocus } from './rackFocus';
+import { createLife } from './life';
 import { createAnnotations, type Vec } from './annotate';
 import './scene.css';
 
@@ -73,6 +74,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
   phaseStart = performance.now();
   const model = await buildCampus(nextTask); scene.add(model.root);
   const rackFocus = createRackFocus(); scene.add(rackFocus.group);
+  const life = createLife(model); scene.add(life.group);
   phase('model');
   await nextTask();
   phaseStart = performance.now();
@@ -160,9 +162,10 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
   const ghost = new T.Mesh(new T.BoxGeometry(1.1, .8, 1), ghostMaterial); ghost.visible = false; scene.add(ghost);
   const annotations = createAnnotations(host);
   const rackAnchors: Vec[] = RACK_X.map(x => [x, 5.55, 2.5]);
-  const wheelsPath = new T.CatmullRomCurve3([[-16, .28, 16.2], [14, .28, 16.2], [19.2, .28, 12], [19.2, .28, -12], [14, .28, -16.3], [-14, .28, -16.3], [-19.2, .28, -12], [-19.2, .28, 12]].map(p => new T.Vector3(...p as [number, number, number])), true, 'centripetal');
   let width = 1, height = 1, mobile = false, progress = 0, reduced = false, selected: Facility = 'warehouse';
-  let raf = 0, stopped = false, lastFrame = 0, lastRender = performance.now(), ambientTime = 0, dirty = true, visible = !document.hidden, covered = false;
+  let raf = 0, stopped = false, lastFrame = 0, lastRender = performance.now(), ambientTime = 0, lifeTime = 0, dirty = true, visible = !document.hidden, covered = false;
+  // Development only: `?poster` holds the first frame (lamps off, nothing moving) for scripts/render-poster.mjs.
+  const poster = import.meta.env.DEV && new URLSearchParams(location.search).has('poster');
   let readyFired = false, watchdog = 0;
   let ignitedAt = -1, igniting = true, fading = false, swaying = false, renderedProgress = -1;
   // The camera rig leans toward the pointer on a heavy, nearly critically damped spring.
@@ -184,7 +187,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     RACK_X.forEach((x, i) => { if (Math.abs(hit.x - x) < nearest) { nearest = Math.abs(hit.x - x); best = i; } });
     return best;
   }
-  const labelWidths = new Map<HTMLElement, number>();
+  const labelWidths = new Map<HTMLElement, number>(), labelHeights = new Map<HTMLElement, number>();
   let state: TimelineState = sampleTimeline(0);
   const cameraTarget = new T.Vector3(), cameraGoal = new T.Vector3(), targetGoal = new T.Vector3();
   let cameraScale = state.scale, cameraOffset = 0, cameraInitialized = false, settling = false;
@@ -210,23 +213,26 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     annotations.resize(width, height);
     ao.setSize(Math.ceil(width * .75), Math.ceil(height * .75));
     ao.enabled = bloom.enabled = !mobile && highQuality;
-    labelWidths.clear();
+    labelWidths.clear(); labelHeights.clear();
   }
-  function projectLabels() {
+  function projectLabels(safeTop: number) {
     labels.forEach(label => {
       const anchor = label.dataset.anchor!;
       const facility = anchor as Facility;
       let show = false; let point: [number, number, number] = [0, 0, 0];
       // Problem and solution beats speak through data panels (annotate.ts) instead of labels.
-      if (anchor === 'decision') { point = state.pallet < .05 ? [6.6, 3, -2] : state.loading < .98 ? [model.movingPallet.position.x, 2.4, model.movingPallet.position.z] : [model.deliveryTruck.position.x, 3.7, model.deliveryTruck.position.z]; show = state.label === 'decision'; }
+      // The shipment label rides above its pallet (then the truck), its leader ending on the load, so
+      // the label never covers what it names.
+      const pallet = model.movingPallet.position, over = anchor === 'decision';
+      if (over) { point = !model.movingPallet.visible && state.loading < .5 ? [6.6, 3.45, -2] : state.loading < .6 ? [pallet.x, pallet.y + 1.25, pallet.z] : [model.deliveryTruck.position.x, 3.95, model.deliveryTruck.position.z]; show = state.label === 'decision'; }
       else { point = facilityAnchors[facility]; show = state.label === 'warehouse' && anchor === 'warehouse' && state.progress < 1.43; }
       projected.set(...point).project(camera);
-      const x = (projected.x + 1) / 2 * width, y = (1 - projected.y) / 2 * height;
+      const x = (projected.x + 1) / 2 * width, y = (1 - projected.y) / 2 * height - (over ? (labelHeights.get(label) ?? 56) + 26 : 0);
       // Labels stay rendered so CSS can draw them in and out; widths are measured once per showing.
-      const shown = show && x >= 20 && x <= width - 40 && y >= 88 && y <= height - 60;
+      const shown = show && x >= 20 && x <= width - 40 && y >= safeTop && y <= height - 60;
       if (label.dataset.shown !== String(shown)) {
         label.dataset.shown = String(shown); label.setAttribute('aria-hidden', String(!shown));
-        if (shown) labelWidths.set(label, label.offsetWidth);
+        if (shown) { labelWidths.set(label, label.offsetWidth); labelHeights.set(label, label.offsetHeight); }
       }
       const safeX = Math.max(12, Math.min(x, width - (labelWidths.get(label) || 200) - 18));
       label.style.transform = `translate3d(${safeX.toFixed(1)}px,${y.toFixed(1)}px,0)`;
@@ -243,9 +249,10 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     if (covered && !settling && !fading && progress === renderedProgress) return;
     if (readyFired && document.querySelector('dialog[open]')) return;
     const busy = dirty || settling || fading || lensMoving || (swaying && !covered);
-    const live = !reduced && (state.ambient > 0 || igniting || fade.connect > 0);
+    // The warehouse keeps working (people, robots, the dock forklift, the conveyor) unless motion is off.
+    const live = !reduced && !poster;
     if (!busy && !live) return;
-    // Frames that only carry ambient life (a passing truck, a lamp warming up) run at 30 fps, 15 on the low tier.
+    // Frames that only carry ambient life (people at work, a passing truck, a lamp warming up) run at 30 fps, 15 on the low tier.
     if (!busy && now - lastRender < (low ? 66 : 32)) return;
     // Exponential camera easing is safe with real elapsed time. Capping it made
     // a short camera move take many seconds on software-rendered devices.
@@ -256,10 +263,10 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     if (slowFrames >= 4 && highQuality) { highQuality = false; ao.enabled = bloom.enabled = false; renderer.setPixelRatio(1); renderer.setSize(width, height); }
     state = sampleTimeline(progress, reduced);
     rackFocus.update(state);
-    if (!reduced) ambientTime += Math.min(dt, .1) * state.ambient;
+    if (!reduced && !poster) { ambientTime += Math.min(dt, .1) * state.ambient; lifeTime += Math.min(dt, .1); }
     // The site switches on bank by bank on first arrival; deep links and reduced motion start lit.
     if (ignitedAt < 0) ignitedAt = reduced || progress > .5 ? 0 : now + 650;
-    const lit = ignitedAt === 0 ? 99 : (now - ignitedAt) / 1000;
+    const lit = poster ? -99 : ignitedAt === 0 ? 99 : (now - ignitedAt) / 1000;
     igniting = false;
     for (const bank of banks) { const level = reduced ? 1 : ignition(lit - bank.delay); if (level < 1) igniting = true; setBank(bank, level); }
     host.dataset.lights = igniting ? 'igniting' : 'on';
@@ -276,15 +283,12 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     let scale = state.scale * framing;
     // The opening and the closing share one wide shot: low under the headline, high above the invitation.
     if (state.hero > 0) {
-      // Desktop frames the model in the room under the hero copy (letting it tuck 50px behind the
-      // hint). Calibrated so 1440×900 is the designed shot (×.9, centre at 84%); shorter screens
-      // zoom out instead of cutting the warehouse off at the fold.
-      const roomTop = (state.chapter === 0 && heading ? heading.bottom : height * .65) - 50, room = Math.max(120, height - roomTop);
-      const heroScale = mobile ? 1.5 : Math.min(1.5, Math.max(.9, .9 * height / (2.466 * room)));
-      const heroCenter = mobile ? height * .8 : Math.min(height * .9, Math.max(height * .74, roomTop + room * .6055));
-      scale = mix(scale, state.scale * heroScale, state.hero); centerY = mix(centerY, heroCenter, state.hero);
+      const frame = heroFrame(width, height, state.chapter === 0 && heading ? heading.bottom : null);
+      scale = mix(scale, state.scale * frame.lens, state.hero); centerY = mix(centerY, frame.center, state.hero);
     }
     if (state.finale > 0) { scale = mix(scale, state.scale * (mobile ? 1.45 : .95), state.finale); centerY = mix(centerY, height * (mobile ? .3 : .34), state.finale); }
+    // The poster render frames the whole model at the hero's lens (×.9 desktop, ×1.5 phone), centred.
+    if (poster) { scale = state.scale * (mobile ? 1.5 : .9); centerY = height / 2; }
     const distance = scale / (2 * Math.tan(T.MathUtils.degToRad(camera.fov / 2)));
     cameraGoal.sub(targetGoal).normalize().multiplyScalar(distance).add(targetGoal);
     const ease = reduced || !cameraInitialized ? 1 : 1 - Math.exp(-dt * 6.5);
@@ -310,7 +314,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     camera.updateMatrixWorld();
     // X-ray lens: follows a mouse over the roof; otherwise a short demo visits A2, A3 and A4
     // (once on desktop, looping on touch screens). Off for reduced motion and outside the opening.
-    const lensOn = !reduced && state.hero > .6, radius = mobile ? Math.min(78, width * .2) : Math.min(132, Math.max(84, width * .075));
+    const lensOn = !reduced && !poster && state.hero > .6, radius = mobile ? Math.min(78, width * .2) : Math.min(132, Math.max(84, width * .075));
     let aimLensR = 0, aimLensX = lensX, aimLensY = lensY, follow = 14;
     if (lensOn && pointerX >= 0 && roofHit(pointerX, pointerY)) {
       lensMode = 'pointer'; aimLensX = pointerX; aimLensY = pointerY; aimLensR = radius; lensRack = rackHit(pointerX, pointerY);
@@ -354,7 +358,6 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     const stockHighlight = (state.label === 'forecast' && state.solutionStep === 3) || state.label === 'decision' ? state.highlight : 0;
     highlightedStock.forEach(mat => { mat.color.copy(stockColor).lerp(activeColor, stockHighlight); mat.emissive.copy(activeColor); mat.emissiveIntensity = stockHighlight * .15; });
     (model.stockOutline.material as T.LineBasicMaterial).opacity = state.highlight;
-    model.selectedStock.visible = state.pallet < .05;
     demandBatches.forEach(({ mesh, count }) => { mesh.count = Math.round(count * (1 - state.shortage)); });
     model.demandStock.visible = state.shortage < .99;
     const showTarget = ease01('target', state.label === 'forecast' && (state.solutionStep === 1 || state.solutionStep === 2));
@@ -370,17 +373,13 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     const showMarkdown = ease01('markdown', state.label === 'forecast' && state.solutionStep === 4);
     model.markdownZone.visible = showMarkdown > 0; markdownMaterial.opacity = showMarkdown; model.markdownZone.scale.y = .72 + .28 * showMarkdown;
     (model.stockOutline.material as T.LineBasicMaterial).color.set(state.progress < 3 ? '#ff723d' : '#a8e6ce');
-    // Forklift follows clear aisle x=4.5, then the front cross aisle, to dock 02.
-    const m = state.pallet;
-    const moveZ = Math.min(1, m / .65), moveX = Math.max(0, (m - .65) / .35);
-    model.lift.position.set(4.5 - moveX * 3.1, .5, -.8 + moveZ * 5.1);
-    model.lift.rotation.y = moveX > 0 && moveX < 1 ? -Math.PI / 2 : 0;
-    model.movingPallet.position.set(4.5 - moveX * 3.1, .7 + state.loading * .45, .55 + moveZ * 5.1 + state.loading * 2.3);
-    model.movingPallet.visible = state.pallet >= .05 && state.loading < .98;
-    model.lift.visible = true;
+    // People, robots, the dock forklift, conveyor, road traffic, rack lights, the wall screen, and the story
+    // forklift lifting the A3 pallet out of its rack and into the truck (life.ts).
+    life.update(reduced || poster ? 0 : lifeTime, poster ? 0 : ambientTime, state);
     const truckP = freightPath.getPoint(state.truck);
     model.deliveryTruck.position.set(truckP.x, .28, truckP.z);
-    model.deliveryTruck.visible = state.progress < 5;
+    // The story truck hands the road back to the traffic loop as the closing wide shot settles.
+    model.deliveryTruck.visible = state.finale < .5;
     tangent.copy(freightPath.getTangent(state.truck)); model.deliveryTruck.rotation.y = Math.atan2(tangent.x, tangent.z);
     route.visible = state.route > 0 && state.progress < 5;
     routeGeo.setDrawRange(0, Math.floor((routeGeo.index?.count ?? 0) * state.route / 6) * 6);
@@ -394,12 +393,8 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     const transferT = state.label === 'forecast' && state.solutionStep === 3 ? beatT(3, 5, 3) : 0;
     ghost.visible = showTransfer > .3;
     if (ghost.visible) { model.transferCurve.getPointAt(Math.min(1, transferT * 1.25), ghost.position); ghostMaterial.opacity = .75 * showTransfer; }
-    const a = (ambientTime * .009 + .09) % 1;
-    model.ambientTruck.position.copy(wheelsPath.getPointAt(a));
-    tangent.copy(wheelsPath.getTangentAt(a)); model.ambientTruck.rotation.y = Math.atan2(tangent.x, tangent.z);
-    model.ambientTruck.visible = state.ambient > .02;
     for (const [name, outline] of Object.entries(model.outlines)) outline.visible = state.label === 'warehouse' && state.progress < 1.4 && name === selected;
-    projectLabels();
+    projectLabels(Math.max(88, (heading?.bottom ?? 80) + 10));
     // Data panels: one per problem/solution beat, scrubbed by progress through the beat.
     let panel: string | null = null, panelAnchor = A2, panelT = 0;
     if (state.label === 'problem') { panel = ['gap', 'out', 'slow'][state.problemStep]; panelAnchor = state.problemStep === 2 ? A4 : A2; panelT = beatT(2, 3, state.problemStep); }
@@ -413,6 +408,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     host.dataset.lens = lensR > 0 ? String(lensRack) : 'off';
     host.dataset.panel = panel ?? 'none';
     const before = performance.now(); renderer.info.reset(); renderer.info.autoReset = false; composer.render();
+    if (poster) (window as Window & { __posterFrame?: string }).__posterFrame = renderer.domElement.toDataURL('image/png');
     const renderMs = performance.now() - before;
     renderedFrames++;
     // Ready means drawn, whichever path scheduled the frame (first request, tab revealed, resize).
@@ -455,7 +451,9 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     tri.setAttribute('uv', new T.Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
     // Shadow depth takes the caster's side (flipped) and map, so textured casters need their own variant.
     const depth = new T.MeshDepthMaterial({ side: T.BackSide }), mappedDepth = new T.MeshDepthMaterial({ side: T.BackSide, map: model.materials.stone.map });
-    const overrides = [depth, mappedDepth, ao.normalMaterial].flatMap(m => [new T.Mesh(box, m), new T.InstancedMesh(box, m, 1)]);
+    // Instanced meshes with per-instance colour (the people in life.ts) are their own variant of each.
+    const tinted = (m: T.Material) => { const mesh = new T.InstancedMesh(box, m, 1); mesh.setColorAt(0, new T.Color()); return mesh; };
+    const overrides = [depth, mappedDepth, ao.normalMaterial].flatMap(m => [new T.Mesh(box, m), new T.InstancedMesh(box, m, 1), tinted(m)]);
     const screen = new T.Group();
     for (const pass of [ao, bloom]) for (const value of Object.values(pass).flat()) if (value instanceof T.ShaderMaterial) screen.add(new T.Mesh(tri, value));
     // OutputPass sets its defines on its first render; these are the ones this renderer's settings produce.

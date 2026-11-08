@@ -42,12 +42,15 @@ const shots: { at: number; position: Vec3; target: Vec3; scale: number; roof: nu
   { at: 3.86, position: [26, 12, 19], target: [10.8, 2.5, -2], scale: 19, roof: 15, wall: 1 },
   { at: 4.04, position: [21, 15, 23], target: [6.6, 2.5, -2], scale: 19, roof: 15, wall: 1 },
   { at: 4.17, position: [21, 15, 23], target: [6.6, 2.5, -2], scale: 19, roof: 15, wall: 1 },
-  { at: 4.25, position: [20, 17, 25], target: [3, 1, 3], scale: 20, roof: 15, wall: 1 },
-  { at: 4.344, position: [20, 17, 25], target: [3, 1, 3], scale: 20, roof: 15, wall: 1 },
-  { at: 4.42, position: [17, 9, 27], target: [1.4, 1.5, 8], scale: 19, roof: 15, wall: 1 },
-  { at: 4.516, position: [17, 9, 27], target: [1.4, 1.5, 8], scale: 19, roof: 15, wall: 1 },
-  { at: 4.60, position: [30, 26, 40], target: [6, 0, 10], scale: 34, roof: 15, wall: 1 },
-  { at: 4.688, position: [30, 26, 40], target: [6, 0, 10], scale: 34, roof: 15, wall: 1 },
+  // The pick and the loading happen inside settled shots: each camera arrives before its forklift moves.
+  // Pick: down the A2/A3 aisle from the front, so the racks never hide the forklift.
+  { at: 4.215, position: [4.2, 12.5, 19.5], target: [3.2, 1.6, .5], scale: 18, roof: 15, wall: 1 },
+  { at: 4.344, position: [4.2, 12.5, 19.5], target: [3.2, 1.6, .5], scale: 18, roof: 15, wall: 1 },
+  // Load: high over the front-left, looking past the trailer roof into dock 02 as the pallet goes in.
+  { at: 4.40, position: [-7, 19, 17], target: [1.4, 1.2, 5.6], scale: 17, roof: 15, wall: 1 },
+  { at: 4.516, position: [-7, 19, 17], target: [1.4, 1.2, 5.6], scale: 17, roof: 15, wall: 1 },
+  { at: 4.60, position: [-12, 24, 42], target: [6, 0, 10], scale: 34, roof: 15, wall: 1 },
+  { at: 4.688, position: [-12, 24, 42], target: [6, 0, 10], scale: 34, roof: 15, wall: 1 },
   { at: 4.78, position: [38, 30, 41], target: [7, 1, 5], scale: 44, roof: 15, wall: 1 },
   { at: 4.86, position: [38, 30, 41], target: [7, 1, 5], scale: 44, roof: 15, wall: 1 },
   { at: 5, position: [39, 31, 43], target: [0, 0, 0], scale: 60, roof: 0, wall: 0 },
@@ -79,7 +82,7 @@ export function sampleTimeline(progress: number, reduced = false) {
     replenishment: ramp(p, 3.36, 3.45),
     highlight: ramp(p, 2, 2.3) * (1 - ramp(p, 4.8, 5)),
     signal: ramp(p, 3.03, 3.22), decision,
-    pallet: ramp(decision, .22, .34), loading: ramp(decision, .42, .52),
+    pallet: ramp(decision, .25, .38), loading: ramp(decision, .45, .56),
     route: ramp(decision, .62, .72), truck: ramp(decision, .82, .94),
     step: storyBeat(p, 4, 5),
     // Only the wide shots carry ambient life; every reading hold stays still.
@@ -88,6 +91,18 @@ export function sampleTimeline(progress: number, reduced = false) {
   };
 }
 export type TimelineState = ReturnType<typeof sampleTimeline>;
+/**
+ * The opening shot's lens (a multiple of the shot scale) and the screen height its subject sits at, for
+ * a viewport and the bottom of the hero copy. Desktop frames the model in the room under the copy,
+ * letting it tuck 50px behind the hint; 1440×900 is the designed shot (×.9, centre at 84%), and shorter
+ * screens zoom out instead of cutting the warehouse off at the fold. The engine and the loading poster
+ * (CampusStage.tsx) share it, so the poster lands exactly where the first frame will draw.
+ */
+export function heroFrame(width: number, height: number, copyBottom: number | null) {
+  if (width < 760) return { lens: 1.5, center: height * .8 };
+  const roomTop = (copyBottom ?? height * .65) - 50, room = Math.max(120, height - roomTop);
+  return { lens: Math.min(1.5, Math.max(.9, .9 * height / (2.466 * room))), center: Math.min(height * .9, Math.max(height * .74, roomTop + room * .6055)) };
+}
 export const facilityAnchors: Record<Facility, Vec3> = {
   warehouse: [6, 7, 1], office: [-7, 5.8, 5], factory: [-10, 6, -9], dispatch: [12.7, 4, 11],
 };
