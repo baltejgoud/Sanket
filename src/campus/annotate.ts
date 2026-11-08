@@ -74,12 +74,18 @@ export function createAnnotations(host: HTMLElement) {
         if (show(tag, !!lens && lens.r > 24 && y >= safeTop && x >= 8)) place(tag, x, y);
       }
     },
-    sources(camera: T.Camera, anchors: Vec[], opacity: number) {
+    sources(camera: T.Camera, anchors: Vec[], opacity: number, safeTop = 88, safeBottom = height - 40) {
+      const placed: [number, number, number, number][] = [];
       sources.forEach((el, i) => {
         const [x, y, z] = project(camera, anchors[i]);
         if (!show(el, opacity > .35 && onScreen(x, y, z))) return;
         const [w, h] = size(el);
-        place(el, clamp(x - w / 2, 12, width - w - 12), y - h - 12);
+        const left = clamp(x - w / 2, 12, width - w - 12);
+        let top = clamp(y - h - 12, safeTop, safeBottom - h);
+        for (const [l, t, r, b] of placed) if (left < r + 8 && left + w > l - 8 && top < b + 8 && top + h > t - 8) top = t - h - 8;
+        if (!show(el, top >= safeTop && top + h <= safeBottom)) return;
+        placed.push([left, top, left + w, top + h]);
+        place(el, left, top);
       });
     },
     /** One panel at a time, beside its rack, kept between the chapter heading and the reading card. */

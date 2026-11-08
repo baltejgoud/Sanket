@@ -1,6 +1,6 @@
 import * as T from 'three';
 
-const TRAIL = 3, SAMPLES = 64;
+const TRAIL = 7, SAMPLES = 64;
 
 /**
  * Signals drawn as comets of light along curves: one draw call, positions stepped on the CPU from
@@ -25,29 +25,37 @@ export function createStreams(curves: T.Curve<T.Vector3>[], color: string, perCu
   });
   const points = new T.Points(geometry, material);
   points.frustumCulled = false; points.visible = false; points.renderOrder = 2;
+  // A quiet continuous carrier makes the path readable between travelling packets.
+  const pathGeometry = new T.BufferGeometry();
+  const pathPositions: number[] = [];
+  tables.forEach(table => table.slice(0, -1).forEach((p, i) => pathPositions.push(p.x, p.y, p.z, table[i + 1].x, table[i + 1].y, table[i + 1].z)));
+  pathGeometry.setAttribute('position', new T.Float32BufferAttribute(pathPositions, 3));
+  const pathMaterial = new T.LineBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending });
+  const carrier = new T.LineSegments(pathGeometry, pathMaterial); points.add(carrier);
   let drawnAt = NaN;
   return {
     points,
     /** time in seconds drives travel; opacity 0 hides the set; scale converts world size to pixels. */
     update(time: number, opacity: number, scale: number) {
       material.uniforms.uOpacity.value = opacity; material.uniforms.uScale.value = scale;
+      pathMaterial.opacity = opacity * .16;
       points.visible = opacity > .002;
       if (!points.visible || time === drawnAt) return;
       drawnAt = time;
       seeds.forEach((s, i) => {
         const table = tables[s.curve];
         for (let k = 0; k < TRAIL; k++) {
-          const u = (((s.phase + time * s.speed - k * .014) % 1) + 1) % 1;
+          const u = (((s.phase + time * s.speed - k * .006) % 1) + 1) % 1;
           const f = u * SAMPLES, j = Math.floor(f), w = f - j, a = table[j], b = table[Math.min(SAMPLES, j + 1)];
           const o = i * TRAIL + k;
           positions[o * 3] = a.x + (b.x - a.x) * w; positions[o * 3 + 1] = a.y + (b.y - a.y) * w; positions[o * 3 + 2] = a.z + (b.z - a.z) * w;
           // Comets fade in at the source, out on arrival, and thin along the tail.
-          alphas[o] = Math.pow(Math.sin(Math.PI * u), .7) * (1 - k * .34);
-          sizes[o] = size * (1 - k * .24);
+          alphas[o] = Math.pow(Math.sin(Math.PI * u), .7) * Math.pow(1 - k / TRAIL, 1.5);
+          sizes[o] = size * (1 - k / TRAIL * .72);
         }
       });
       geometry.attributes.position.needsUpdate = true; geometry.attributes.aAlpha.needsUpdate = true; geometry.attributes.aSize.needsUpdate = true;
     },
-    dispose() { geometry.dispose(); material.dispose(); },
+    dispose() { geometry.dispose(); material.dispose(); pathGeometry.dispose(); pathMaterial.dispose(); },
   };
 }

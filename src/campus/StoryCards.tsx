@@ -5,6 +5,8 @@ import { guideCopy, type StoryChapter } from './guideCopy';
 import { storyCopy } from './storyCopy';
 import { BEAT_COUNTS } from './timeline';
 import { track } from '../lib/analytics';
+import { cardDetails } from './cardDetails';
+import type { PointerEvent } from 'react';
 
 /** A shareable scene address: #problems/2 is the second scene of “The problem”. */
 export const SCENE_HASH = /^#(warehouse|problems|forecast|decide)\/(\d+)$/;
@@ -27,9 +29,9 @@ const cards: Record<Lang, Record<Chapter, Card[]>> = {
       ['LOOK INSIDE', 'Same warehouse. Different stock decisions.', 'The roof lifts to reveal the racks. A2 will sell out, A4 will hold slow stock, and A3 will supply a transfer. Keep these rack labels in view as the story moves closer.'],
     ],
     problems: [
-      ['01 / DEMAND CHANGES', 'A full shelf can hide a coming shortage.', 'A2 starts selling faster, but replenishment takes time. The useful question is whether this stock will last until the next delivery, not simply how much is on the shelf today.'],
-      ['02 / THE STOCKOUT', 'Demand is still here. The product is not.', 'A2 empties before replacement stock arrives. The next order may become a missed sale or a wait. The decision needed to happen earlier, while there was still time to replenish.'],
-      ['03 / THE OTHER SIDE', 'Stock in the wrong product cannot fill the gap.', 'A4 sells slowly while A2 is empty. It occupies space and ties up cash, but cannot replace a different product. Plan each product and location separately instead of buying more of everything.'],
+      ['01 / THE WARNING', 'The shelf looks full. The clock says otherwise.', 'A2 has about 9 days of stock. The next delivery takes 14. Even before the shelf empties, a five-day gap is already taking shape.'],
+      ['02 / THE STOCKOUT', 'The stock runs out. The demand doesn’t.', 'Now A2 is empty, with replacement stock still on the way. Customers must wait or buy elsewhere. The time to act was before the last box left.'],
+      ['03 / THE SURPLUS', 'Too much here. Too little where it matters.', 'A4 holds about 120 days of slow-selling stock while A2 stands empty. Cash and space are tied up in a different product. Buying more of everything repeats the problem.'],
     ],
     forecast: solutionCards.en,
     decide: [
@@ -83,6 +85,13 @@ const cards: Record<Lang, Record<Chapter, Card[]>> = {
 export function StoryCards({ chapter, lang, openTool }: { chapter: Chapter; lang: Lang; openTool?: (tool: number) => void }) {
   const items = chapter === 'forecast' ? solutionCards[lang] : cards[lang][chapter];
   const guide = guideCopy[lang];
+  const detail = cardDetails[lang];
+  const light = (e: PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== 'mouse' || document.documentElement.classList.contains('is-calm') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const card = e.currentTarget, rect = card.getBoundingClientRect();
+    card.style.setProperty('--light-x', `${((e.clientX - rect.left) / rect.width * 100).toFixed(1)}%`);
+    card.style.setProperty('--light-y', `${((e.clientY - rect.top) / rect.height * 100).toFixed(1)}%`);
+  };
   // Scene steppers are groups, not landmarks; the chapter name tells the four apart.
   const chapterName = storyCopy[lang].chapters[{ warehouse: 1, problems: 2, forecast: 3, decide: 4 }[chapter]];
   const next = lang === 'hi' ? 'अगला दृश्य' : lang === 'te' ? 'తదుపరి దృశ్యం' : 'Next scene';
@@ -98,9 +107,9 @@ export function StoryCards({ chapter, lang, openTool }: { chapter: Chapter; lang
     window.scrollTo({ top: target, behavior: calm ? 'instant' : 'smooth' });
   };
   return <div className="story-card-deck" data-card-deck={chapter}>
-    {items.map(([eyebrow, title, body], i) => <article key={title} className={`story-detail-card${chapter === 'forecast' ? ' with-brief' : ''}`} data-card-index={i} hidden={i !== 0}>
-      <div className="model-cue"><ScanLine size={16} aria-hidden="true" /><span><b>{guide.model}</b>{guide.cues[chapter][i]}</span></div>
-      <div className="card-heading"><p className="card-kicker">{eyebrow}</p><h3>{title}</h3><div role="group" className="card-progress" aria-label={`${chapterName} · ${guide.scene} ${i + 1} / ${items.length}`}>{items.map((item, j) => <button key={j} data-scene-focus={`step-${j}`} onClick={() => goToScene(j)} aria-label={`${guide.scene} ${j + 1}: ${item[1]}`} aria-current={j === i ? 'step' : undefined}><span>{String(j + 1).padStart(2, '0')}</span></button>)}</div></div>
+    {items.map(([eyebrow, title, body], i) => <article key={i} className={`story-detail-card${chapter === 'forecast' ? ' with-brief' : ''}`} data-card-index={i} hidden={i !== 0} onPointerMove={light}>
+      <div className="model-cue"><ScanLine size={16} aria-hidden="true" /><span><b>{guide.model}</b>{guide.cues[chapter][i]}</span><span className="card-fact">{detail.facts[chapter][i]}</span></div>
+      <div className="card-heading"><p className="card-kicker">{eyebrow}<span className="card-scene-count" aria-hidden="true">{String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}</span></p><h3>{title}</h3><div role="group" className="card-progress" aria-label={`${chapterName} · ${guide.scene} ${i + 1} / ${items.length}`}>{items.map((item, j) => <button key={j} data-scene-focus={`step-${j}`} onClick={() => goToScene(j)} aria-label={`${guide.scene} ${j + 1}: ${item[1]}`} aria-current={j === i ? 'step' : undefined} data-complete={j < i}><span>{String(j + 1).padStart(2, '0')}</span><small aria-hidden="true">{detail.steps[chapter][j]}</small></button>)}</div></div>
       <div className="card-explanation"><p>{body}</p><div className="card-actions">
         <button data-scene-focus="previous" onClick={() => goToScene(i - 1)} disabled={i === 0} aria-label={guide.previous}><ArrowLeft size={17} aria-hidden="true" /></button>
         <button data-scene-focus="next" onClick={() => goToScene(i + 1)}>{i === items.length - 1 ? guide.nextChapter : next}<ArrowDown size={17} aria-hidden="true" /></button>

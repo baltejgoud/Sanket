@@ -203,16 +203,9 @@ html.is-calm { scroll-behavior:auto }
 .card-kicker { font:10px/1.5 var(--font-mono); letter-spacing:.12em; color:#ffad78; margin:0 0 12px }
 .card-heading h3 { font:500 clamp(23px,2.1vw,31px)/1.12 var(--font-display); letter-spacing:-.035em; color:#f1eee5; text-wrap:balance }
 .card-explanation>p { font-size:16px; line-height:1.7; color:#c7cebd; margin:0; text-wrap:pretty }
-.card-progress { display:flex; align-items:center; gap:5px; margin-top:20px }
-.card-progress i { width:24px; height:3px; background:#3d4737 }
-.card-progress i[data-complete=true] { background:#d1d9c8 }
-.card-progress>span { margin-left:10px; color:#aeb9a2; font:10px var(--font-mono) }
 .card-actions { display:flex; gap:25px; flex-wrap:wrap; margin-top:17px }
 .card-actions button { display:inline-flex; gap:10px; align-items:center; color:#f3eadc; min-height:38px; border-bottom:1px solid #667258; font-size:12px }
 .card-actions button:hover { color:#ffb17c; border-color:#ffb17c }
-.solution-section .story-detail-card { border-color:#547d6b; background:linear-gradient(125deg,#1a2b24f5,#101a14f5) }
-.solution-section .card-kicker { color:#a8e6ce }
-.solution-section .story-detail-card::before { background:#a8e6ce }
 .lang-hi .card-heading h3,.lang-te .card-heading h3 { line-height:1.4; letter-spacing:0; font-size:26px }
 @keyframes card-arrival { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
 @media(max-width:759px) {
@@ -227,9 +220,6 @@ html.is-calm { scroll-behavior:auto }
   .story-detail-card { grid-template-columns:1fr; gap:12px; padding:20px; border-radius:10px }
   .card-kicker { font-size:8px; margin-bottom:8px }
   .card-heading h3 { font-size:24px; line-height:1.13; text-wrap:pretty }
-  .card-progress { margin-top:12px }
-  .card-progress i { width:19px }
-  .card-progress>span { font-size:8px }
   .card-explanation>p { font-size:13px; line-height:1.6 }
   .card-actions { margin-top:10px; gap:18px }
   .card-actions button { font-size:11px; min-height:35px }
@@ -244,7 +234,6 @@ html.is-calm { scroll-behavior:auto }
   .card-heading h3 { font-size:24px }
   .card-explanation>p { font-size:13px; line-height:1.5 }
   .card-kicker { font-size:8px; margin-bottom:8px }
-  .card-progress { margin-top:10px }
   .card-actions { margin-top:7px }
   /* The chapter eyebrow must clear the fixed header, which is 86–94px tall on desktop. */
   .campus-story .story-section:not(.opening):not(.contact-section) .story-sticky { padding-top:max(88px, calc(var(--header-clear) + 12px)) }
@@ -286,7 +275,6 @@ html.is-calm { scroll-behavior:auto }
   .story-detail-card.with-brief { grid-template-columns:1fr; gap:10px; padding:16px 18px }
   .with-brief .card-heading h3 { font-size:21px }
   .with-brief .card-explanation>p { font-size:12px; line-height:1.5 }
-  .with-brief .card-progress { margin-top:8px }
   .solution-brief { border-left:0; border-top:1px solid #4c6c59; padding:10px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px }
   .solution-brief .brief-label { grid-column:1/-1; font-size:7px; margin:0 }
   .solution-brief strong { font-size:23px; grid-row:span 2; align-self:center }
@@ -296,7 +284,6 @@ html.is-calm { scroll-behavior:auto }
 }
 @media(max-height:700px) and (max-width:759px) {
   .with-brief .card-heading h3 { font-size:19px }
-  .with-brief .card-progress { display:none }
   .with-brief .card-explanation>p { font-size:11px }
   .story-detail-card.with-brief { gap:6px; padding:12px 16px }
 }
@@ -317,12 +304,6 @@ html.is-calm { scroll-behavior:auto }
 .model-cue>svg { flex:none; color:#e5af7c }
 .model-cue b { font:9px/1.6 var(--font-mono); letter-spacing:.09em; color:#b3bda7; margin-right:14px; white-space:nowrap }
 .solution-section .model-cue>svg { color:#a8e6ce }
-.card-progress { gap:4px; margin-top:14px }
-.card-progress button { min-width:44px; min-height:44px; display:grid; place-items:center; font:10px var(--font-mono); color:#bec7b3; border:1px solid transparent; border-radius:6px }
-.card-progress button>span { border-bottom:2px solid #56624c; padding:5px 3px }
-.card-progress button[aria-current=step] { color:#f8e4cc; background:#33402a; border-color:#6a795c }
-.card-progress button[aria-current=step]>span { border-color:#ffb17c }
-.card-progress button:hover { background:#33402a; color:#fff }
 .card-actions { gap:12px 20px; align-items:center }
 .card-actions button[data-scene-focus=previous] { min-width:44px; justify-content:center; border:1px solid #667258; border-radius:6px }
 .card-actions button:disabled { opacity:.35; cursor:default }
@@ -361,7 +342,6 @@ html.is-calm { scroll-behavior:auto }
   .story-detail-card,.story-detail-card.with-brief { gap:10px; padding:14px 18px }
   .model-cue { font-size:11px; gap:8px; padding-bottom:9px }
   .model-cue b { font-size:8px; margin-right:8px }
-  .card-progress,.with-brief .card-progress { display:flex; margin-top:6px; gap:3px }
   .card-heading h3,.with-brief .card-heading h3 { font-size:21px }
   .card-explanation>p,.with-brief .card-explanation>p { font-size:12px; line-height:1.55 }
   .card-actions { gap:8px 14px; margin-top:8px }

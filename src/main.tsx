@@ -7,6 +7,7 @@ import "./styles/base.css";
 import "./styles/shell.css";
 import "./styles/campus.css";
 import "./styles/kinetic.css";
+import "./styles/refinement.css";
 
 // Vercel Web Analytics (cookieless) only when a build turns it on; lib/analytics.ts sends events to it.
 if (import.meta.env.VITE_VERCEL_ANALYTICS === "1") {

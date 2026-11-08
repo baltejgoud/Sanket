@@ -7,6 +7,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { buildCampus } from './models';
 import { sampleTimeline, facilityAnchors, type Facility, type TimelineState } from './timeline';
 import { createStreams } from './streams';
+import { createRackFocus } from './rackFocus';
 import { createAnnotations, type Vec } from './annotate';
 import './scene.css';
 
@@ -64,13 +65,14 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
   ao.kernelRadius = .65; ao.minDistance = .0004; ao.maxDistance = .055;
   composer.addPass(ao);
   // Only emissive lamps and signal orange cross the threshold, so the glow stays on the lights.
-  const bloom = new UnrealBloomPass(new T.Vector2(512, 512), .62, .45, .9);
+  const bloom = new UnrealBloomPass(new T.Vector2(512, 512), .4, .35, 1.05);
   composer.addPass(bloom);
   const output = new OutputPass(); composer.addPass(output);
   phase('passes');
   await nextTask();
   phaseStart = performance.now();
   const model = await buildCampus(nextTask); scene.add(model.root);
+  const rackFocus = createRackFocus(); scene.add(rackFocus.group);
   phase('model');
   await nextTask();
   phaseStart = performance.now();
@@ -150,8 +152,8 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     bez([-27, 2, 20], [-12, 11, 10], [4, 7.4, 0]), bez([28, 2, 16], [16, 12, 8], [6, 7.4, -1]),
     bez([-25, 2, -19], [-10, 12, -10], [3, 7.4, -2]), bez([27, 2, -21], [14, 11, -12], [7, 7.4, -1]),
     bez([1, 2, 27], [2, 13, 14], [5, 7.4, .5]), bez([-31, 4, 2], [-14, 13, 2], [4, 7.4, -.5]),
-  ], '#ff7a3d', 26, .32);
-  const connectStreams = createStreams(SOURCES.map(a => bez(a, [(a[0] + A2[0]) / 2, 11, (a[2] + A2[2]) / 2], [A2[0], 5.4, A2[2]])), '#a8e6ce', 30, .3);
+  ], '#ff7a3d', 12, .22);
+  const connectStreams = createStreams(SOURCES.map(a => bez(a, [(a[0] + A2[0]) / 2, 11, (a[2] + A2[2]) / 2], [A2[0], 5.4, A2[2]])), '#a8e6ce', 14, .22);
   scene.add(heroStreams.points, connectStreams.points);
   // A ghost pallet rides the suggested transfer arc as the beat is scrolled.
   const ghostMaterial = new T.MeshStandardMaterial({ color: '#a8e6ce', emissive: '#5fbf98', emissiveIntensity: .7, transparent: true, opacity: .75, depthWrite: false });
@@ -253,6 +255,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     // RAF cadence includes GPU time; CPU submission timing alone misses a slow GPU.
     if (slowFrames >= 4 && highQuality) { highQuality = false; ao.enabled = bloom.enabled = false; renderer.setPixelRatio(1); renderer.setSize(width, height); }
     state = sampleTimeline(progress, reduced);
+    rackFocus.update(state);
     if (!reduced) ambientTime += Math.min(dt, .1) * state.ambient;
     // The site switches on bank by bank on first arrival; deep links and reduced motion start lit.
     if (ignitedAt < 0) ignitedAt = reduced || progress > .5 ? 0 : now + 650;
@@ -284,7 +287,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     if (state.finale > 0) { scale = mix(scale, state.scale * (mobile ? 1.45 : .95), state.finale); centerY = mix(centerY, height * (mobile ? .3 : .34), state.finale); }
     const distance = scale / (2 * Math.tan(T.MathUtils.degToRad(camera.fov / 2)));
     cameraGoal.sub(targetGoal).normalize().multiplyScalar(distance).add(targetGoal);
-    const ease = reduced || !cameraInitialized ? 1 : 1 - Math.exp(-dt * 5);
+    const ease = reduced || !cameraInitialized ? 1 : 1 - Math.exp(-dt * 6.5);
     basePosition.lerp(cameraGoal, ease); cameraTarget.lerp(targetGoal, ease);
     cameraScale += (scale - cameraScale) * ease;
     const offsetGoal = height / 2 - centerY;
@@ -406,7 +409,7 @@ export async function createCampus(host: HTMLElement, onReady: () => void, onFai
     }
     annotations.panel(camera, panel, panelAnchor, panelT, Math.max(88, (heading?.bottom ?? 80) + 12), card ? card.top - 12 : height - 60);
     annotations.racks(camera, rackAnchors, lensR > 0 && lensRack >= 0 ? { x: lensX, y: lensY, r: lensR, rack: lensRack } : state.label === 'warehouse' && state.progress >= 1.43 ? 'all' : 'off', Math.max(88, (heading?.bottom ?? 80) + 8));
-    annotations.sources(camera, SOURCES, showConnect);
+    annotations.sources(camera, SOURCES, showConnect, Math.max(88, (heading?.bottom ?? 80) + 12), card ? card.top - 14 : height - 40);
     host.dataset.lens = lensR > 0 ? String(lensRack) : 'off';
     host.dataset.panel = panel ?? 'none';
     const before = performance.now(); renderer.info.reset(); renderer.info.autoReset = false; composer.render();

@@ -3,8 +3,8 @@ import type { Lang } from '../i18n';
 // One illustrative planning case, kept separate from customer results or live product data.
 export const solutionCards: Record<Lang, [string, string, string][]> = {
   en: [
-    ['SANKET / 01 · CONNECT', 'Start with the data you already have.', 'Bring sales, inventory and supplier lead times together from your ERP, store or files. SANKET connects each product to where it sells and where stock is held.'],
-    ['SANKET / 02 · FORECAST', 'See the gap before the shelf empties.', 'For A2, compare expected demand with available stock, incoming orders and the time to replenish. The figures show an earlier planning moment, before the stockout you just saw.'],
+    ['SANKET / 01 · CONNECT', 'Bring the signals into one picture.', 'Connect sales, stock and supplier lead times from your ERP, stores or files. See each product in the context of where it sells, where it sits and how long replenishment takes.'],
+    ['SANKET / 02 · FORECAST', 'See the gap while there’s time to act.', 'Rewind to before A2 ran out. Forecast the next four weeks, then compare demand with available stock, inbound orders and delivery timing. The shaded band shows uncertainty.'],
     ['SANKET / 03 · REPLENISH', 'A suggested order, with the reasoning visible.', 'This simplified A2 plan suggests 800 units after allowing for a buffer, stock on hand and confirmed inbound stock. Check delivery timing and supplier constraints before placing the order.'],
     ['SANKET / 04 · REBALANCE', 'Use the stock you already own.', 'A separate example: A3 has stock that could serve demand at the West location. Review a 360-unit transfer, checking the source buffer, transit time and destination need.'],
     ['SANKET / 05 · MARK DOWN', 'Give slow stock a better next move.', 'For the slow product in A4, review a possible 12% markdown in week 8. Check margin and expected sell-through before changing the price. This is a separate decision from the A2 order.'],

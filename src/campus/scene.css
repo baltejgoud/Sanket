@@ -1,6 +1,12 @@
 /* In-scene annotations (ScenePanels.tsx / annotate.ts). Loaded with the WebGL engine chunk, so the
    first paint never pays for it and the no-WebGL page never shows these elements. */
 
+/* The pointer's light on the reading surface arrives with the spatial scene. */
+.story-detail-card::after { content:''; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 450px 240px at var(--light-x,50%) var(--light-y,0%),#ffffff08,transparent); opacity:0; transition:opacity .3s }
+@media(hover:hover) and (pointer:fine) { .story-detail-card:hover::after { opacity:1 } }
+.is-calm .story-detail-card::after { display:none }
+@media(prefers-reduced-motion:reduce) { .story-detail-card::after { display:none } }
+
 .rack-chip,.source-chip,.scene-panel,.xray-tag { position: absolute; top: 0; left: 0; pointer-events: none; will-change: transform }
 .rack-chip,.source-chip,.xray-tag { opacity: 0; transition: opacity .25s }
 .rack-chip[data-shown=true],.source-chip[data-shown=true],.xray-tag[data-shown=true] { opacity: 1 }
@@ -28,7 +34,7 @@
 @keyframes source-pulse { 0% { box-shadow: 0 0 0 0 #a8e6ce99 } 80%,100% { box-shadow: 0 0 0 7px #a8e6ce00 } }
 
 /* ---------- Data panels ---------- */
-.scene-panel { --tone: #ff8a4d; --t: 0; width: 248px; padding: 13px 15px 14px; border: 1px solid color-mix(in srgb, var(--tone) 38%, #333b2f); border-radius: 10px; background: linear-gradient(160deg, #141a12f0, #0b0f0af2); box-shadow: inset 0 1px 0 #ffffff10, 0 18px 44px #000a; color: #eef0e6; opacity: 0; clip-path: inset(0 0 100% 0 round 10px); transition: opacity .2s, clip-path 0s .2s }
+.scene-panel { --tone: #ff8a4d; --t: 0; width: 248px; padding: 13px 15px 14px; border: 1px solid color-mix(in srgb, var(--tone) 38%, #333b2f); border-top-color: color-mix(in srgb, var(--tone) 65%, #333b2f); border-radius: 8px; background: linear-gradient(160deg, #141a12f5, #0b0f0af7); box-shadow: inset 0 1px 0 #ffffff10, 0 18px 44px #000a; color: #eef0e6; opacity: 0; clip-path: inset(0 0 100% 0 round 8px); transition: opacity .2s, clip-path 0s .2s }
 /* The open state's inset is generous so the leader line, which reaches out to the rack, is never cut. */
 .scene-panel[data-shown=true] { opacity: 1; clip-path: inset(-420px round 10px); transition: opacity .25s, clip-path .7s var(--ease-settle) }
 .tone-mint { --tone: #a8e6ce } .tone-amber { --tone: #f3bd73 }
