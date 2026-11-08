@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { CHAPTER_IDS, BEAT_COUNTS, storyBeat, documentProgress, sampleTimeline, type Facility } from './timeline';
+import { CHAPTER_IDS, BEAT_COUNTS, storyBeat, documentProgress, sampleTimeline, heroFrame, type Facility } from './timeline';
+import posterMeta from './poster/poster.json';
+import posterDesktop from './poster/hero-desktop.webp';
+import posterMobile from './poster/hero-mobile.webp';
 import { useReducedMotion } from '../lib/kinetic';
 import { useMotion } from '../lib/prefs';
 import { storyCopy } from './storyCopy';
@@ -15,7 +18,25 @@ export const LOAD_3D = 'sanket:load-3d';
 export function CampusStage({ lang, selected, onChapter }: { lang: Lang; selected: Facility; onSelect: (f: Facility) => void; onChapter: (id: string) => void }) {
   const n = storyCopy[lang];
   const host = useRef<HTMLDivElement>(null);
+  const poster = useRef<HTMLImageElement>(null);
   const [status, setStatus] = useState('loading');
+  // The loading poster is the scene's own first frame (scripts/render-poster.mjs), placed with the
+  // engine's hero framing so the 3D cross-fades in over it without a jump.
+  useEffect(() => {
+    const place = () => {
+      const img = poster.current, stage = host.current;
+      if (!img || !stage) return;
+      const width = stage.clientWidth, height = stage.clientHeight, meta = width < 760 ? posterMeta.mobile : posterMeta.desktop;
+      const frame = heroFrame(width, height, document.querySelector('#signal .story-copy')?.getBoundingClientRect().bottom ?? null);
+      const f = height / (60 * frame.lens) / meta.unit;
+      img.style.width = `${(meta.w * f).toFixed(1)}px`;
+      img.style.transform = `translate(${(width / 2 - meta.tx * f).toFixed(1)}px,${(frame.center - meta.ty * f).toFixed(1)}px)`;
+    };
+    place();
+    document.fonts?.ready.then(place);
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, []);
   const initialAnchorHandled = useRef(false);
   useEffect(() => {
     if (status === 'loading' || initialAnchorHandled.current) return;
@@ -145,6 +166,7 @@ export function CampusStage({ lang, selected, onChapter }: { lang: Lang; selecte
   }, [onChapter]);
   // A named group: the scene's live parts (loading status, data panels) stay reachable inside it.
   return <div ref={host} className={`campus-stage campus-${status}`} role="group" aria-label={n.stage}>
+    {!dataSaver() && <picture><source media="(max-width: 759px)" srcSet={posterMobile} /><img ref={poster} className="campus-poster" src={posterDesktop} alt="" decoding="async" /></picture>}
     <div className="campus-shade" />
     <div className="hero-shade" />
     <div className="finale-shade" />

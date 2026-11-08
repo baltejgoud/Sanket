@@ -4,7 +4,7 @@ body { background:#090b09 }
 .campus-stage { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:#090b09 }
 .campus-stage canvas { width:100%; height:100%; opacity:0; transition:opacity 1s }
 .campus-ready canvas { opacity:1 }
-.campus-shade { position:absolute; inset:0; background:linear-gradient(90deg,#090b09 0%,#090b09f5 14%,#090b0994 30%,transparent 53%),linear-gradient(0deg,#090b09b3,transparent 18%,transparent 90%,#090b094d) }
+.campus-shade { position:absolute; inset:0 }
 .campus-load { position:absolute; right:16%; top:50%; color:#aaa99f; font-size:13px; max-width:280px }
 .campus-ready .campus-load { display:none }
 .campus-fallback .campus-caption { display:none }
@@ -18,11 +18,8 @@ body { background:#090b09 }
 .campus-caption { position:absolute; left:var(--gutter); right:var(--gutter); bottom:29px; display:flex; justify-content:space-between; color:#bdbeb0; font:10px/1.5 var(--font-mono); letter-spacing:.12em }
 .campus-caption span:first-child { color:#e3e1d7 }
 .campus-story { position:relative; z-index:2; pointer-events:none }
-.story-section { position:relative; height:155svh; scroll-margin-top:0 }
-.opening { height:145svh }
+.story-section { position:relative; scroll-margin-top:0 }
 .opening .story-sticky { align-items:flex-start; padding-top:14svh }
-.decision-section { height:220svh }
-.contact-section { height:105svh }
 .story-sticky { position:sticky; top:0; height:100svh; min-height:620px; display:flex; align-items:center; padding:100px var(--gutter) 85px }
 .story-copy { width:37%; max-width:600px; pointer-events:auto }
 .hero-copy { width:46%; max-width:740px }
@@ -78,9 +75,9 @@ body { background:#090b09 }
   :root { --header-clear:70px }
   .site-header { grid-template-columns:1fr auto }
   .brand-word { font-size:17px } .brand-deva { display:inline; font-size:16px }
-  .chapter-nav,.header-actions>.lang-switch,.header-actions>.talk,.header-actions>.jump { display:none }
+  .chapter-nav,.header-actions>.lang-switch,.header-actions>.jump { display:none }
+  .header-actions>.talk { display:inline-flex; min-height:40px; padding:0 13px; font-size:12px; gap:0 } .header-actions>.talk svg { display:none }
   .header-actions .motion-toggle,.header-actions .menu-button { display:grid; min-width:44px; min-height:44px; place-items:center }
-  .story-section { height:145svh } .decision-section { height:200svh } .contact-section { height:115svh }
   .story-sticky { min-height:700px; padding:110px var(--gutter) 60px; align-items:flex-start }
   .opening .story-sticky { padding-top:110px }
   .story-copy,.hero-copy { width:100%; max-width:480px }
@@ -90,10 +87,7 @@ body { background:#090b09 }
   .story-eyebrow { font-size:8px; letter-spacing:.1em; margin-bottom:18px; gap:9px }
   .story-lead,.hero-copy .story-lead { font-size:15px; max-width:350px; margin-top:17px; line-height:1.5 }
   .campus-button { font-size:11px; gap:8px; min-height:45px; padding:6px 15px } .campus-button svg { width:17px }
-  .campus-shade { background:linear-gradient(180deg,#090b09 0%,#090b09 30%,#090b09ed 48%,#090b0955 62%,transparent 75%,#090b0977) }
-  .campus-label { font-size:10px; padding:7px 9px; max-width:170px; border-radius:5px }
-  .campus-label small { font-size:6px }
-  .campus-caption { bottom:20px; font-size:7px; letter-spacing:.08em } .campus-load { right:24px; top:72% }
+  .campus-caption { letter-spacing:.08em }
   .text-action { font-size:12px; margin-top:12px; padding-block:7px }
   .campus-contact { margin-top:20px } .campus-contact a { padding:12px 0 } .campus-contact strong { font-size:13px } .campus-contact small { font-size:10px }
   .campus-footer { bottom:50px; font-size:8px; gap:10px; flex-wrap:wrap } .campus-footer small { width:100%; margin-left:0; font-size:8px }
@@ -104,18 +98,19 @@ html.is-calm { scroll-behavior:auto }
 /* Scroll story: a centered caption and one shared, full-width stage. */
 .campus-stage { --scene-reveal:0 }
 .campus-ready canvas { opacity:var(--scene-reveal); transition:none }
-.campus-shade { background:linear-gradient(180deg,#090b09 0%,#090b09 29%,#090b09b0 38%,transparent 52%,transparent 85%,#090b09 100%) }
 .campus-stage[data-story-chapter=signal] .campus-label,
 .campus-stage[data-story-chapter=signal] .campus-caption,
 .campus-stage[data-story-chapter=contact] .campus-caption { display:none }
-.campus-caption { bottom:19px; font-size:8px }
-.campus-label { font-size:11px; padding:9px 12px; pointer-events:none }
-.campus-label small { font-size:7px }
-.campus-load { left:50%; right:auto; top:70%; transform:translateX(-50%); text-align:center }
-.campus-story .story-section { height:165svh }
-.campus-story .opening { height:150svh }
-.campus-story .problem-section { height:190svh }
-.campus-story .decision-section { height:230svh }
+.campus-label { pointer-events:none }
+.campus-load { left:50%; right:auto; top:auto; bottom:22px; transform:translateX(-50%); text-align:center; font:10px/1.5 var(--font-mono); letter-spacing:.1em }
+/* The poster holds the hero shot while three.js loads, then fades as the canvas fades in (CampusStage.tsx). */
+.campus-poster { position:absolute; top:0; left:0; max-width:none; height:auto; transform-origin:0 0; pointer-events:none; opacity:var(--hero,1) }
+.campus-ready .campus-poster { opacity:0; transition:opacity 1.4s }
+/* Scroll lengths: a one-screen sticky hold plus about 80% of a screen per scene (was ~27 screens, now ~20). */
+.campus-story .opening { height:135svh }
+.campus-story .warehouse-section { height:260svh }
+.campus-story .problem-section { height:345svh }
+.campus-story .solution-section,.campus-story .decision-section { height:500svh }
 .campus-story .story-sticky { min-height:0; height:100svh; padding:110px var(--gutter) 70px; align-items:flex-start; justify-content:center }
 .campus-story .story-copy { width:100%; max-width:1000px; text-align:center }
 .campus-story .story-eyebrow { justify-content:center; margin-bottom:16px; text-transform:uppercase; font-size:9px; letter-spacing:.16em }
@@ -147,6 +142,7 @@ html.is-calm { scroll-behavior:auto }
 .chapter-nav a { font-size:12px; padding-inline:9px }
 .chapter-nav a>.mono { display:none }
 @media(max-width:1000px) { .brand-deva { display:none } .header-actions { gap:6px } .chapter-nav a { font-size:10px; padding-inline:6px } }
+@media(max-width:400px) { .header-actions>.motion-toggle { display:none } .header-actions>.talk { padding:0 11px; font-size:11px } }
 @media(max-width:759px) {
   .campus-story .story-sticky { padding:100px 22px 50px }
   .campus-story .story-copy h2 { font-size:34px; line-height:1.08 }
@@ -155,9 +151,6 @@ html.is-calm { scroll-behavior:auto }
   .campus-story .story-eyebrow { font-size:8px; margin-bottom:13px }
   .campus-story .hero-copy h1 { font-size:clamp(42px,9.7vw,72px); letter-spacing:-.05em }
   .campus-story .hero-copy .story-lead { font-size:15px; margin-top:24px; max-width:370px }
-  .campus-shade { background:linear-gradient(180deg,#090b09 0%,#090b09 31%,#090b09a0 42%,transparent 54%,transparent 86%,#090b09 100%) }
-  .campus-label { font-size:9px; padding:7px 9px; max-width:160px }
-  .campus-label small { font-size:6px }
   .campus-caption { font-size:6px; left:18px; right:18px; bottom:20px; gap:20px }
   .campus-caption span:last-child { display:none }
   .campus-contact { grid-template-columns:1fr; gap:0; margin-top:25px; max-width:420px }
@@ -183,10 +176,6 @@ html.is-calm { scroll-behavior:auto }
 .campus-story .story-copy { opacity:var(--caption-opacity,1) }
 .campus-fallback ~ .campus-story .story-copy { opacity:1 }
 /* Cinematic chapters: one page of scroll per beat, with settled camera holds. */
-.campus-story .warehouse-section { height:340svh }
-.campus-story .problem-section { height:550svh }
-.campus-story .solution-section { height:550svh }
-.campus-story .decision-section { height:850svh }
 .campus-story .story-section:not(.opening):not(.contact-section) .story-sticky { padding-top:105px; padding-bottom:0 }
 .campus-story .story-section:not(.opening):not(.contact-section) .story-copy { max-width:1150px }
 .campus-story .story-section:not(.opening):not(.contact-section) .story-copy h2 { font-size:clamp(34px,3.6vw,56px); line-height:1.06 }
@@ -209,9 +198,6 @@ html.is-calm { scroll-behavior:auto }
 .lang-hi .card-heading h3,.lang-te .card-heading h3 { line-height:1.4; letter-spacing:0; font-size:26px }
 @keyframes card-arrival { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
 @media(max-width:759px) {
-  .campus-story .warehouse-section { height:340svh }
-  .campus-story .problem-section,.campus-story .solution-section { height:550svh }
-  .campus-story .decision-section { height:850svh }
   .campus-story .story-section:not(.opening):not(.contact-section) .story-sticky { padding:88px 20px 0 }
   .campus-story .story-section:not(.opening):not(.contact-section) .story-copy h2 { font-size:29px; line-height:1.08 }
   .campus-story .story-section:not(.opening):not(.contact-section) .story-lead { display:none }
@@ -251,9 +237,6 @@ html.is-calm { scroll-behavior:auto }
 /* Opaque once scrolled: at 96% the copy passing under the logo still showed through on phones. */
 .site-header.is-scrolled { backdrop-filter:none; background:#090b09; border-bottom-color:#1d221b }
 
-/* Product recommendations get the same visual weight as the problem. */
-.campus-story .solution-section { height:800svh }
-.campus-story .decision-section { height:650svh }
 .story-detail-card.with-brief { grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) minmax(190px,.72fr); gap:28px; padding:25px 28px }
 .with-brief .card-heading h3 { font-size:clamp(23px,1.9vw,29px) }
 .with-brief .card-explanation>p { font-size:14px; line-height:1.65 }
@@ -265,6 +248,7 @@ html.is-calm { scroll-behavior:auto }
 .solution-brief svg { width:100%; height:28px }
 .solution-brief .brief-review { font-size:9px; line-height:1.4; color:#a9bbab; margin:3px 0 0 }
 .card-actions button { min-height:44px }
+.card-actions>.card-more { display:none }
 @media(max-width:1000px) and (min-width:760px) {
   .story-detail-card.with-brief { grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:18px }
   .solution-brief { grid-column:1/-1; border-left:0; border-top:1px solid #4c6c59; padding:12px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:5px 20px }
@@ -334,7 +318,7 @@ html.is-calm { scroll-behavior:auto }
 .campus-fallback ~ .campus-story .card-progress,
 .campus-fallback ~ .campus-story [data-scene-focus],
 .campus-fallback ~ .campus-story .story-controls-hint { display:none }
-.campus-fallback ~ .campus-story .card-actions>button:not([data-scene-focus]) { display:inline-flex }
+.campus-fallback ~ .campus-story .card-actions>button:not([data-scene-focus]):not(.card-more) { display:inline-flex }
 @media(max-width:759px) {
   .hero-paths { gap:6px 22px; margin-top:20px }
   .hero-shortcut,.hero-paths .story-begin { font-size:12px }

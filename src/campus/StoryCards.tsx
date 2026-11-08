@@ -6,7 +6,7 @@ import { storyCopy } from './storyCopy';
 import { BEAT_COUNTS } from './timeline';
 import { track } from '../lib/analytics';
 import { cardDetails } from './cardDetails';
-import type { PointerEvent } from 'react';
+import { useState, type PointerEvent } from 'react';
 
 /** A shareable scene address: #problems/2 is the second scene of “The problem”. */
 export const SCENE_HASH = /^#(warehouse|problems|forecast|decide)\/(\d+)$/;
@@ -95,6 +95,9 @@ export function StoryCards({ chapter, lang, openTool }: { chapter: Chapter; lang
   // Scene steppers are groups, not landmarks; the chapter name tells the four apart.
   const chapterName = storyCopy[lang].chapters[{ warehouse: 1, problems: 2, forecast: 3, decide: 4 }[chapter]];
   const next = lang === 'hi' ? 'अगला दृश्य' : lang === 'te' ? 'తదుపరి దృశ్యం' : 'Next scene';
+  // Phones show a short card over the scene; “More” opens the full explanation (and keeps it open for later scenes).
+  const [expanded, setExpanded] = useState(false);
+  const more = expanded ? (lang === 'hi' ? 'कम दिखाएँ' : lang === 'te' ? 'తక్కువ చూపు' : 'Less') : (lang === 'hi' ? 'और पढ़ें' : lang === 'te' ? 'మరింత చదవండి' : 'More');
   const goToScene = (index: number) => {
     track('scene_stepped', { chapter, scene: index + 1 });
     const section = document.getElementById(chapter)!;
@@ -106,13 +109,14 @@ export function StoryCards({ chapter, lang, openTool }: { chapter: Chapter; lang
     const calm = document.documentElement.classList.contains('is-calm') || matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: target, behavior: calm ? 'instant' : 'smooth' });
   };
-  return <div className="story-card-deck" data-card-deck={chapter}>
+  return <div className="story-card-deck" data-card-deck={chapter} data-expanded={expanded}>
     {items.map(([eyebrow, title, body], i) => <article key={i} className={`story-detail-card${chapter === 'forecast' ? ' with-brief' : ''}`} data-card-index={i} hidden={i !== 0} onPointerMove={light}>
       <div className="model-cue"><ScanLine size={16} aria-hidden="true" /><span><b>{guide.model}</b>{guide.cues[chapter][i]}</span><span className="card-fact">{detail.facts[chapter][i]}</span></div>
       <div className="card-heading"><p className="card-kicker">{eyebrow}<span className="card-scene-count" aria-hidden="true">{String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}</span></p><h3>{title}</h3><div role="group" className="card-progress" aria-label={`${chapterName} · ${guide.scene} ${i + 1} / ${items.length}`}>{items.map((item, j) => <button key={j} data-scene-focus={`step-${j}`} onClick={() => goToScene(j)} aria-label={`${guide.scene} ${j + 1}: ${item[1]}`} aria-current={j === i ? 'step' : undefined} data-complete={j < i}><span>{String(j + 1).padStart(2, '0')}</span><small aria-hidden="true">{detail.steps[chapter][j]}</small></button>)}</div></div>
       <div className="card-explanation"><p>{body}</p><div className="card-actions">
         <button data-scene-focus="previous" onClick={() => goToScene(i - 1)} disabled={i === 0} aria-label={guide.previous}><ArrowLeft size={17} aria-hidden="true" /></button>
         <button data-scene-focus="next" onClick={() => goToScene(i + 1)}>{i === items.length - 1 ? guide.nextChapter : next}<ArrowDown size={17} aria-hidden="true" /></button>
+        <button className="card-more" aria-expanded={expanded} onClick={() => setExpanded(e => !e)}>{more}</button>
         {openTool && chapter === 'forecast' && i === 0 && <button onClick={() => openTool(2)}>{lang === 'hi' ? 'कनेक्शन देखें' : lang === 'te' ? 'కనెక్షన్లు చూడండి' : 'Explore connections'}<ArrowUpRight size={17} aria-hidden="true" /></button>}
         {openTool && chapter === 'problems' && i === 2 && <button onClick={() => openTool(1)}>{lang === 'hi' ? 'संभावित लाभ देखें' : lang === 'te' ? 'ప్రయోజనం అంచనా వేయండి' : 'Estimate the impact'}<ArrowUpRight size={17} aria-hidden="true" /></button>}
         {openTool && chapter === 'forecast' && (i === 1 || i === items.length - 1) && <button onClick={() => openTool(0)}>{lang === 'hi' ? 'पूर्वानुमान आज़माएँ' : lang === 'te' ? 'ఫోర్‌కాస్ట్ చూడండి' : 'Try a forecast'}<ArrowUpRight size={17} aria-hidden="true" /></button>}

@@ -37,7 +37,13 @@ try {
       console.log(JSON.stringify({ width, lang, chapter, fraction, ...layout }));
     }
     if (lang === 'en') {
-      await page.getByRole('button', { name: 'Try a forecast', exact: true }).click();
+      // Phones keep tool links behind the card's "More" while the 3D runs.
+      const card = page.locator('#forecast .story-detail-card:not([hidden])');
+      if (width < 760) {
+        await card.locator('.card-more').evaluate(b => b.click());
+        assert.equal(await card.locator('.card-more').getAttribute('aria-expanded'), 'true');
+      }
+      await card.getByRole('button', { name: 'Try a forecast', exact: true }).click();
       await page.waitForSelector('dialog[open]');
       await page.getByRole('button', { name: 'Close tool', exact: true }).click();
       assert.equal(await page.locator('dialog[open]').count(), 0);

@@ -130,6 +130,26 @@
   .source-chip { font-size: 9px; padding: 4px 8px }
 }
 
+/* ---------- Phones: a short reading card, so the scene gets over half the screen ---------- */
+@media (max-width: 759px) {
+  .campus-ready ~ .campus-story .story-card-deck { bottom: calc(19px + env(safe-area-inset-bottom)) }
+  .campus-ready ~ .campus-story .story-detail-card { row-gap: 6px; padding: 13px 16px 11px }
+  .campus-ready ~ .campus-story .story-detail-card .card-progress { display: none }
+  .campus-ready ~ .campus-story .card-kicker { margin-bottom: 4px }
+  .campus-ready ~ .campus-story .card-heading h3 { font-size: 19px; line-height: 1.16 }
+  .campus-ready ~ .campus-story:is(.lang-hi, .lang-te) .card-heading h3 { font-size: 17px; line-height: 1.4 }
+  .campus-ready ~ .campus-story .card-actions { margin-top: 7px }
+  .campus-ready ~ .campus-story .story-section:not(.opening):not(.contact-section) .story-copy h2 { font-size: 24px }
+  .campus-ready ~ .campus-story:is(.lang-hi, .lang-te) .story-section:not(.opening):not(.contact-section) .story-copy h2 { font-size: 22px }
+  .campus-ready ~ .campus-story .card-actions > .card-more { display: inline-flex; margin-left: auto; color: #d7dfcc; border-bottom: 1px solid #667258 }
+  /* Collapsed: the cue, the figures column and the tool links wait behind "More"; the text keeps three lines. */
+  .campus-ready ~ .campus-story [data-expanded=false] .model-cue { display: none }
+  .campus-ready ~ .campus-story [data-expanded=false] .card-explanation > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden }
+  .campus-ready ~ .campus-story [data-expanded=false] .card-actions > button:not([data-scene-focus]):not(.card-more) { display: none }
+  .campus-ready ~ .campus-story [data-expanded=false] .solution-brief { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; border: 0 }
+  .campus-ready .campus-caption { font-size: 7px; bottom: 5px }
+}
+
 .is-calm :is(.gap-hole, .source-chip > i, .rack-chip, .out-stamp, .price-tag) { animation: none !important }
 .is-calm .out-stamp { opacity: .92; scale: 1 }
 @media (prefers-reduced-motion: reduce) {
